@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="PortManager.Views.DeleteRulePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:PortManager.Models">
+
+    <Grid Padding="32,24,32,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="删除端口规则 / Delete rule" Style="{StaticResource PageTitle}"/>
+            <TextBlock Text="选择要删除的规则，或手动输入规则名称 / Select a rule or enter its exact name" Opacity="0.6" Margin="0,0,0,16" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- 手动输入删除 -->
+        <Border Grid.Row="1" Style="{StaticResource CardPanel}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox x:Name="ManualNameInput" PlaceholderText="输入规则名称精确匹配" Width="300"/>
+                <Button x:Name="DeleteManualBtn" Content="删除 / Delete" Style="{ThemeResource AccentButtonStyle}" Click="DeleteManual_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 规则列表 + 删除按钮 -->
+        <ListView
+            Grid.Row="2"
+            x:Name="RulesList"
+            SelectionMode="None">
+
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="models:FirewallRule">
+                    <Border Style="{StaticResource CardPanel}" Margin="0,0,0,8" Padding="16,12,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="{x:Bind Name}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="1" Text="{x:Bind DirectionDisplay}" FontSize="12" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.7"/>
+                            <TextBlock Grid.Column="2" Text="{x:Bind ProtocolDisplay}" FontSize="12" VerticalAlignment="Center" Margin="8,0,0,0" Opacity="0.7"/>
+                            <TextBlock Grid.Column="3" Text="{x:Bind LocalPort}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="#E8710A"/>
+                            <Button Grid.Column="4" Content="删除 / Delete" Click="DeleteItem_Click" Tag="{x:Bind Name}" Margin="12,0,0,0" Style="{ThemeResource AccentButtonStyle}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+            <ListView.EmptyContent>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                    <FontIcon Glyph="&#xE7B3;" FontSize="40" Opacity="0.3"/>
+                    <TextBlock Text="暂无可删除的规则" Opacity="0.5"/>
+                </StackPanel>
+            </ListView.EmptyContent>
+        </ListView>
+    </Grid>
+</Page>

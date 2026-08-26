@@ -1,0 +1,86 @@
+name: Build Port Manager
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x86
+            platform: x86
+          - rid: win-x64
+            platform: x64
+          - rid: win-arm64
+            platform: ARM64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Test
+        run: dotnet test PortManager.Tests/PortManager.Tests.csproj --configuration Release
+      - name: Restore
+        run: dotnet restore PortManager.csproj -p:Platform=${{ matrix.platform }}
+      - name: Build
+        run: dotnet build PortManager.csproj --configuration Release --no-restore -p:Platform=${{ matrix.platform }}
+      - name: Publish portable app
+        run: dotnet publish PortManager.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
+      - name: Zip portable app
+        shell: pwsh
+        run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/PortManager-${{ matrix.rid }}.zip
+      - name: Upload portable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PortManager-${{ matrix.rid }}
+          path: artifacts/PortManager-${{ matrix.rid }}.zip
+
+  msix:
+    runs-on: windows-latest
+    needs: build
+    strategy:
+      matrix:
+        include:
+          - rid: win-x86
+            platform: x86
+          - rid: win-x64
+            platform: x64
+          - rid: win-arm64
+            platform: ARM64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build MSIX package
+        run: dotnet publish PortManager.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=MSIX -p:GenerateAppxPackageOnBuild=true -o artifacts/msix/${{ matrix.platform }}
+      - name: Upload MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PortManager-MSIX-${{ matrix.platform }}
+          path: artifacts/msix/${{ matrix.platform }}/**/*.msix
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    needs: [build, msix]
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/**/*
