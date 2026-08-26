@@ -16,7 +16,8 @@ Windows Firewall port manager built with WinUI 3. The shell includes a bilingual
 
 ## 技术栈
 
-- **WinUI 3** (Windows App SDK 1.8+)
+- **Microsoft UI XAML / WinUI 3** (Windows App SDK 1.8+)
+- **Windows Community Toolkit 8.2** (`SettingsCard` / `SettingsExpander`)
 - **.NET 8** / C# 12
 - **Fluent Design** + Mica 材质
 - **netsh + PowerShell** 防火墙操作
@@ -43,7 +44,15 @@ Windows Firewall port manager built with WinUI 3. The shell includes a bilingual
 dotnet publish PortManager.csproj -c Release -r win-x64 --self-contained true -p:WindowsPackageType=None -o artifacts\win-x64
 ```
 
-将 `win-x64` 替换为 `win-x86` 或 `win-arm64` 即可生成对应架构。GitHub Actions 会对三种架构执行测试、构建，并上传 portable ZIP 和 MSIX 包。
+将 `win-x64` 替换为 `win-x86` 或 `win-arm64` 即可生成对应架构。GitHub Actions 会先执行单元测试，再构建三种架构的 portable ZIP 和 Inno Setup 安装包，并在推送 `v*` 标签时创建 GitHub Release。
+
+发布产物：
+
+| 架构 | 免安装 | 安装包 |
+|---|---|---|
+| x86 | `PortManager-win-x86.zip` | `PortManager-Setup-x86.exe` |
+| x64 | `PortManager-win-x64.zip` | `PortManager-Setup-x64.exe` |
+| ARM64 | `PortManager-win-arm64.zip` | `PortManager-Setup-arm64.exe` |
 
 ## 项目结构
 

@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using PortManager.Models;
 using PortManager.Services;
 
@@ -23,6 +25,7 @@ public sealed partial class DeleteRulePage : Page
         foreach (var r in list)
             Rules.Add(r);
         RulesList.ItemsSource = Rules;
+        EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async void DeleteItem_Click(object sender, RoutedEventArgs e)
@@ -73,10 +76,12 @@ public sealed partial class DeleteRulePage : Page
     {
         var panel = new Border
         {
-            Background = success ? new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 0x27, 0xAE, 0x60)) : new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Color.FromArgb(255, 0xE7, 0x4C, 0x3C)),
+            Background = new SolidColorBrush(success
+                ? Microsoft.UI.ColorHelper.FromArgb(255, 0x27, 0xAE, 0x60)
+                : Microsoft.UI.ColorHelper.FromArgb(255, 0xE7, 0x4C, 0x3C)),
             CornerRadius = new CornerRadius(6),
             Padding = new Thickness(16, 8, 16, 8),
-            Child = new TextBlock { Text = message, Foreground = new Windows.UI.Xaml.Media.SolidColorBrush(Windows.UI.Colors.White) }
+            Child = new TextBlock { Text = message, Foreground = new SolidColorBrush(Microsoft.UI.Colors.White) }
         };
         // 简单提示：利用 ContentDialog
         var dialog = new ContentDialog

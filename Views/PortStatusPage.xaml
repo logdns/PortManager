@@ -60,5 +60,11 @@
             </ListView.ItemTemplate>
 
         </ListView>
+
+        <StackPanel x:Name="EmptyState" Grid.Row="2"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+            <FontIcon Glyph="&#xE721;" FontSize="40" Opacity="0.35"/>
+            <TextBlock x:Name="EmptyText" Text="输入端口号进行查询 / Enter a port to search" Opacity="0.65"/>
+        </StackPanel>
     </Grid>
 </Page>

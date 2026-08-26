@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -38,6 +39,11 @@ public sealed partial class PortStatusPage : Page
         var rules = await FirewallService.QueryPortAsync(port);
         foreach (var r in rules)
             Results.Add(r);
+
+        EmptyState.Visibility = rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        EmptyText.Text = rules.Count == 0
+            ? $"未找到端口 {port} 的规则 / No rules found for port {port}"
+            : string.Empty;
 
         SearchBtn.IsEnabled = true;
         SearchBtn.Content = "查询 / Search";

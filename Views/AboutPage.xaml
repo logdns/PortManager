@@ -34,6 +34,7 @@
                 <StackPanel Spacing="4">
                     <TextBlock Text="技术栈" Style="{StaticResource SectionTitle}"/>
                     <TextBlock Text="• WinUI 3 (Windows App SDK)" Opacity="0.7" Margin="0,4,0,0"/>
+                    <TextBlock Text="• Windows Community Toolkit" Opacity="0.7" Margin="0,4,0,0"/>
                     <TextBlock Text="• .NET 8 / C# 12" Opacity="0.7" Margin="0,4,0,0"/>
                     <TextBlock Text="• Fluent Design / Mica 材质" Opacity="0.7" Margin="0,4,0,0"/>
                     <TextBlock Text="• netsh + PowerShell 防火墙操作" Opacity="0.7" Margin="0,4,0,0"/>

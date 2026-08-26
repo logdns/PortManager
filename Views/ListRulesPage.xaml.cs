@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PortManager.Models;
@@ -28,6 +31,7 @@ public sealed partial class ListRulesPage : Page
             Rules.Add(r);
 
         LoadingRing.IsActive = false;
+        EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -43,6 +47,8 @@ public sealed partial class ListRulesPage : Page
 
         foreach (var r in filtered)
             Rules.Add(r);
+
+        EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void RefreshButton_Click(object sender, RoutedEventArgs e)

@@ -1,5 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using PortManager.Services;
 
 namespace PortManager.Views;
@@ -11,7 +13,7 @@ public sealed partial class AddPortPage : Page
         this.InitializeComponent();
     }
 
-    private void PortInput_KeyDown(object sender, Input.KeyRoutedEventArgs e)
+    private void PortInput_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         UpdatePreview();
     }
@@ -70,7 +72,9 @@ public sealed partial class AddPortPage : Page
         // 显示结果
         ResultPanel.Visibility = Visibility.Visible;
         ResultTitle.Text = result.Success ? "添加成功" : "部分失败";
-        ResultTitle.Foreground = result.Success ? new Windows.UI.Color { R = 0x27, G = 0xAE, B = 0x60 } : new Windows.UI.Color { R = 0xE7, G = 0x4C, B = 0x3C };
+        ResultTitle.Foreground = new SolidColorBrush(result.Success
+            ? Microsoft.UI.ColorHelper.FromArgb(255, 0x27, 0xAE, 0x60)
+            : Microsoft.UI.ColorHelper.FromArgb(255, 0xE7, 0x4C, 0x3C));
         ResultDetail.Text = result.Message + $"\n规则名: {ruleName} | 端口: {port} | 协议: {protocol}";
     }
 

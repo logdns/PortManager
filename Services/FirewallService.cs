@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using PortManager.Models;
 
 namespace PortManager.Services;
@@ -60,13 +64,7 @@ Get-NetFirewallRule -Action Allow -Direction Inbound,Outbound |
     public static async Task<List<FirewallRule>> QueryPortAsync(int port)
     {
         var all = await ListRulesAsync();
-        return all.Where(r =>
-        {
-            // LocalPort 可能是 "3389"、"3389-3400"、"RPC" 等
-            if (int.TryParse(r.LocalPort, out var p))
-                return p == port;
-            return r.LocalPort.Contains(port.ToString());
-        }).ToList();
+        return all.Where(r => PortRangeMatcher.Matches(r.LocalPort, port)).ToList();
     }
 
     /// <summary>
@@ -110,8 +108,8 @@ Get-NetFirewallRule -Action Allow -Direction Inbound,Outbound |
     /// </summary>
     public static async Task<bool> DeleteRuleAsync(string ruleName)
     {
-        var args = $"advfirewall firewall delete rule name=\"{ruleName}\"";
-        var (exitCode, _) = await RunNetshAsync(args);
+        var (exitCode, _) = await RunNetshAsync(
+            "advfirewall", "firewall", "delete", "rule", $"name={ruleName}");
         return exitCode == 0;
     }
 
@@ -133,9 +131,10 @@ Get-NetFirewallRule -Action Allow -Direction Inbound,Outbound |
     private static async Task<bool> AddSingleRuleAsync(
         string name, int port, string protocol, string direction)
     {
-        var args = $"advfirewall firewall add rule name=\"{name}\" dir={direction} " +
-                   $"action=allow protocol={protocol} localport={port} profile=any";
-        var (exitCode, _) = await RunNetshAsync(args);
+        var (exitCode, _) = await RunNetshAsync(
+            "advfirewall", "firewall", "add", "rule",
+            $"name={name}", $"dir={direction}", "action=allow",
+            $"protocol={protocol}", $"localport={port}", "profile=any");
         return exitCode == 0;
     }
 
@@ -144,36 +143,46 @@ Get-NetFirewallRule -Action Allow -Direction Inbound,Outbound |
         var psi = new ProcessStartInfo
         {
             FileName = "powershell.exe",
-            Arguments = $"-NoProfile -Command \"{script.Replace("\"", "\\\"")}\"",
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             CreateNoWindow = true
         };
+        psi.ArgumentList.Add("-NoProfile");
+        psi.ArgumentList.Add("-NonInteractive");
+        psi.ArgumentList.Add("-Command");
+        psi.ArgumentList.Add(script);
 
         using var p = Process.Start(psi);
         if (p == null) return string.Empty;
-        var output = await p.StandardOutput.ReadToEndAsync();
+        var outputTask = p.StandardOutput.ReadToEndAsync();
+        var errorTask = p.StandardError.ReadToEndAsync();
         await p.WaitForExitAsync();
-        return output;
+        var output = await outputTask;
+        _ = await errorTask;
+        return p.ExitCode == 0 ? output : string.Empty;
     }
 
-    private static async Task<(int exitCode, string output)> RunNetshAsync(string arguments)
+    private static async Task<(int exitCode, string output)> RunNetshAsync(params string[] arguments)
     {
         var psi = new ProcessStartInfo
         {
             FileName = "netsh.exe",
-            Arguments = arguments,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             CreateNoWindow = true
         };
+        foreach (var argument in arguments)
+            psi.ArgumentList.Add(argument);
 
         using var p = Process.Start(psi);
         if (p == null) return (-1, string.Empty);
-        var output = await p.StandardOutput.ReadToEndAsync();
+        var outputTask = p.StandardOutput.ReadToEndAsync();
+        var errorTask = p.StandardError.ReadToEndAsync();
         await p.WaitForExitAsync();
-        return (p.ExitCode, output);
+        var output = await outputTask;
+        var error = await errorTask;
+        return (p.ExitCode, string.IsNullOrWhiteSpace(output) ? error : output);
     }
 }

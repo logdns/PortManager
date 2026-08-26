@@ -71,5 +71,11 @@
             </ListView.ItemTemplate>
 
         </ListView>
+
+        <StackPanel x:Name="EmptyState" Grid.Row="2" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+            <FontIcon Glyph="&#xE7B3;" FontSize="40" Opacity="0.35"/>
+            <TextBlock Text="暂无端口规则 / No port rules" Opacity="0.65"/>
+        </StackPanel>
     </Grid>
 </Page>
