@@ -1,61 +1,47 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Runtime.InteropServices;
 using PortManager.Models;
 
 namespace PortManager.Services;
 
 public static class FirewallService
 {
-    private const string ListRulesScript = """
-        $ErrorActionPreference = 'Stop'
-        $ProgressPreference = 'SilentlyContinue'
-        [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-
-        Get-NetFirewallRule -Action Allow -Enabled True -ErrorAction Stop |
-          ForEach-Object {
-            $rule = $_
-            $rule | Get-NetFirewallPortFilter -ErrorAction Stop |
-              ForEach-Object {
-                $filter = $_
-                $localPort = [string]$filter.LocalPort
-                $remotePort = [string]$filter.RemotePort
-                if (($localPort -and $localPort -ne 'Any') -or
-                    ($remotePort -and $remotePort -ne 'Any')) {
-                  $protocol = switch ([string]$filter.Protocol) {
-                    '6' { 'TCP' }
-                    '17' { 'UDP' }
-                    '256' { 'Any' }
-                    default { [string]$filter.Protocol }
-                  }
-
-                  [PSCustomObject]@{
-                    Name = [string]$rule.DisplayName
-                    Dir = [string]$rule.Direction
-                    Proto = $protocol
-                    LocalPort = $localPort
-                    RemotePort = $remotePort
-                    Profile = [string]$rule.Profile
-                    Enabled = [string]$rule.Enabled
-                  }
-                }
-              }
-          } | ConvertTo-Json -Depth 3 -Compress
-        """;
+    private const int ActionAllow = 1;
+    private const int DirectionInbound = 1;
+    private const int DirectionOutbound = 2;
+    private const int ProtocolTcp = 6;
+    private const int ProtocolUdp = 17;
+    private const int AllProfiles = int.MaxValue;
+    private const int FileNotFoundHResult = unchecked((int)0x80070002);
+    private const int ElementNotFoundHResult = unchecked((int)0x80070490);
+    private static readonly TimeSpan CacheLifetime = TimeSpan.FromSeconds(3);
+    private static readonly SemaphoreSlim OperationGate = new(1, 1);
+    private static List<FirewallRule>? _cachedRules;
+    private static DateTime _cacheExpiresUtc;
 
     public static async Task<List<FirewallRule>> ListRulesAsync()
     {
-        var output = await RunPowerShellAsync(ListRulesScript);
-        return ParseRulesJson(output);
+        await OperationGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (_cachedRules is not null && DateTime.UtcNow < _cacheExpiresUtc)
+                return new List<FirewallRule>(_cachedRules);
+
+            var rules = await RunNativeAsync(ListRulesCore, "Could not read Windows Firewall rules.")
+                .ConfigureAwait(false);
+            _cachedRules = rules;
+            _cacheExpiresUtc = DateTime.UtcNow.Add(CacheLifetime);
+            return new List<FirewallRule>(rules);
+        }
+        finally
+        {
+            OperationGate.Release();
+        }
     }
 
     public static async Task<List<FirewallRule>> QueryPortAsync(int port)
     {
-        var all = await ListRulesAsync();
+        var all = await ListRulesAsync().ConfigureAwait(false);
         return all.Where(rule =>
                 PortRangeMatcher.Matches(rule.LocalPort, port) ||
                 PortRangeMatcher.Matches(rule.RemotePort, port))
@@ -65,56 +51,44 @@ public static class FirewallService
     public static async Task<OperationResult> AddRuleAsync(
         int port, string protocol, string direction, string ruleName)
     {
-        var result = new OperationResult();
-        var protocols = protocol == "ANY" ? new[] { "TCP", "UDP" } : new[] { protocol };
-        var directions = direction switch
+        await OperationGate.WaitAsync().ConfigureAwait(false);
+        try
         {
-            "Both" => new[] { "in", "out" },
-            "out" => new[] { "out" },
-            _ => new[] { "in" }
-        };
-
-        var errors = new List<string>();
-        foreach (var dir in directions)
-        {
-            foreach (var proto in protocols)
-            {
-                var name = ruleName;
-                if (protocols.Length > 1)
-                    name += $"_{proto}";
-                if (directions.Length > 1)
-                    name += dir == "in" ? "_Inbound" : "_Outbound";
-                var (success, error) = await AddSingleRuleAsync(name, port, proto, dir);
-                if (success)
-                    result.SuccessCount++;
-                else
-                {
-                    result.FailedCount++;
-                    if (!string.IsNullOrWhiteSpace(error))
-                        errors.Add(error.Trim());
-                }
-            }
+            var result = await RunNativeAsync(
+                    () => AddRulesCore(port, protocol, direction, ruleName),
+                    "Could not add the Windows Firewall rule.")
+                .ConfigureAwait(false);
+            InvalidateCache();
+            return result;
         }
-
-        result.Success = result.FailedCount == 0;
-        result.Message = result.Success
-            ? $"Added {result.SuccessCount} firewall rule(s)."
-            : $"Added {result.SuccessCount}; failed {result.FailedCount}.";
-        result.ErrorMessage = string.Join(Environment.NewLine, errors.Distinct());
-        return result;
+        finally
+        {
+            OperationGate.Release();
+        }
     }
 
     public static async Task<bool> DeleteRuleAsync(string ruleName)
     {
-        var (exitCode, _) = await RunNetshAsync(
-            "advfirewall", "firewall", "delete", "rule", $"name={ruleName}");
-        return exitCode == 0;
+        await OperationGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            var deleted = await RunNativeAsync(
+                    () => DeleteRuleCore(ruleName),
+                    "Could not delete the Windows Firewall rule.")
+                .ConfigureAwait(false);
+            InvalidateCache();
+            return deleted;
+        }
+        finally
+        {
+            OperationGate.Release();
+        }
     }
 
     public static async Task<OperationResult> ModifyRuleAsync(
         string oldName, int port, string protocol, string direction, string newName)
     {
-        if (!await DeleteRuleAsync(oldName))
+        if (!await DeleteRuleAsync(oldName).ConfigureAwait(false))
         {
             return new OperationResult
             {
@@ -124,91 +98,225 @@ public static class FirewallService
             };
         }
 
-        return await AddRuleAsync(port, protocol, direction, newName);
+        return await AddRuleAsync(port, protocol, direction, newName).ConfigureAwait(false);
     }
 
-    internal static List<FirewallRule> ParseRulesJson(string output)
-    {
-        if (string.IsNullOrWhiteSpace(output))
-            return new List<FirewallRule>();
+    internal static FirewallRule CreateRuleModel(
+        string name,
+        int direction,
+        int protocol,
+        string? localPorts,
+        string? remotePorts,
+        int profiles,
+        bool enabled) => new()
+        {
+            Name = name,
+            Direction = direction == DirectionOutbound ? "Outbound" : "Inbound",
+            Protocol = protocol switch
+            {
+                ProtocolTcp => "TCP",
+                ProtocolUdp => "UDP",
+                256 => "Any",
+                _ => protocol.ToString(CultureInfo.InvariantCulture)
+            },
+            LocalPort = NormalizePorts(localPorts),
+            RemotePort = NormalizePorts(remotePorts),
+            Profile = FormatProfiles(profiles),
+            Enabled = enabled.ToString()
+        };
 
-        var json = output.Trim();
-        if (!json.StartsWith('['))
-            json = $"[{json}]";
+    internal static string NormalizePorts(string? value) =>
+        string.IsNullOrWhiteSpace(value) || value == "*" ? "Any" : value;
+
+    internal static bool HasSpecificPort(string value) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        !value.Equals("Any", StringComparison.OrdinalIgnoreCase) &&
+        value != "*";
+
+    private static List<FirewallRule> ListRulesCore()
+    {
+        object? policy = null;
+        object? rules = null;
+        var result = new List<FirewallRule>();
 
         try
         {
-            return JsonSerializer.Deserialize<List<FirewallRule>>(json) ?? new List<FirewallRule>();
+            policy = CreateComObject("HNetCfg.FwPolicy2");
+            rules = ((dynamic)policy).Rules;
+
+            foreach (object item in (dynamic)rules)
+            {
+                try
+                {
+                    dynamic rule = item;
+                    if (!(bool)rule.Enabled || (int)rule.Action != ActionAllow)
+                        continue;
+
+                    var localPorts = NormalizePorts((string?)rule.LocalPorts);
+                    var remotePorts = NormalizePorts((string?)rule.RemotePorts);
+                    if (!HasSpecificPort(localPorts) && !HasSpecificPort(remotePorts))
+                        continue;
+
+                    result.Add(CreateRuleModel(
+                        (string)rule.Name,
+                        (int)rule.Direction,
+                        (int)rule.Protocol,
+                        localPorts,
+                        remotePorts,
+                        (int)rule.Profiles,
+                        (bool)rule.Enabled));
+                }
+                catch (COMException)
+                {
+                    // A malformed third-party rule must not prevent the remaining rules from loading.
+                }
+                finally
+                {
+                    ReleaseComObject(item);
+                }
+            }
+
+            return result
+                .OrderBy(rule => rule.Name, StringComparer.CurrentCultureIgnoreCase)
+                .ToList();
         }
-        catch (JsonException ex)
+        finally
         {
-            throw new FirewallOperationException("Windows Firewall returned an unreadable response.", ex);
+            ReleaseComObject(rules);
+            ReleaseComObject(policy);
         }
     }
 
-    private static async Task<(bool success, string error)> AddSingleRuleAsync(
-        string name, int port, string protocol, string direction)
+    private static OperationResult AddRulesCore(
+        int port, string protocol, string direction, string ruleName)
     {
-        var portArgument = GetPortArgument(direction, port);
-        var (exitCode, output) = await RunNetshAsync(
-            "advfirewall", "firewall", "add", "rule",
-            $"name={name}", $"dir={direction}", "action=allow",
-            $"protocol={protocol}", portArgument, "profile=any", "enable=yes");
-        return (exitCode == 0, output);
+        object? policy = null;
+        object? rules = null;
+
+        try
+        {
+            policy = CreateComObject("HNetCfg.FwPolicy2");
+            rules = ((dynamic)policy).Rules;
+            var protocols = protocol == "ANY" ? new[] { "TCP", "UDP" } : new[] { protocol };
+            var directions = direction switch
+            {
+                "Both" => new[] { "in", "out" },
+                "out" => new[] { "out" },
+                _ => new[] { "in" }
+            };
+
+            var result = new OperationResult();
+            var errors = new List<string>();
+            foreach (var dir in directions)
+            {
+                foreach (var proto in protocols)
+                {
+                    var name = ruleName;
+                    if (protocols.Length > 1)
+                        name += $"_{proto}";
+                    if (directions.Length > 1)
+                        name += dir == "in" ? "_Inbound" : "_Outbound";
+
+                    try
+                    {
+                        AddSingleRule(rules, name, port, proto, dir);
+                        result.SuccessCount++;
+                    }
+                    catch (Exception ex)
+                    {
+                        result.FailedCount++;
+                        errors.Add(ex.Message);
+                    }
+                }
+            }
+
+            result.Success = result.FailedCount == 0;
+            result.Message = result.Success
+                ? $"Added {result.SuccessCount} firewall rule(s)."
+                : $"Added {result.SuccessCount}; failed {result.FailedCount}.";
+            result.ErrorMessage = string.Join(Environment.NewLine, errors.Distinct());
+            return result;
+        }
+        finally
+        {
+            ReleaseComObject(rules);
+            ReleaseComObject(policy);
+        }
     }
 
-    internal static string GetPortArgument(string direction, int port) =>
-        direction == "out" ? $"remoteport={port}" : $"localport={port}";
-
-    private static async Task<string> RunPowerShellAsync(string script)
+    private static void AddSingleRule(object rules, string name, int port, string protocol, string direction)
     {
-        var psi = CreateProcessStartInfo("powershell.exe");
-        psi.ArgumentList.Add("-NoLogo");
-        psi.ArgumentList.Add("-NoProfile");
-        psi.ArgumentList.Add("-NonInteractive");
-        psi.ArgumentList.Add("-EncodedCommand");
-        psi.ArgumentList.Add(Convert.ToBase64String(Encoding.Unicode.GetBytes(script)));
-
-        var (exitCode, output, error) = await RunProcessAsync(psi);
-        if (exitCode != 0)
-            throw new FirewallOperationException(BuildProcessError("PowerShell firewall query failed", error, output));
-
-        return output;
+        object? ruleObject = null;
+        try
+        {
+            ruleObject = CreateComObject("HNetCfg.FWRule");
+            dynamic rule = ruleObject;
+            rule.Name = name;
+            rule.Description = "Managed by Port Manager";
+            rule.Grouping = "Port Manager";
+            rule.Protocol = protocol == "UDP" ? ProtocolUdp : ProtocolTcp;
+            rule.Direction = direction == "out" ? DirectionOutbound : DirectionInbound;
+            if (direction == "out")
+                rule.RemotePorts = port.ToString(CultureInfo.InvariantCulture);
+            else
+                rule.LocalPorts = port.ToString(CultureInfo.InvariantCulture);
+            rule.Enabled = true;
+            rule.Profiles = AllProfiles;
+            rule.Action = ActionAllow;
+            ((dynamic)rules).Add(rule);
+        }
+        finally
+        {
+            ReleaseComObject(ruleObject);
+        }
     }
 
-    private static async Task<(int exitCode, string output)> RunNetshAsync(params string[] arguments)
+    private static bool DeleteRuleCore(string ruleName)
     {
-        var psi = CreateProcessStartInfo("netsh.exe");
-        foreach (var argument in arguments)
-            psi.ArgumentList.Add(argument);
+        object? policy = null;
+        object? rules = null;
+        object? existingRule = null;
 
-        var (exitCode, output, error) = await RunProcessAsync(psi);
-        return (exitCode, string.IsNullOrWhiteSpace(error) ? output : error);
+        try
+        {
+            policy = CreateComObject("HNetCfg.FwPolicy2");
+            rules = ((dynamic)policy).Rules;
+            try
+            {
+                existingRule = ((dynamic)rules).Item(ruleName);
+            }
+            catch (COMException ex) when (IsNotFound(ex))
+            {
+                return false;
+            }
+
+            ((dynamic)rules).Remove(ruleName);
+            return true;
+        }
+        finally
+        {
+            ReleaseComObject(existingRule);
+            ReleaseComObject(rules);
+            ReleaseComObject(policy);
+        }
     }
 
-    private static ProcessStartInfo CreateProcessStartInfo(string fileName) => new()
+    private static object CreateComObject(string programmaticId)
     {
-        FileName = fileName,
-        UseShellExecute = false,
-        RedirectStandardOutput = true,
-        RedirectStandardError = true,
-        StandardOutputEncoding = Encoding.UTF8,
-        StandardErrorEncoding = Encoding.UTF8,
-        CreateNoWindow = true
-    };
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException("Windows Firewall is available only on Windows.");
 
-    private static async Task<(int exitCode, string output, string error)> RunProcessAsync(ProcessStartInfo psi)
+        var type = Type.GetTypeFromProgID(programmaticId, throwOnError: false)
+            ?? throw new FirewallOperationException($"Windows component {programmaticId} is unavailable.");
+        return Activator.CreateInstance(type)
+            ?? throw new FirewallOperationException($"Windows component {programmaticId} could not be created.");
+    }
+
+    private static async Task<T> RunNativeAsync<T>(Func<T> operation, string failureMessage)
     {
         try
         {
-            using var process = Process.Start(psi);
-            if (process is null)
-                throw new FirewallOperationException($"Could not start {psi.FileName}.");
-
-            var outputTask = process.StandardOutput.ReadToEndAsync();
-            var errorTask = process.StandardError.ReadToEndAsync();
-            await process.WaitForExitAsync();
-            return (process.ExitCode, await outputTask, await errorTask);
+            return await Task.Run(operation).ConfigureAwait(false);
         }
         catch (FirewallOperationException)
         {
@@ -216,14 +324,35 @@ public static class FirewallService
         }
         catch (Exception ex)
         {
-            throw new FirewallOperationException($"Could not run {psi.FileName}.", ex);
+            throw new FirewallOperationException(failureMessage, ex);
         }
     }
 
-    private static string BuildProcessError(string prefix, string error, string output)
+    private static string FormatProfiles(int profiles)
     {
-        var detail = string.IsNullOrWhiteSpace(error) ? output : error;
-        return string.IsNullOrWhiteSpace(detail) ? prefix : $"{prefix}: {detail.Trim()}";
+        if (profiles == AllProfiles)
+            return "Any";
+
+        var names = new List<string>();
+        if ((profiles & 1) != 0) names.Add("Domain");
+        if ((profiles & 2) != 0) names.Add("Private");
+        if ((profiles & 4) != 0) names.Add("Public");
+        return names.Count == 0 ? profiles.ToString(CultureInfo.InvariantCulture) : string.Join(", ", names);
+    }
+
+    private static bool IsNotFound(COMException exception) =>
+        exception.HResult is FileNotFoundHResult or ElementNotFoundHResult;
+
+    private static void InvalidateCache()
+    {
+        _cachedRules = null;
+        _cacheExpiresUtc = DateTime.MinValue;
+    }
+
+    private static void ReleaseComObject(object? instance)
+    {
+        if (instance is not null && Marshal.IsComObject(instance))
+            Marshal.FinalReleaseComObject(instance);
     }
 }
 

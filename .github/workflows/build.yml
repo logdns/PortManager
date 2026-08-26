@@ -79,7 +79,7 @@ jobs:
           $publishDirectory = "artifacts/portable/${{ matrix.rid }}"
           $architecture = '${{ matrix.installer_arch }}'
           $instructions = @"
-          Port Manager 1.1.4
+          Port Manager 1.1.5
 
           Architecture: $architecture
 
@@ -102,6 +102,24 @@ jobs:
           $executable = Join-Path $pwd "artifacts/portable/win-x64/PortManager.exe"
           $logPath = Join-Path $env:LOCALAPPDATA "PortManager/startup.log"
           Remove-Item $logPath -Force -ErrorAction SilentlyContinue
+
+          Add-Type @'
+          using System;
+          using System.Runtime.InteropServices;
+          public static class PortManagerWindowTest
+          {
+              [DllImport("user32.dll")]
+              public static extern bool ShowWindowAsync(IntPtr window, int command);
+              [DllImport("user32.dll")]
+              public static extern bool IsIconic(IntPtr window);
+              [DllImport("user32.dll")]
+              public static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
+              [DllImport("user32.dll")]
+              public static extern IntPtr SendMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
+              [DllImport("user32.dll", EntryPoint = "GetClassLongPtrW")]
+              public static extern IntPtr GetClassLongPtr(IntPtr window, int index);
+          }
+          '@
 
           $process = Start-Process -FilePath $executable -PassThru
           try {
@@ -144,6 +162,41 @@ jobs:
                   throw "Application failed after loading the dashboard:`n$log"
                 }
               }
+            }
+
+            $process.Refresh()
+            $windowHandle = $process.MainWindowHandle
+            if ($windowHandle -eq [IntPtr]::Zero) {
+              throw "The application has no native main window handle."
+            }
+
+            $smallIcon = [PortManagerWindowTest]::SendMessage($windowHandle, 0x007F, [IntPtr]2, [IntPtr]::Zero)
+            if ($smallIcon -eq [IntPtr]::Zero) {
+              $smallIcon = [PortManagerWindowTest]::GetClassLongPtr($windowHandle, -34)
+            }
+            $largeIcon = [PortManagerWindowTest]::SendMessage($windowHandle, 0x007F, [IntPtr]1, [IntPtr]::Zero)
+            if ($largeIcon -eq [IntPtr]::Zero) {
+              $largeIcon = [PortManagerWindowTest]::GetClassLongPtr($windowHandle, -14)
+            }
+            if ($smallIcon -eq [IntPtr]::Zero -or $largeIcon -eq [IntPtr]::Zero) {
+              throw "The native window icon was not applied."
+            }
+
+            [PortManagerWindowTest]::ShowWindowAsync($windowHandle, 6) | Out-Null
+            Start-Sleep -Seconds 1
+            if (-not [PortManagerWindowTest]::IsIconic($windowHandle)) {
+              throw "The main window could not be minimized."
+            }
+
+            [PortManagerWindowTest]::ShowWindowAsync($windowHandle, 9) | Out-Null
+            [PortManagerWindowTest]::PostMessage($windowHandle, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
+            if (-not $process.WaitForExit(10000)) {
+              throw "The application did not exit within 10 seconds after WM_CLOSE."
+            }
+
+            $log = Get-Content $logPath -Raw
+            if ($log -notmatch 'Main window closed\.') {
+              throw "The application exited without completing the window close handler:`n$log"
             }
           }
           finally {

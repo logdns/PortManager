@@ -91,14 +91,14 @@ PortManager/
     ├── ListRulesPage ────────┤
     ├── DeleteRulePage ───────┼──► FirewallService (Services)
     └── PortStatusPage ───────┘         │
-                                        ├── netsh.exe (添加/删除)
-                                        └── powershell.exe (查询)
+                                        └── Windows Firewall COM API
+                                            (HNetCfg.FwPolicy2 / FWRule)
 ```
 
 `FirewallService` 封装了所有防火墙操作：
-- `ListRulesAsync()` — PowerShell `Get-NetFirewallRule` 查询
-- `AddRuleAsync()` — `netsh advfirewall firewall add rule`
-- `DeleteRuleAsync()` — `netsh advfirewall firewall delete rule`
+- `ListRulesAsync()` — 原生 COM 枚举并短时缓存规则
+- `AddRuleAsync()` — 原生 COM 添加规则
+- `DeleteRuleAsync()` — 原生 COM 删除规则
 - `QueryPortAsync()` — 按端口过滤查询
 
-ANY 协议自动拆成 TCP + UDP 两条规则分别添加，规避 netsh 不支持 `protocol=any` 带端口参数的限制。
+ANY 协议自动拆成 TCP + UDP 两条规则分别添加，保证端口条件明确且可分别管理。

@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PortManager.Models;
@@ -8,7 +7,6 @@ namespace PortManager.Views;
 
 public sealed partial class ListRulesPage : Page
 {
-    public ObservableCollection<FirewallRule> Rules { get; } = new();
     private List<FirewallRule> _allRules = new();
     private bool _loaded;
 
@@ -36,7 +34,7 @@ public sealed partial class ListRulesPage : Page
         catch (FirewallOperationException ex)
         {
             _allRules.Clear();
-            Rules.Clear();
+            RulesList.ItemsSource = null;
             EmptyState.Visibility = Visibility.Collapsed;
             ErrorBar.Message = $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}";
             ErrorBar.IsOpen = true;
@@ -60,16 +58,13 @@ public sealed partial class ListRulesPage : Page
                 rule.Name.Contains(keyword, StringComparison.CurrentCultureIgnoreCase) ||
                 rule.PortDisplay.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
 
-        Rules.Clear();
-        foreach (var rule in filtered)
-            Rules.Add(rule);
-
-        EmptyState.Visibility = Rules.Count == 0 && !ErrorBar.IsOpen
+        RulesList.ItemsSource = filtered;
+        EmptyState.Visibility = filtered.Count == 0 && !ErrorBar.IsOpen
             ? Visibility.Visible
             : Visibility.Collapsed;
-        UpdateCount();
+        UpdateCount(filtered.Count);
     }
 
-    private void UpdateCount() =>
-        RuleCountText.Text = string.Format(App.Text("Rules_CountFormat"), Rules.Count);
+    private void UpdateCount(int count = 0) =>
+        RuleCountText.Text = string.Format(App.Text("Rules_CountFormat"), count);
 }

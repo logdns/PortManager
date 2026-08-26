@@ -41,8 +41,7 @@
             </StackPanel>
         </Grid>
 
-        <ListView Grid.Row="3" x:Name="RulesList" ItemsSource="{x:Bind Rules, Mode=OneWay}"
-                  SelectionMode="None">
+        <ListView Grid.Row="3" x:Name="RulesList" SelectionMode="None">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

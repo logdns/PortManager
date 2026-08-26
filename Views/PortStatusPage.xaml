@@ -40,7 +40,7 @@
             </Grid>
         </Border>
 
-        <ListView Grid.Row="3" ItemsSource="{x:Bind Results, Mode=OneWay}" SelectionMode="None">
+        <ListView x:Name="ResultsList" Grid.Row="3" SelectionMode="None">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

@@ -1,14 +1,11 @@
-using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using PortManager.Models;
 using PortManager.Services;
 
 namespace PortManager.Views;
 
 public sealed partial class DeleteRulePage : Page
 {
-    public ObservableCollection<FirewallRule> Rules { get; } = new();
     private bool _loaded;
 
     public DeleteRulePage() => InitializeComponent();
@@ -30,14 +27,12 @@ public sealed partial class DeleteRulePage : Page
         try
         {
             var rules = await FirewallService.ListRulesAsync();
-            Rules.Clear();
-            foreach (var rule in rules)
-                Rules.Add(rule);
-            EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            RulesList.ItemsSource = rules;
+            EmptyState.Visibility = rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (FirewallOperationException ex)
         {
-            Rules.Clear();
+            RulesList.ItemsSource = null;
             EmptyState.Visibility = Visibility.Collapsed;
             ShowStatus(InfoBarSeverity.Error, App.Text("Common_FirewallError"),
                 $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}");

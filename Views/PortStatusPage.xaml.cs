@@ -1,16 +1,12 @@
-using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using PortManager.Models;
 using PortManager.Services;
 
 namespace PortManager.Views;
 
 public sealed partial class PortStatusPage : Page
 {
-    public ObservableCollection<FirewallRule> Results { get; } = new();
-
     public PortStatusPage() => InitializeComponent();
 
     private void PortSearch_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -30,7 +26,7 @@ public sealed partial class PortStatusPage : Page
         }
 
         var port = (int)PortSearchInput.Value;
-        Results.Clear();
+        ResultsList.ItemsSource = null;
         EmptyState.Visibility = Visibility.Collapsed;
         StatusBar.IsOpen = false;
         SearchButton.IsEnabled = false;
@@ -39,10 +35,9 @@ public sealed partial class PortStatusPage : Page
         try
         {
             var rules = await FirewallService.QueryPortAsync(port);
-            foreach (var rule in rules)
-                Results.Add(rule);
+            ResultsList.ItemsSource = rules;
 
-            if (Results.Count == 0)
+            if (rules.Count == 0)
             {
                 EmptyText.Text = string.Format(App.Text("Query_EmptyFormat"), port);
                 EmptyState.Visibility = Visibility.Visible;
@@ -50,7 +45,7 @@ public sealed partial class PortStatusPage : Page
             else
             {
                 ShowStatus(InfoBarSeverity.Informational,
-                    string.Format(App.Text("Query_ResultFormat"), port, Results.Count), string.Empty);
+                    string.Format(App.Text("Query_ResultFormat"), port, rules.Count), string.Empty);
             }
         }
         catch (FirewallOperationException ex)

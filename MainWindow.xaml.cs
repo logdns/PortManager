@@ -18,6 +18,7 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         ConfigureWindow();
         ApplyLanguage();
+        Closed += MainWindow_Closed;
         _isReady = true;
     }
 
@@ -38,11 +39,24 @@ public sealed partial class MainWindow : Window
         var appWindow = AppWindow.GetFromWindowId(windowId);
         appWindow.Resize(new SizeInt32(1100, 720));
 
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "PortManager.ico");
+        if (File.Exists(iconPath))
+            appWindow.SetIcon(iconPath);
+
         if (appWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.PreferredMinimumWidth = 760;
             presenter.PreferredMinimumHeight = 520;
+            presenter.IsMinimizable = true;
+            presenter.IsMaximizable = true;
+            presenter.IsResizable = true;
         }
+    }
+
+    private static void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+        App.LogStartup("Main window closed.");
+        Application.Current.Exit();
     }
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)

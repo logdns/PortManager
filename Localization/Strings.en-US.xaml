@@ -97,7 +97,7 @@
 
     <x:String x:Key="About_Title">About</x:String>
     <x:String x:Key="About_Description">Windows Firewall port management utility</x:String>
-    <x:String x:Key="About_Version">Version 1.1.4</x:String>
+    <x:String x:Key="About_Version">Version 1.1.5</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>

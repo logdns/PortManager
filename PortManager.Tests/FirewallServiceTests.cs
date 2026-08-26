@@ -6,43 +6,35 @@ namespace PortManager.Tests;
 public class FirewallServiceTests
 {
     [Fact]
-    public void ParseRulesJson_AcceptsSinglePowerShellObject()
+    public void CreateRuleModel_MapsNativeFirewallValues()
     {
-        const string json = """
-            {"Name":"HTTPS","Dir":"Inbound","Proto":"TCP","LocalPort":"443","RemotePort":"Any","Profile":"Any","Enabled":"True"}
-            """;
+        var rule = FirewallService.CreateRuleModel("HTTPS", 1, 6, "443", "*", int.MaxValue, true);
 
-        var rules = FirewallService.ParseRulesJson(json);
-
-        var rule = Assert.Single(rules);
         Assert.Equal("HTTPS", rule.Name);
+        Assert.Equal("Inbound", rule.Direction);
+        Assert.Equal("TCP", rule.Protocol);
         Assert.Equal("443", rule.PortDisplay);
-    }
-
-    [Fact]
-    public void ParseRulesJson_AcceptsObjectArray()
-    {
-        const string json = """
-            [{"Name":"DNS in","Dir":"Inbound","Proto":"UDP","LocalPort":"53","RemotePort":"Any","Profile":"Any","Enabled":"True"},{"Name":"DNS out","Dir":"Outbound","Proto":"UDP","LocalPort":"Any","RemotePort":"53","Profile":"Any","Enabled":"True"}]
-            """;
-
-        var rules = FirewallService.ParseRulesJson(json);
-
-        Assert.Equal(2, rules.Count);
-        Assert.All(rules, rule => Assert.Equal("53", rule.PortDisplay));
-    }
-
-    [Fact]
-    public void ParseRulesJson_RejectsMalformedOutput()
-    {
-        Assert.Throws<FirewallOperationException>(() => FirewallService.ParseRulesJson("not-json"));
+        Assert.Equal("Any", rule.RemotePort);
+        Assert.Equal("Any", rule.Profile);
     }
 
     [Theory]
-    [InlineData("in", 443, "localport=443")]
-    [InlineData("out", 443, "remoteport=443")]
-    public void GetPortArgument_UsesTheCorrectEndpoint(string direction, int port, string expected)
+    [InlineData(null, "Any")]
+    [InlineData("", "Any")]
+    [InlineData("*", "Any")]
+    [InlineData("443", "443")]
+    public void NormalizePorts_HandlesFirewallWildcards(string? value, string expected)
     {
-        Assert.Equal(expected, FirewallService.GetPortArgument(direction, port));
+        Assert.Equal(expected, FirewallService.NormalizePorts(value));
+    }
+
+    [Theory]
+    [InlineData("Any", false)]
+    [InlineData("*", false)]
+    [InlineData("80", true)]
+    [InlineData("8000-8100", true)]
+    public void HasSpecificPort_FiltersRulesWithoutPortConditions(string value, bool expected)
+    {
+        Assert.Equal(expected, FirewallService.HasSpecificPort(value));
     }
 }

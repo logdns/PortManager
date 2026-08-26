@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using PortManager.Services;
 using Xunit;
@@ -25,7 +26,11 @@ public class FirewallIntegrationTests
             var addResult = await FirewallService.AddRuleAsync(port, "TCP", "in", ruleName);
             Assert.True(addResult.Success, addResult.ErrorMessage);
 
+            var timer = Stopwatch.StartNew();
             var listedRules = await FirewallService.ListRulesAsync();
+            timer.Stop();
+            Assert.True(timer.Elapsed < TimeSpan.FromSeconds(20),
+                $"Listing firewall rules took {timer.Elapsed.TotalSeconds:F1} seconds.");
             Assert.Contains(listedRules, rule => rule.Name == ruleName && rule.PortDisplay == port.ToString());
 
             var queriedRules = await FirewallService.QueryPortAsync(port);
