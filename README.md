@@ -16,7 +16,7 @@ Windows Firewall port manager built with WinUI 3. The shell includes a bilingual
 
 ## 技术栈
 
-- **WinUI 3** (Windows App SDK 1.6+)
+- **WinUI 3** (Windows App SDK 1.8+)
 - **.NET 8** / C# 12
 - **Fluent Design** + Mica 材质
 - **netsh + PowerShell** 防火墙操作
