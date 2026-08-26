@@ -59,12 +59,6 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
 
-            <ListView.EmptyContent>
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-                    <FontIcon Glyph="&#xE721;" FontSize="40" Opacity="0.3"/>
-                    <TextBlock x:Name="EmptyText" Text="输入端口号进行查询" Opacity="0.5"/>
-                </StackPanel>
-            </ListView.EmptyContent>
         </ListView>
     </Grid>
 </Page>

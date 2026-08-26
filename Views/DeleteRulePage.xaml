@@ -53,12 +53,6 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
 
-            <ListView.EmptyContent>
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-                    <FontIcon Glyph="&#xE7B3;" FontSize="40" Opacity="0.3"/>
-                    <TextBlock Text="暂无可删除的规则" Opacity="0.5"/>
-                </StackPanel>
-            </ListView.EmptyContent>
         </ListView>
     </Grid>
 </Page>

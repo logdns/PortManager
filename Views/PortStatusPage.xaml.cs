@@ -42,10 +42,6 @@ public sealed partial class PortStatusPage : Page
         SearchBtn.IsEnabled = true;
         SearchBtn.Content = "查询 / Search";
 
-        if (rules.Count == 0)
-        {
-            EmptyText.Text = $"未找到端口 {port} 的放行规则";
-        }
     }
 
     private async Task ShowMessageAsync(string message, bool _)
