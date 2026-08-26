@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <x:String x:Key="App_Title">Port Manager</x:String>
+    <x:String x:Key="Nav_Dashboard">Dashboard</x:String>
+    <x:String x:Key="Nav_AddPort">Add port</x:String>
+    <x:String x:Key="Nav_Rules">Firewall rules</x:String>
+    <x:String x:Key="Nav_Delete">Delete rules</x:String>
+    <x:String x:Key="Nav_Query">Port query</x:String>
+    <x:String x:Key="Nav_More">More features</x:String>
+    <x:String x:Key="Nav_About">About</x:String>
+    <x:String x:Key="Language_Header">Interface language</x:String>
+    <x:String x:Key="Language_Chinese">中文</x:String>
+    <x:String x:Key="Language_English">English</x:String>
+
+    <x:String x:Key="Common_Refresh">Refresh</x:String>
+    <x:String x:Key="Common_Delete">Delete</x:String>
+    <x:String x:Key="Common_Cancel">Cancel</x:String>
+    <x:String x:Key="Common_Confirm">OK</x:String>
+    <x:String x:Key="Common_Reset">Reset</x:String>
+    <x:String x:Key="Common_Retry">Retry</x:String>
+    <x:String x:Key="Common_FirewallError">Windows Firewall is unavailable</x:String>
+    <x:String x:Key="Common_FirewallErrorDetail">Confirm that the app is running as administrator and the Windows Defender Firewall service is active.</x:String>
+
+    <x:String x:Key="Dashboard_Title">Dashboard</x:String>
+    <x:String x:Key="Dashboard_Subtitle">Manage Windows Firewall port rules on this PC</x:String>
+    <x:String x:Key="Dashboard_RuleCount">Enabled allow rules</x:String>
+    <x:String x:Key="Dashboard_Healthy">Firewall connection is healthy</x:String>
+    <x:String x:Key="Dashboard_Loading">Loading rules</x:String>
+    <x:String x:Key="Dashboard_QuickActions">Quick actions</x:String>
+    <x:String x:Key="Dashboard_Add">Add port</x:String>
+    <x:String x:Key="Dashboard_View">View rules</x:String>
+    <x:String x:Key="Dashboard_Query">Query port</x:String>
+    <x:String x:Key="Dashboard_Extensions">Extension area</x:String>
+    <x:String x:Key="Dashboard_ExtensionsDescription">Reserved module entry points for connection monitoring, rule import and export, and audit logs.</x:String>
+
+    <x:String x:Key="Add_Title">Add port rule</x:String>
+    <x:String x:Key="Add_Subtitle">Create a Windows Firewall allow rule</x:String>
+    <x:String x:Key="Add_Port">Port</x:String>
+    <x:String x:Key="Add_Protocol">Protocol</x:String>
+    <x:String x:Key="Add_Direction">Direction</x:String>
+    <x:String x:Key="Add_Inbound">Inbound</x:String>
+    <x:String x:Key="Add_Outbound">Outbound</x:String>
+    <x:String x:Key="Add_Both">Inbound and outbound</x:String>
+    <x:String x:Key="Add_RuleName">Rule name</x:String>
+    <x:String x:Key="Add_RuleNamePlaceholder">Generated automatically when empty</x:String>
+    <x:String x:Key="Add_Preview">Rule summary</x:String>
+    <x:String x:Key="Add_Action">Action</x:String>
+    <x:String x:Key="Add_Allow">Allow connection</x:String>
+    <x:String x:Key="Add_Button">Add rule</x:String>
+    <x:String x:Key="Add_Adding">Adding...</x:String>
+    <x:String x:Key="Add_InvalidPort">Enter a port from 1 to 65535.</x:String>
+    <x:String x:Key="Add_Success">Rule added</x:String>
+    <x:String x:Key="Add_Failed">Rule was not added</x:String>
+    <x:String x:Key="Add_Partial">Some rules were not added</x:String>
+    <x:String x:Key="Add_ResultFormat">Added {0} rule(s); {1} failed. Rule name: {2}</x:String>
+
+    <x:String x:Key="Rules_Title">Firewall rules</x:String>
+    <x:String x:Key="Rules_Subtitle">Enabled allow rules that contain a port condition</x:String>
+    <x:String x:Key="Rules_SearchPlaceholder">Search by name or port</x:String>
+    <x:String x:Key="Rules_Empty">No port rules found</x:String>
+    <x:String x:Key="Rules_CountFormat">{0} rule(s)</x:String>
+    <x:String x:Key="Rules_Port">Port</x:String>
+
+    <x:String x:Key="Delete_Title">Delete rules</x:String>
+    <x:String x:Key="Delete_Subtitle">Choose an existing rule or enter its full name</x:String>
+    <x:String x:Key="Delete_ManualPlaceholder">Full rule name</x:String>
+    <x:String x:Key="Delete_Empty">No port rules to delete</x:String>
+    <x:String x:Key="Delete_ConfirmTitle">Delete firewall rule?</x:String>
+    <x:String x:Key="Delete_ConfirmFormat">Permanently delete “{0}”?</x:String>
+    <x:String x:Key="Delete_SuccessFormat">Deleted “{0}”.</x:String>
+    <x:String x:Key="Delete_FailedFormat">Could not delete “{0}”.</x:String>
+    <x:String x:Key="Delete_NameRequired">Enter the full rule name.</x:String>
+
+    <x:String x:Key="Query_Title">Port query</x:String>
+    <x:String x:Key="Query_Subtitle">Find firewall rules that allow a local or remote port</x:String>
+    <x:String x:Key="Query_PortPlaceholder">Port</x:String>
+    <x:String x:Key="Query_Button">Search</x:String>
+    <x:String x:Key="Query_Searching">Searching...</x:String>
+    <x:String x:Key="Query_Initial">Enter a port to begin</x:String>
+    <x:String x:Key="Query_EmptyFormat">No rules allow port {0}</x:String>
+    <x:String x:Key="Query_ResultFormat">Found {1} rule(s) for port {0}</x:String>
+
+    <x:String x:Key="More_Title">More features</x:String>
+    <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>
+    <x:String x:Key="More_Connection">Connection monitor</x:String>
+    <x:String x:Key="More_ConnectionDescription">Inspect active connections, processes, and remote endpoints</x:String>
+    <x:String x:Key="More_Live">Live connections</x:String>
+    <x:String x:Key="More_Process">Process mapping</x:String>
+    <x:String x:Key="More_Planned">Planned</x:String>
+    <x:String x:Key="More_Import">Rule import and export</x:String>
+    <x:String x:Key="More_ImportDescription">Back up and restore firewall rules</x:String>
+    <x:String x:Key="More_Audit">Audit log</x:String>
+    <x:String x:Key="More_AuditDescription">Track port rule changes</x:String>
+
+    <x:String x:Key="About_Title">About</x:String>
+    <x:String x:Key="About_Description">Windows Firewall port management utility</x:String>
+    <x:String x:Key="About_Version">Version 1.1.0</x:String>
+    <x:String x:Key="About_Features">Features</x:String>
+    <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>
+    <x:String x:Key="About_Frameworks">Frameworks</x:String>
+    <x:String x:Key="About_FrameworkText">Microsoft WinUI 3 · Windows Community Toolkit · .NET 8</x:String>
+    <x:String x:Key="About_Admin">Administrator access</x:String>
+    <x:String x:Key="About_AdminText">Changing Windows Firewall rules requires administrator privileges.</x:String>
+</ResourceDictionary>

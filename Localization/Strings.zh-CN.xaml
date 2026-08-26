@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <x:String x:Key="App_Title">端口管理器</x:String>
+    <x:String x:Key="Nav_Dashboard">概览</x:String>
+    <x:String x:Key="Nav_AddPort">添加端口</x:String>
+    <x:String x:Key="Nav_Rules">防火墙规则</x:String>
+    <x:String x:Key="Nav_Delete">删除规则</x:String>
+    <x:String x:Key="Nav_Query">端口查询</x:String>
+    <x:String x:Key="Nav_More">更多功能</x:String>
+    <x:String x:Key="Nav_About">关于</x:String>
+    <x:String x:Key="Language_Header">界面语言</x:String>
+    <x:String x:Key="Language_Chinese">中文</x:String>
+    <x:String x:Key="Language_English">English</x:String>
+
+    <x:String x:Key="Common_Refresh">刷新</x:String>
+    <x:String x:Key="Common_Delete">删除</x:String>
+    <x:String x:Key="Common_Cancel">取消</x:String>
+    <x:String x:Key="Common_Confirm">确定</x:String>
+    <x:String x:Key="Common_Reset">重置</x:String>
+    <x:String x:Key="Common_Retry">重试</x:String>
+    <x:String x:Key="Common_FirewallError">无法访问 Windows 防火墙</x:String>
+    <x:String x:Key="Common_FirewallErrorDetail">请确认应用已获得管理员权限，并检查 Windows Defender 防火墙服务是否正在运行。</x:String>
+
+    <x:String x:Key="Dashboard_Title">概览</x:String>
+    <x:String x:Key="Dashboard_Subtitle">管理此电脑的 Windows 防火墙端口规则</x:String>
+    <x:String x:Key="Dashboard_RuleCount">已启用的放行规则</x:String>
+    <x:String x:Key="Dashboard_Healthy">防火墙连接正常</x:String>
+    <x:String x:Key="Dashboard_Loading">正在读取规则</x:String>
+    <x:String x:Key="Dashboard_QuickActions">常用操作</x:String>
+    <x:String x:Key="Dashboard_Add">添加端口</x:String>
+    <x:String x:Key="Dashboard_View">查看规则</x:String>
+    <x:String x:Key="Dashboard_Query">查询端口</x:String>
+    <x:String x:Key="Dashboard_Extensions">扩展区域</x:String>
+    <x:String x:Key="Dashboard_ExtensionsDescription">已为连接监控、规则导入导出和审计日志预留模块入口。</x:String>
+
+    <x:String x:Key="Add_Title">添加端口规则</x:String>
+    <x:String x:Key="Add_Subtitle">创建 Windows 防火墙放行规则</x:String>
+    <x:String x:Key="Add_Port">端口号</x:String>
+    <x:String x:Key="Add_Protocol">协议</x:String>
+    <x:String x:Key="Add_Direction">方向</x:String>
+    <x:String x:Key="Add_Inbound">入站</x:String>
+    <x:String x:Key="Add_Outbound">出站</x:String>
+    <x:String x:Key="Add_Both">入站和出站</x:String>
+    <x:String x:Key="Add_RuleName">规则名称</x:String>
+    <x:String x:Key="Add_RuleNamePlaceholder">留空时自动生成</x:String>
+    <x:String x:Key="Add_Preview">规则摘要</x:String>
+    <x:String x:Key="Add_Action">操作</x:String>
+    <x:String x:Key="Add_Allow">允许连接</x:String>
+    <x:String x:Key="Add_Button">添加规则</x:String>
+    <x:String x:Key="Add_Adding">正在添加...</x:String>
+    <x:String x:Key="Add_InvalidPort">请输入 1 到 65535 之间的端口号。</x:String>
+    <x:String x:Key="Add_Success">规则添加成功</x:String>
+    <x:String x:Key="Add_Failed">规则添加失败</x:String>
+    <x:String x:Key="Add_Partial">部分规则添加失败</x:String>
+    <x:String x:Key="Add_ResultFormat">已添加 {0} 条规则，失败 {1} 条。规则名称：{2}</x:String>
+
+    <x:String x:Key="Rules_Title">防火墙规则</x:String>
+    <x:String x:Key="Rules_Subtitle">当前已启用且包含端口条件的放行规则</x:String>
+    <x:String x:Key="Rules_SearchPlaceholder">搜索名称或端口</x:String>
+    <x:String x:Key="Rules_Empty">没有找到端口规则</x:String>
+    <x:String x:Key="Rules_CountFormat">共 {0} 条规则</x:String>
+    <x:String x:Key="Rules_Port">端口</x:String>
+
+    <x:String x:Key="Delete_Title">删除规则</x:String>
+    <x:String x:Key="Delete_Subtitle">从现有规则列表中选择，或输入完整规则名称</x:String>
+    <x:String x:Key="Delete_ManualPlaceholder">完整规则名称</x:String>
+    <x:String x:Key="Delete_Empty">没有可删除的端口规则</x:String>
+    <x:String x:Key="Delete_ConfirmTitle">确认删除规则</x:String>
+    <x:String x:Key="Delete_ConfirmFormat">确定要永久删除“{0}”吗？</x:String>
+    <x:String x:Key="Delete_SuccessFormat">已删除规则“{0}”。</x:String>
+    <x:String x:Key="Delete_FailedFormat">无法删除规则“{0}”。</x:String>
+    <x:String x:Key="Delete_NameRequired">请输入完整规则名称。</x:String>
+
+    <x:String x:Key="Query_Title">端口查询</x:String>
+    <x:String x:Key="Query_Subtitle">查找允许指定本地或远程端口的防火墙规则</x:String>
+    <x:String x:Key="Query_PortPlaceholder">端口号</x:String>
+    <x:String x:Key="Query_Button">查询</x:String>
+    <x:String x:Key="Query_Searching">正在查询...</x:String>
+    <x:String x:Key="Query_Initial">输入端口号开始查询</x:String>
+    <x:String x:Key="Query_EmptyFormat">没有规则允许端口 {0}</x:String>
+    <x:String x:Key="Query_ResultFormat">端口 {0} 找到 {1} 条规则</x:String>
+
+    <x:String x:Key="More_Title">更多功能</x:String>
+    <x:String x:Key="More_Subtitle">后续模块采用独立页面接入，不影响现有端口管理功能</x:String>
+    <x:String x:Key="More_Connection">连接监控</x:String>
+    <x:String x:Key="More_ConnectionDescription">查看活动连接、进程和远程端点</x:String>
+    <x:String x:Key="More_Live">实时连接</x:String>
+    <x:String x:Key="More_Process">进程关联</x:String>
+    <x:String x:Key="More_Planned">规划中</x:String>
+    <x:String x:Key="More_Import">规则导入导出</x:String>
+    <x:String x:Key="More_ImportDescription">备份和恢复防火墙规则</x:String>
+    <x:String x:Key="More_Audit">审计日志</x:String>
+    <x:String x:Key="More_AuditDescription">记录端口规则变更</x:String>
+
+    <x:String x:Key="About_Title">关于</x:String>
+    <x:String x:Key="About_Description">Windows 防火墙端口管理工具</x:String>
+    <x:String x:Key="About_Version">版本 1.1.0</x:String>
+    <x:String x:Key="About_Features">功能</x:String>
+    <x:String x:Key="About_FeatureText">添加、查询和删除 TCP/UDP 防火墙规则，支持入站、出站和双向配置。</x:String>
+    <x:String x:Key="About_Frameworks">技术框架</x:String>
+    <x:String x:Key="About_FrameworkText">Microsoft WinUI 3 · Windows Community Toolkit · .NET 8</x:String>
+    <x:String x:Key="About_Admin">管理员权限</x:String>
+    <x:String x:Key="About_AdminText">修改 Windows 防火墙规则需要管理员权限。</x:String>
+</ResourceDictionary>
