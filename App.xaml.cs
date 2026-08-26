@@ -15,7 +15,7 @@ public partial class App : Application
         try
         {
             InitializeComponent();
-            SetLanguage(AppLanguage.Chinese);
+            SetLanguageCore(AppLanguage.Chinese);
             UnhandledException += OnUnhandledException;
             LogStartup("Application object initialized.");
         }
@@ -32,10 +32,15 @@ public partial class App : Application
 
     public static void SetLanguage(AppLanguage language)
     {
+        ((App)Current).SetLanguageCore(language);
+    }
+
+    private void SetLanguageCore(AppLanguage language)
+    {
         LanguageState.Current = language;
 
         if (_languageDictionary is not null)
-            Current.Resources.MergedDictionaries.Remove(_languageDictionary);
+            Resources.MergedDictionaries.Remove(_languageDictionary);
 
         var fileName = language == AppLanguage.English
             ? "Strings.en-US.xaml"
@@ -44,7 +49,7 @@ public partial class App : Application
         {
             Source = new Uri($"ms-appx:///Localization/{fileName}")
         };
-        Current.Resources.MergedDictionaries.Add(_languageDictionary);
+        Resources.MergedDictionaries.Add(_languageDictionary);
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
