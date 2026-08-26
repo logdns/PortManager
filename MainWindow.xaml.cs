@@ -107,8 +107,8 @@ public sealed partial class MainWindow : Window
             return;
 
         _currentTag = tag;
-        if (force || ContentFrame.CurrentSourcePageType != pageType)
-            ContentFrame.Navigate(pageType);
+        if ((force || ContentFrame.CurrentSourcePageType != pageType) && ContentFrame.Navigate(pageType))
+            App.LogStartup($"Navigation completed: {pageType.Name}.");
     }
 
     private NavigationViewItem? FindNavigationItem(string tag)

@@ -79,7 +79,7 @@ jobs:
           $publishDirectory = "artifacts/portable/${{ matrix.rid }}"
           $architecture = '${{ matrix.installer_arch }}'
           $instructions = @"
-          Port Manager 1.1.3
+          Port Manager 1.1.4
 
           Architecture: $architecture
 
@@ -106,18 +106,18 @@ jobs:
           $process = Start-Process -FilePath $executable -PassThru
           try {
             $deadline = (Get-Date).AddSeconds(30)
-            $started = $false
+            $dashboardLoaded = $false
             while ((Get-Date) -lt $deadline) {
               Start-Sleep -Seconds 1
               $process.Refresh()
               if (Test-Path $logPath) {
                 $log = Get-Content $logPath -Raw
-                if ($log -match 'MainWindow activated') {
-                  $started = $true
-                  break
-                }
-                if ($log -match 'failed:|Unexpected application error') {
+                if ($log -match 'Application initialization failed|Unable to open the main window|Unexpected application error') {
                   throw "Application startup failed:`n$log"
+                }
+                if ($log -match 'Navigation completed: DashboardPage\.') {
+                  $dashboardLoaded = $true
+                  break
                 }
               }
               if ($process.HasExited) {
@@ -125,9 +125,25 @@ jobs:
               }
             }
 
-            if (-not $started) {
+            if (-not $dashboardLoaded) {
               $log = if (Test-Path $logPath) { Get-Content $logPath -Raw } else { '<no startup log>' }
-              throw "Main window did not start within 30 seconds:`n$log"
+              throw "Dashboard did not load within 30 seconds:`n$log"
+            }
+
+            # Keep the real GUI alive long enough to catch Loaded-event and async startup failures.
+            $cleanObservationDeadline = (Get-Date).AddSeconds(10)
+            while ((Get-Date) -lt $cleanObservationDeadline) {
+              Start-Sleep -Seconds 1
+              $process.Refresh()
+              if ($process.HasExited) {
+                throw "Application exited after loading the dashboard with code $($process.ExitCode)."
+              }
+              if (Test-Path $logPath) {
+                $log = Get-Content $logPath -Raw
+                if ($log -match 'Application initialization failed|Unable to open the main window|Unexpected application error') {
+                  throw "Application failed after loading the dashboard:`n$log"
+                }
+              }
             }
           }
           finally {
@@ -179,8 +195,9 @@ jobs:
       - name: Build installer
         shell: pwsh
         run: |
-          $version = "${{ github.ref_name }}".TrimStart("v")
-          if ($version -notmatch '^\d+\.\d+\.\d+') { $version = "1.0.0" }
+          [xml]$project = Get-Content PortManager.csproj
+          $version = @($project.Project.PropertyGroup.Version)[0]
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid project version: $version" }
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DSourceDir=$pwd\artifacts\installer-source" "/DBuildArch=${{ matrix.installer_arch }}" "/DAppVersion=$version" installer\PortManager.iss
       - name: Upload installer artifact
         uses: actions/upload-artifact@v5

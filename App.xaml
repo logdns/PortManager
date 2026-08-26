@@ -13,8 +13,8 @@
 
             <!-- 全局样式：卡片容器 -->
             <Style x:Key="CardPanel" TargetType="Border">
-                <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}"/>
-                <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}"/>
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="CornerRadius" Value="6"/>
                 <Setter Property="Padding" Value="20"/>

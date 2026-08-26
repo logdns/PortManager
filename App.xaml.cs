@@ -85,7 +85,7 @@ public partial class App : Application
     private static string LogPath
         => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PortManager", "startup.log");
 
-    private static void LogStartup(string message)
+    internal static void LogStartup(string message)
     {
         try
         {
