@@ -48,6 +48,12 @@ jobs:
                 $json | ConvertTo-Json -Depth 8 | Select-String -Pattern 'error|Error|exception|Exception|file|File|line|Line' | ForEach-Object { Write-Host $_ }
               } catch { Write-Host $_ }
             }
+          $compiler = Get-ChildItem "$env:USERPROFILE\.nuget\packages\microsoft.windowsappsdk\*\tools\net472\XamlCompiler.exe" | Select-Object -First 1
+          $input = Get-ChildItem -Path obj -Recurse -Filter input.json | Select-Object -First 1
+          if ($compiler -and $input) {
+            Write-Host "===== direct XAML compiler ====="
+            & $compiler.FullName $input.FullName "$($input.DirectoryName)\output-debug.json" 2>&1 | ForEach-Object { Write-Host $_ }
+          }
       - name: Publish portable app
         run: dotnet publish PortManager.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
       - name: Zip portable app
