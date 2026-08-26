@@ -34,6 +34,12 @@ jobs:
         run: dotnet restore PortManager.csproj -p:Platform=${{ matrix.platform }}
       - name: Build
         run: dotnet build PortManager.csproj --configuration Release --no-restore -p:Platform=${{ matrix.platform }}
+      - name: Dump XAML compiler diagnostics
+        if: failure()
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path obj -Recurse -Include input.json,output.json -ErrorAction SilentlyContinue |
+            ForEach-Object { Write-Host "===== $($_.FullName) ====="; Get-Content $_.FullName }
       - name: Publish portable app
         run: dotnet publish PortManager.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
       - name: Zip portable app
