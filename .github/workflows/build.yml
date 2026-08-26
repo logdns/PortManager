@@ -39,7 +39,15 @@ jobs:
         shell: pwsh
         run: |
           Get-ChildItem -Path obj -Recurse -Include input.json,output.json -ErrorAction SilentlyContinue |
-            ForEach-Object { Write-Host "===== $($_.FullName) ====="; Get-Content $_.FullName }
+            ForEach-Object {
+              Write-Host "===== $($_.FullName) ====="
+              $raw = Get-Content $_.FullName -Raw
+              Write-Host ("bytes=" + $raw.Length)
+              try {
+                $json = $raw | ConvertFrom-Json
+                $json | ConvertTo-Json -Depth 8 | Select-String -Pattern 'error|Error|exception|Exception|file|File|line|Line' | ForEach-Object { Write-Host $_ }
+              } catch { Write-Host $_ }
+            }
       - name: Publish portable app
         run: dotnet publish PortManager.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
       - name: Zip portable app
