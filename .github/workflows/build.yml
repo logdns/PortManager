@@ -13,8 +13,8 @@ jobs:
   test:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
       - name: Run unit tests
@@ -37,8 +37,8 @@ jobs:
             platform: ARM64
             installer_arch: arm64
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
       - name: Restore
@@ -57,7 +57,7 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/PortManager-${{ matrix.rid }}.zip
       - name: Upload portable artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: PortManager-${{ matrix.rid }}
           path: artifacts/PortManager-${{ matrix.rid }}.zip
@@ -66,6 +66,7 @@ jobs:
     runs-on: windows-latest
     needs: build
     strategy:
+      fail-fast: false
       matrix:
         include:
           - rid: win-x86
@@ -78,15 +79,21 @@ jobs:
             platform: ARM64
             installer_arch: arm64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Download portable build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: PortManager-${{ matrix.rid }}
           path: artifacts/download
       - name: Extract portable build
         shell: pwsh
         run: Expand-Archive artifacts/download/PortManager-${{ matrix.rid }}.zip artifacts/installer-source
+      - name: Download Simplified Chinese installer language
+        shell: pwsh
+        run: |
+          curl.exe --fail --silent --show-error --location `
+            https://raw.githubusercontent.com/jrsoftware/issrc/1ae7bf81dc0d2013235dfe4bb0b6f4e4a0b6b25c/Files/Languages/ChineseSimplified.isl `
+            --output installer/ChineseSimplified.isl
       - name: Build installer
         shell: pwsh
         run: |
@@ -94,7 +101,7 @@ jobs:
           if ($version -notmatch '^\d+\.\d+\.\d+') { $version = "1.0.0" }
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DSourceDir=$pwd\artifacts\installer-source" "/DBuildArch=${{ matrix.installer_arch }}" "/DAppVersion=$version" installer\PortManager.iss
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: PortManager-Setup-${{ matrix.rid }}
           path: artifacts/installer/*.exe
@@ -105,7 +112,7 @@ jobs:
     needs: [build, installer]
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: release-assets
       - name: Publish GitHub release
