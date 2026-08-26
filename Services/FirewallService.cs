@@ -1,5 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using PortManager.Models;
 
 namespace PortManager.Services;
@@ -351,7 +356,7 @@ public static class FirewallService
 
     private static void ReleaseComObject(object? instance)
     {
-        if (instance is not null && Marshal.IsComObject(instance))
+        if (OperatingSystem.IsWindows() && instance is not null && Marshal.IsComObject(instance))
             Marshal.FinalReleaseComObject(instance);
     }
 }
