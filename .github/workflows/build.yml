@@ -19,6 +19,11 @@ jobs:
           dotnet-version: 8.0.x
       - name: Run unit tests
         run: dotnet test PortManager.Tests/PortManager.Tests.csproj --configuration Release
+      - name: Run Windows Firewall integration test
+        shell: pwsh
+        env:
+          PORTMANAGER_RUN_INTEGRATION: "1"
+        run: dotnet test PortManager.Tests/PortManager.Tests.csproj --configuration Release --no-build --filter "Category=WindowsIntegration"
 
   build:
     needs: test
@@ -71,9 +76,10 @@ jobs:
       - name: Add portable package instructions
         shell: pwsh
         run: |
+          $publishDirectory = "artifacts/portable/${{ matrix.rid }}"
           $architecture = '${{ matrix.installer_arch }}'
           $instructions = @"
-          Port Manager 1.1.2
+          Port Manager 1.1.3
 
           Architecture: $architecture
 
@@ -89,6 +95,46 @@ jobs:
           matches Settings > System > About > System type.
           "@
           Set-Content -Path "$publishDirectory\README.txt" -Value $instructions -Encoding UTF8
+      - name: Smoke test packaged application startup
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: |
+          $executable = Join-Path $pwd "artifacts/portable/win-x64/PortManager.exe"
+          $logPath = Join-Path $env:LOCALAPPDATA "PortManager/startup.log"
+          Remove-Item $logPath -Force -ErrorAction SilentlyContinue
+
+          $process = Start-Process -FilePath $executable -PassThru
+          try {
+            $deadline = (Get-Date).AddSeconds(30)
+            $started = $false
+            while ((Get-Date) -lt $deadline) {
+              Start-Sleep -Seconds 1
+              $process.Refresh()
+              if (Test-Path $logPath) {
+                $log = Get-Content $logPath -Raw
+                if ($log -match 'MainWindow activated') {
+                  $started = $true
+                  break
+                }
+                if ($log -match 'failed:|Unexpected application error') {
+                  throw "Application startup failed:`n$log"
+                }
+              }
+              if ($process.HasExited) {
+                throw "Application exited during startup with code $($process.ExitCode)."
+              }
+            }
+
+            if (-not $started) {
+              $log = if (Test-Path $logPath) { Get-Content $logPath -Raw } else { '<no startup log>' }
+              throw "Main window did not start within 30 seconds:`n$log"
+            }
+          }
+          finally {
+            if (-not $process.HasExited) {
+              Stop-Process -Id $process.Id -Force
+            }
+          }
       - name: Zip portable app
         shell: pwsh
         run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/PortManager-${{ matrix.rid }}.zip

@@ -8,14 +8,13 @@ namespace PortManager;
 public partial class App : Application
 {
     private MainWindow? _mainWindow;
-    private static ResourceDictionary? _languageDictionary;
+    private ResourceDictionary? _languageDictionary;
 
     public App()
     {
         try
         {
             InitializeComponent();
-            SetLanguageCore(AppLanguage.Chinese);
             UnhandledException += OnUnhandledException;
             LogStartup("Application object initialized.");
         }
@@ -39,8 +38,12 @@ public partial class App : Application
     {
         LanguageState.Current = language;
 
-        if (_languageDictionary is not null)
-            Resources.MergedDictionaries.Remove(_languageDictionary);
+        foreach (var dictionary in Resources.MergedDictionaries
+                     .Where(IsLanguageDictionary)
+                     .ToList())
+        {
+            Resources.MergedDictionaries.Remove(dictionary);
+        }
 
         var fileName = language == AppLanguage.English
             ? "Strings.en-US.xaml"
@@ -50,6 +53,12 @@ public partial class App : Application
             Source = new Uri($"ms-appx:///Localization/{fileName}")
         };
         Resources.MergedDictionaries.Add(_languageDictionary);
+    }
+
+    private static bool IsLanguageDictionary(ResourceDictionary dictionary)
+    {
+        var source = dictionary.Source?.OriginalString;
+        return source is not null && source.Contains("/Localization/Strings.", StringComparison.OrdinalIgnoreCase);
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
