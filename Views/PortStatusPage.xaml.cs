@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -12,10 +11,7 @@ public sealed partial class PortStatusPage : Page
 {
     public ObservableCollection<FirewallRule> Results { get; } = new();
 
-    public PortStatusPage()
-    {
-        this.InitializeComponent();
-    }
+    public PortStatusPage() => InitializeComponent();
 
     private void PortSearch_KeyDown(object sender, KeyRoutedEventArgs e)
     {
@@ -25,40 +21,55 @@ public sealed partial class PortStatusPage : Page
 
     private async void SearchButton_Click(object sender, RoutedEventArgs e)
     {
-        var portStr = PortSearchInput.Text.Trim();
-        if (!int.TryParse(portStr, out var port) || port < 1 || port > 65535)
+        if (double.IsNaN(PortSearchInput.Value) ||
+            PortSearchInput.Value < 1 || PortSearchInput.Value > 65535)
         {
-            await ShowMessageAsync("请输入有效的端口号 (1-65535)", false);
+            ShowStatus(InfoBarSeverity.Warning, App.Text("Add_InvalidPort"), string.Empty);
+            PortSearchInput.Focus(FocusState.Programmatic);
             return;
         }
 
+        var port = (int)PortSearchInput.Value;
         Results.Clear();
-        SearchBtn.IsEnabled = false;
-        SearchBtn.Content = "查询中... / Searching...";
+        EmptyState.Visibility = Visibility.Collapsed;
+        StatusBar.IsOpen = false;
+        SearchButton.IsEnabled = false;
+        SearchButtonText.Text = App.Text("Query_Searching");
 
-        var rules = await FirewallService.QueryPortAsync(port);
-        foreach (var r in rules)
-            Results.Add(r);
+        try
+        {
+            var rules = await FirewallService.QueryPortAsync(port);
+            foreach (var rule in rules)
+                Results.Add(rule);
 
-        EmptyState.Visibility = rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        EmptyText.Text = rules.Count == 0
-            ? $"未找到端口 {port} 的规则 / No rules found for port {port}"
-            : string.Empty;
-
-        SearchBtn.IsEnabled = true;
-        SearchBtn.Content = "查询 / Search";
-
+            if (Results.Count == 0)
+            {
+                EmptyText.Text = string.Format(App.Text("Query_EmptyFormat"), port);
+                EmptyState.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                ShowStatus(InfoBarSeverity.Informational,
+                    string.Format(App.Text("Query_ResultFormat"), port, Results.Count), string.Empty);
+            }
+        }
+        catch (FirewallOperationException ex)
+        {
+            ShowStatus(InfoBarSeverity.Error, App.Text("Common_FirewallError"),
+                $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}");
+        }
+        finally
+        {
+            SearchButton.IsEnabled = true;
+            SearchButtonText.Text = App.Text("Query_Button");
+        }
     }
 
-    private async Task ShowMessageAsync(string message, bool _)
+    private void ShowStatus(InfoBarSeverity severity, string title, string message)
     {
-        var dialog = new ContentDialog
-        {
-            XamlRoot = this.XamlRoot,
-            Title = "提示",
-            Content = message,
-            CloseButtonText = "确定"
-        };
-        await dialog.ShowAsync();
+        StatusBar.Severity = severity;
+        StatusBar.Title = title;
+        StatusBar.Message = message;
+        StatusBar.IsOpen = true;
     }
 }

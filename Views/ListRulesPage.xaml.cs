@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PortManager.Models;
@@ -13,51 +10,66 @@ public sealed partial class ListRulesPage : Page
 {
     public ObservableCollection<FirewallRule> Rules { get; } = new();
     private List<FirewallRule> _allRules = new();
+    private bool _loaded;
 
-    public ListRulesPage()
+    public ListRulesPage() => InitializeComponent();
+
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        this.InitializeComponent();
-        _ = LoadRulesAsync();
+        if (_loaded)
+            return;
+
+        _loaded = true;
+        await LoadRulesAsync();
     }
 
     private async Task LoadRulesAsync()
     {
         LoadingRing.IsActive = true;
-        Rules.Clear();
+        ErrorBar.IsOpen = false;
 
-        _allRules = await FirewallService.ListRulesAsync();
-
-        foreach (var r in _allRules)
-            Rules.Add(r);
-
-        LoadingRing.IsActive = false;
-        EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        try
+        {
+            _allRules = await FirewallService.ListRulesAsync();
+            ApplyFilter();
+        }
+        catch (FirewallOperationException ex)
+        {
+            _allRules.Clear();
+            Rules.Clear();
+            EmptyState.Visibility = Visibility.Collapsed;
+            ErrorBar.Message = $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}";
+            ErrorBar.IsOpen = true;
+            UpdateCount();
+        }
+        finally
+        {
+            LoadingRing.IsActive = false;
+        }
     }
 
-    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        var keyword = SearchBox.Text.Trim().ToLower();
-        Rules.Clear();
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
+    private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await LoadRulesAsync();
 
+    private void ApplyFilter()
+    {
+        var keyword = SearchBox.Text.Trim();
         var filtered = string.IsNullOrEmpty(keyword)
             ? _allRules
-            : _allRules.Where(r =>
-                r.Name.ToLower().Contains(keyword) ||
-                r.LocalPort.Contains(keyword)).ToList();
+            : _allRules.Where(rule =>
+                rule.Name.Contains(keyword, StringComparison.CurrentCultureIgnoreCase) ||
+                rule.PortDisplay.Contains(keyword, StringComparison.OrdinalIgnoreCase)).ToList();
 
-        foreach (var r in filtered)
-            Rules.Add(r);
+        Rules.Clear();
+        foreach (var rule in filtered)
+            Rules.Add(rule);
 
-        EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        EmptyState.Visibility = Rules.Count == 0 && !ErrorBar.IsOpen
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+        UpdateCount();
     }
 
-    private void RefreshButton_Click(object sender, RoutedEventArgs e)
-    {
-        _ = LoadRulesAsync();
-    }
-
-    private void RulesList_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        // 可扩展：点击规则跳转详情
-    }
+    private void UpdateCount() =>
+        RuleCountText.Text = string.Format(App.Text("Rules_CountFormat"), Rules.Count);
 }

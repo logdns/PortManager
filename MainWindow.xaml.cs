@@ -1,65 +1,123 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using PortManager.Services;
 using PortManager.Views;
+using Windows.Graphics;
 
 namespace PortManager;
 
 public sealed partial class MainWindow : Window
 {
-    private bool _english;
+    private bool _isReady;
+    private string _currentTag = "Dashboard";
 
     public MainWindow()
     {
-        this.InitializeComponent();
-        ExtendsContentIntoTitleBar = true;
-        SetTitleBar(AppTitleBar);
+        InitializeComponent();
+        ConfigureWindow();
+        ApplyLanguage();
+        _isReady = true;
+    }
+
+    public void NavigateTo(string tag)
+    {
+        var item = FindNavigationItem(tag);
+        if (item is not null)
+            NavView.SelectedItem = item;
+        else
+            NavigateFrame(tag);
+    }
+
+    private void ConfigureWindow()
+    {
+        Title = App.Text("App_Title");
+        var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+        appWindow.Resize(new SizeInt32(1100, 720));
+
+        if (appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.PreferredMinimumWidth = 760;
+            presenter.PreferredMinimumHeight = 520;
+        }
     }
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
     {
-        NavView.SelectedItem = NavView.MenuItems[0];
-    }
-
-    private void LanguageButton_Click(object sender, RoutedEventArgs e)
-    {
-        _english = !_english;
-        AppTitleBar.Title = _english ? "Port Manager" : "电脑端口管理";
-        LanguageButton.Content = _english ? "English / 中文" : "中文 / English";
-
-        var labels = _english
-            ? new[] { "Dashboard", "Add port", "Port rules", "Delete rule", "Query port", "More features" }
-            : new[] { "概览", "添加端口", "端口列表", "删除规则", "端口查询", "更多功能" };
-        for (var i = 0; i < 5; i++)
-            ((NavigationViewItem)NavView.MenuItems[i]).Content = labels[i];
-        ((NavigationViewItem)NavView.MenuItems[5]).Content = labels[5];
-        if (NavView.FooterMenuItems.Count > 0)
-            ((NavigationViewItem)NavView.FooterMenuItems[0]).Content = _english ? "About" : "关于";
+        if (NavView.SelectedItem is null)
+            NavView.SelectedItem = DashboardItem;
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (args.SelectedItem is not NavigationViewItem item)
+        if (args.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+            NavigateFrame(tag);
+    }
+
+    private void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isReady)
             return;
 
-        var tag = item.Tag?.ToString();
-        if (string.IsNullOrEmpty(tag))
+        var language = LanguageSelector.SelectedIndex == 1
+            ? AppLanguage.English
+            : AppLanguage.Chinese;
+        if (LanguageState.Current == language)
             return;
 
-        Type? pageType = tag switch
+        App.SetLanguage(language);
+        ApplyLanguage();
+        NavigateFrame(_currentTag, force: true);
+    }
+
+    private void ApplyLanguage()
+    {
+        Title = App.Text("App_Title");
+        PaneTitle.Text = App.Text("App_Title");
+        DashboardItem.Content = App.Text("Nav_Dashboard");
+        AddPortItem.Content = App.Text("Nav_AddPort");
+        RulesItem.Content = App.Text("Nav_Rules");
+        DeleteItem.Content = App.Text("Nav_Delete");
+        QueryItem.Content = App.Text("Nav_Query");
+        MoreItem.Content = App.Text("Nav_More");
+        AboutItem.Content = App.Text("Nav_About");
+        LanguageHeader.Text = App.Text("Language_Header");
+        ChineseOption.Content = App.Text("Language_Chinese");
+        EnglishOption.Content = App.Text("Language_English");
+    }
+
+    private void NavigateFrame(string tag, bool force = false)
+    {
+        var pageType = tag switch
         {
-            "Dashboard"   => typeof(DashboardPage),
-            "AddPort"     => typeof(AddPortPage),
-            "ListRules"   => typeof(ListRulesPage),
-            "DeleteRule"  => typeof(DeleteRulePage),
-            "PortStatus"  => typeof(PortStatusPage),
-            "ComingSoon"  => typeof(ComingSoonPage),
-            "About"       => typeof(AboutPage),
-            _             => null
+            "Dashboard" => typeof(DashboardPage),
+            "AddPort" => typeof(AddPortPage),
+            "ListRules" => typeof(ListRulesPage),
+            "DeleteRule" => typeof(DeleteRulePage),
+            "PortStatus" => typeof(PortStatusPage),
+            "ComingSoon" => typeof(ComingSoonPage),
+            "About" => typeof(AboutPage),
+            _ => null
         };
 
-        if (pageType != null && ContentFrame.CurrentSourcePageType != pageType)
-        {
+        if (pageType is null)
+            return;
+
+        _currentTag = tag;
+        if (force || ContentFrame.CurrentSourcePageType != pageType)
             ContentFrame.Navigate(pageType);
+    }
+
+    private NavigationViewItem? FindNavigationItem(string tag)
+    {
+        foreach (var item in NavView.MenuItems.Concat(NavView.FooterMenuItems))
+        {
+            if (item is NavigationViewItem navigationItem && navigationItem.Tag as string == tag)
+                return navigationItem;
         }
+
+        return null;
     }
 }

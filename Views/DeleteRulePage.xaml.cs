@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using PortManager.Models;
 using PortManager.Services;
 
@@ -11,47 +9,49 @@ namespace PortManager.Views;
 public sealed partial class DeleteRulePage : Page
 {
     public ObservableCollection<FirewallRule> Rules { get; } = new();
+    private bool _loaded;
 
-    public DeleteRulePage()
+    public DeleteRulePage() => InitializeComponent();
+
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
     {
-        this.InitializeComponent();
-        _ = LoadRulesAsync();
+        if (_loaded)
+            return;
+
+        _loaded = true;
+        await LoadRulesAsync();
     }
 
     private async Task LoadRulesAsync()
     {
-        Rules.Clear();
-        var list = await FirewallService.ListRulesAsync();
-        foreach (var r in list)
-            Rules.Add(r);
-        RulesList.ItemsSource = Rules;
-        EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        LoadingRing.IsActive = true;
+        StatusBar.IsOpen = false;
+
+        try
+        {
+            var rules = await FirewallService.ListRulesAsync();
+            Rules.Clear();
+            foreach (var rule in rules)
+                Rules.Add(rule);
+            EmptyState.Visibility = Rules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+        catch (FirewallOperationException ex)
+        {
+            Rules.Clear();
+            EmptyState.Visibility = Visibility.Collapsed;
+            ShowStatus(InfoBarSeverity.Error, App.Text("Common_FirewallError"),
+                $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}");
+        }
+        finally
+        {
+            LoadingRing.IsActive = false;
+        }
     }
 
     private async void DeleteItem_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button btn) return;
-        var ruleName = btn.Tag?.ToString();
-        if (string.IsNullOrEmpty(ruleName)) return;
-
-        var dialog = new ContentDialog
-        {
-            XamlRoot = this.XamlRoot,
-            Title = "确认删除",
-            Content = $"确定要删除规则 \"{ruleName}\" 吗？",
-            PrimaryButtonText = "删除",
-            CloseButtonText = "取消",
-            DefaultButton = ContentDialogButton.Close
-        };
-
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary)
-        {
-            var ok = await FirewallService.DeleteRuleAsync(ruleName);
-            await ShowToastAsync(ok ? $"规则 \"{ruleName}\" 已删除" : $"删除失败，请检查名称", ok);
-            if (ok)
-                await LoadRulesAsync();
-        }
+        if (sender is Button button && button.Tag is string ruleName)
+            await ConfirmAndDeleteAsync(ruleName, button);
     }
 
     private async void DeleteManual_Click(object sender, RoutedEventArgs e)
@@ -59,37 +59,60 @@ public sealed partial class DeleteRulePage : Page
         var ruleName = ManualNameInput.Text.Trim();
         if (string.IsNullOrEmpty(ruleName))
         {
-            await ShowToastAsync("请输入规则名称", false);
+            ShowStatus(InfoBarSeverity.Warning, App.Text("Delete_NameRequired"), string.Empty);
             return;
         }
 
-        var ok = await FirewallService.DeleteRuleAsync(ruleName);
-        await ShowToastAsync(ok ? $"规则 \"{ruleName}\" 已删除" : $"未找到规则 \"{ruleName}\"", ok);
-        if (ok)
+        await ConfirmAndDeleteAsync(ruleName, DeleteManualButton);
+    }
+
+    private async Task ConfirmAndDeleteAsync(string ruleName, Button sourceButton)
+    {
+        var dialog = new ContentDialog
         {
-            ManualNameInput.Text = "";
-            await LoadRulesAsync();
+            XamlRoot = XamlRoot,
+            Title = App.Text("Delete_ConfirmTitle"),
+            Content = string.Format(App.Text("Delete_ConfirmFormat"), ruleName),
+            PrimaryButtonText = App.Text("Common_Delete"),
+            CloseButtonText = App.Text("Common_Cancel"),
+            DefaultButton = ContentDialogButton.Close
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            return;
+
+        sourceButton.IsEnabled = false;
+        try
+        {
+            var deleted = await FirewallService.DeleteRuleAsync(ruleName);
+            if (deleted)
+            {
+                ManualNameInput.Text = string.Empty;
+                await LoadRulesAsync();
+                ShowStatus(InfoBarSeverity.Success,
+                    string.Format(App.Text("Delete_SuccessFormat"), ruleName), string.Empty);
+            }
+            else
+            {
+                ShowStatus(InfoBarSeverity.Error,
+                    string.Format(App.Text("Delete_FailedFormat"), ruleName), string.Empty);
+            }
+        }
+        catch (FirewallOperationException ex)
+        {
+            ShowStatus(InfoBarSeverity.Error, App.Text("Common_FirewallError"), ex.Message);
+        }
+        finally
+        {
+            sourceButton.IsEnabled = true;
         }
     }
 
-    private async Task ShowToastAsync(string message, bool success)
+    private void ShowStatus(InfoBarSeverity severity, string title, string message)
     {
-        var panel = new Border
-        {
-            Background = new SolidColorBrush(success
-                ? Microsoft.UI.ColorHelper.FromArgb(255, 0x27, 0xAE, 0x60)
-                : Microsoft.UI.ColorHelper.FromArgb(255, 0xE7, 0x4C, 0x3C)),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(16, 8, 16, 8),
-            Child = new TextBlock { Text = message, Foreground = new SolidColorBrush(Microsoft.UI.Colors.White) }
-        };
-        // 简单提示：利用 ContentDialog
-        var dialog = new ContentDialog
-        {
-            XamlRoot = this.XamlRoot,
-            Content = panel,
-            CloseButtonText = "确定"
-        };
-        await dialog.ShowAsync();
+        StatusBar.Severity = severity;
+        StatusBar.Title = title;
+        StatusBar.Message = message;
+        StatusBar.IsOpen = true;
     }
 }

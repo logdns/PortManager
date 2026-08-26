@@ -1,7 +1,5 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using PortManager.Services;
 
 namespace PortManager.Views;
@@ -10,82 +8,89 @@ public sealed partial class AddPortPage : Page
 {
     public AddPortPage()
     {
-        this.InitializeComponent();
-    }
-
-    private void PortInput_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
+        InitializeComponent();
         UpdatePreview();
     }
 
+    private void Form_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args) => UpdatePreview();
+    private void Form_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdatePreview();
+
     private void UpdatePreview()
     {
-        PreviewPort.Text = string.IsNullOrWhiteSpace(PortInput.Text) ? "—" : PortInput.Text;
+        if (PreviewPort is null)
+            return;
 
-        var proto = ProtocolSelector.SelectedItem as RadioButton;
-        PreviewProtocol.Text = proto?.Tag?.ToString() ?? "TCP";
-
-        var dir = DirectionSelector.SelectedItem as RadioButton;
-        PreviewDirection.Text = dir?.Tag?.ToString() switch
+        PreviewPort.Text = double.IsNaN(PortInput.Value)
+            ? "--"
+            : ((int)PortInput.Value).ToString();
+        PreviewProtocol.Text = (ProtocolSelector.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "TCP";
+        PreviewDirection.Text = (DirectionSelector.SelectedItem as RadioButton)?.Tag?.ToString() switch
         {
-            "in"   => "入站",
-            "out"  => "出站",
-            "Both" => "入站+出站",
-            _      => "入站"
+            "out" => App.Text("Add_Outbound"),
+            "Both" => App.Text("Add_Both"),
+            _ => App.Text("Add_Inbound")
         };
     }
 
     private async void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        // 验证端口
-        var portStr = PortInput.Text.Trim();
-        if (string.IsNullOrEmpty(portStr) || !int.TryParse(portStr, out var port) || port < 1 || port > 65535)
+        if (double.IsNaN(PortInput.Value) || PortInput.Value < 1 || PortInput.Value > 65535)
         {
-            PortError.Text = "请输入有效的端口号 (1-65535)";
-            PortError.Visibility = Visibility.Visible;
+            ShowResult(InfoBarSeverity.Warning, App.Text("Add_InvalidPort"), string.Empty);
+            PortInput.Focus(FocusState.Programmatic);
             return;
         }
-        PortError.Visibility = Visibility.Collapsed;
 
-        // 获取参数
-        var protoRadio = ProtocolSelector.SelectedItem as RadioButton;
-        var protocol = protoRadio?.Tag?.ToString() ?? "TCP";
-
-        var dirRadio = DirectionSelector.SelectedItem as RadioButton;
-        var direction = dirRadio?.Tag?.ToString() ?? "in";
-
+        var port = (int)PortInput.Value;
+        var protocol = (ProtocolSelector.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "TCP";
+        var direction = (DirectionSelector.SelectedItem as RadioButton)?.Tag?.ToString() ?? "in";
         var ruleName = string.IsNullOrWhiteSpace(RuleNameInput.Text)
-            ? $"Custom_Port_{port}_{protocol}"
+            ? $"PortManager_{port}_{protocol}"
             : RuleNameInput.Text.Trim();
 
-        // 禁用按钮
         AddButton.IsEnabled = false;
-        AddButton.Content = "正在添加... / Adding...";
+        AddButtonText.Text = App.Text("Add_Adding");
+        ResultBar.IsOpen = false;
 
-        // 调用服务
-        var result = await FirewallService.AddRuleAsync(port, protocol, direction, ruleName);
-
-        // 恢复按钮
-        AddButton.IsEnabled = true;
-        AddButton.Content = "添加规则 / Add";
-
-        // 显示结果
-        ResultPanel.Visibility = Visibility.Visible;
-        ResultTitle.Text = result.Success ? "添加成功" : "部分失败";
-        ResultTitle.Foreground = new SolidColorBrush(result.Success
-            ? Microsoft.UI.ColorHelper.FromArgb(255, 0x27, 0xAE, 0x60)
-            : Microsoft.UI.ColorHelper.FromArgb(255, 0xE7, 0x4C, 0x3C));
-        ResultDetail.Text = result.Message + $"\n规则名: {ruleName} | 端口: {port} | 协议: {protocol}";
+        try
+        {
+            var result = await FirewallService.AddRuleAsync(port, protocol, direction, ruleName);
+            var title = result.Success
+                ? App.Text("Add_Success")
+                : result.SuccessCount > 0 ? App.Text("Add_Partial") : App.Text("Add_Failed");
+            var message = string.Format(App.Text("Add_ResultFormat"),
+                result.SuccessCount, result.FailedCount, ruleName);
+            if (!string.IsNullOrWhiteSpace(result.ErrorMessage))
+                message += $"\n{result.ErrorMessage}";
+            ShowResult(result.Success ? InfoBarSeverity.Success : InfoBarSeverity.Error, title, message);
+        }
+        catch (FirewallOperationException ex)
+        {
+            ShowResult(InfoBarSeverity.Error, App.Text("Common_FirewallError"),
+                $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}");
+        }
+        finally
+        {
+            AddButton.IsEnabled = true;
+            AddButtonText.Text = App.Text("Add_Button");
+        }
     }
 
     private void ResetButton_Click(object sender, RoutedEventArgs e)
     {
-        PortInput.Text = "";
+        PortInput.Value = double.NaN;
         ProtocolSelector.SelectedIndex = 0;
         DirectionSelector.SelectedIndex = 0;
-        RuleNameInput.Text = "";
-        PortError.Visibility = Visibility.Collapsed;
-        ResultPanel.Visibility = Visibility.Collapsed;
+        RuleNameInput.Text = string.Empty;
+        ResultBar.IsOpen = false;
         UpdatePreview();
+    }
+
+    private void ShowResult(InfoBarSeverity severity, string title, string message)
+    {
+        ResultBar.Severity = severity;
+        ResultBar.Title = title;
+        ResultBar.Message = message;
+        ResultBar.IsOpen = true;
     }
 }

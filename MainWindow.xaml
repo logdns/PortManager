@@ -8,77 +8,77 @@
         <MicaBackdrop Kind="Base"/>
     </Window.SystemBackdrop>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <NavigationView
+        x:Name="NavView"
+        PaneDisplayMode="Auto"
+        IsBackButtonVisible="Collapsed"
+        IsSettingsVisible="False"
+        IsPaneOpen="True"
+        OpenPaneLength="240"
+        CompactPaneLength="48"
+        SelectionChanged="NavView_SelectionChanged"
+        Loaded="NavView_Loaded">
 
-        <!-- 自定义标题栏 -->
-        <TitleBar x:Name="AppTitleBar" Grid.Row="0" Title="Port Manager / 电脑端口管理">
-            <TitleBar.IconSource>
-                <FontIconSource Glyph="&#xE737;"/>
-            </TitleBar.IconSource>
-        </TitleBar>
-        <Button x:Name="LanguageButton" Grid.Row="0" Content="中文 / English" Click="LanguageButton_Click"
-                HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,148,0"
-                Padding="12,6" ToolTipService.ToolTip="切换语言 / Switch language"/>
+        <NavigationView.PaneHeader>
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="4,8,0,12">
+                <Image Source="ms-appx:///Assets/Square44x44Logo.png" Width="24" Height="24"/>
+                <TextBlock x:Name="PaneTitle" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+        </NavigationView.PaneHeader>
 
-        <!-- 导航 + 内容 -->
-        <NavigationView
-            x:Name="NavView"
-            Grid.Row="1"
-            PaneDisplayMode="Left"
-            IsBackButtonVisible="Collapsed"
-            IsSettingsVisible="False"
-            OpenPaneLength="200"
-            CompactPaneLength="48"
-            SelectionChanged="NavView_SelectionChanged"
-            Loaded="NavView_Loaded">
+        <NavigationView.MenuItems>
+            <NavigationViewItem x:Name="DashboardItem" Tag="Dashboard">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE80F;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="AddPortItem" Tag="AddPort">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE710;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="RulesItem" Tag="ListRules">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE8FD;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="DeleteItem" Tag="DeleteRule">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE74D;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="QueryItem" Tag="PortStatus">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE721;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItemSeparator/>
+            <NavigationViewItem x:Name="MoreItem" Tag="ComingSoon">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE712;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
 
-            <NavigationView.MenuItems>
-                <NavigationViewItem Content="概览 / Dashboard" Tag="Dashboard">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE80F;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem Content="添加端口 / Add port" Tag="AddPort">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE710;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem Content="端口列表 / Port rules" Tag="ListRules">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE14D;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem Content="删除规则 / Delete rule" Tag="DeleteRule">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE74D;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem Content="端口查询 / Query port" Tag="PortStatus">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE721;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem Content="更多功能 / More" Tag="ComingSoon">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE712;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-            </NavigationView.MenuItems>
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem x:Name="AboutItem" Tag="About">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE946;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.FooterMenuItems>
 
-            <NavigationView.FooterMenuItems>
-                <NavigationViewItem Content="关于 / About" Tag="About">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xE946;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-            </NavigationView.FooterMenuItems>
+        <NavigationView.PaneFooter>
+            <StackPanel Margin="8,8,8,12" Spacing="6">
+                <TextBlock x:Name="LanguageHeader" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <ComboBox x:Name="LanguageSelector" SelectedIndex="0" HorizontalAlignment="Stretch"
+                          SelectionChanged="LanguageSelector_SelectionChanged">
+                    <ComboBoxItem x:Name="ChineseOption" Tag="zh-CN"/>
+                    <ComboBoxItem x:Name="EnglishOption" Tag="en-US"/>
+                </ComboBox>
+            </StackPanel>
+        </NavigationView.PaneFooter>
 
-            <!-- 页面容器 -->
-            <Frame x:Name="ContentFrame"/>
-        </NavigationView>
-    </Grid>
+        <Frame x:Name="ContentFrame" IsNavigationStackEnabled="False"/>
+    </NavigationView>
 </Window>

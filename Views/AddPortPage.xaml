@@ -2,69 +2,62 @@
 <Page
     x:Class="PortManager.Views.AddPortPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <ScrollViewer Padding="32,24,32,24" VerticalScrollBarVisibility="Auto">
-        <StackPanel MaxWidth="640">
+    <ScrollViewer Padding="32,28" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch">
+        <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="24">
+            <StackPanel>
+                <TextBlock Text="{StaticResource Add_Title}" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text="{StaticResource Add_Subtitle}" Style="{StaticResource PageSubtitle}"/>
+            </StackPanel>
 
-            <TextBlock Text="添加端口规则 / Add port rule" Style="{StaticResource PageTitle}"/>
-            <TextBlock Text="创建 Windows 防火墙入站/出站放行规则 / Create an inbound or outbound allow rule" Opacity="0.6" Margin="0,0,0,24" TextWrapping="Wrap"/>
+            <InfoBar x:Name="ResultBar" IsOpen="False" IsClosable="True"/>
 
-            <!-- 端口号 -->
             <Border Style="{StaticResource CardPanel}">
-                <StackPanel>
-                    <TextBlock Text="端口号 / Port" Style="{StaticResource SectionTitle}"/>
-                    <TextBox
-                        x:Name="PortInput"
-                        PlaceholderText="输入 1-65535"
-                        KeyDown="PortInput_KeyDown"
-                        Margin="0,4,0,0"/>
-                    <TextBlock x:Name="PortError" Foreground="#E74C3C" FontSize="13" Visibility="Collapsed" Margin="0,4,0,0"/>
-                </StackPanel>
+                <Grid RowSpacing="18" ColumnSpacing="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <NumberBox x:Name="PortInput" Grid.Row="0" Grid.Column="0"
+                               Header="{StaticResource Add_Port}" PlaceholderText="1–65535"
+                               Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact"
+                               ValueChanged="Form_ValueChanged"/>
+
+                    <ComboBox x:Name="ProtocolSelector" Grid.Row="0" Grid.Column="1"
+                              Header="{StaticResource Add_Protocol}" SelectedIndex="0"
+                              HorizontalAlignment="Stretch" SelectionChanged="Form_SelectionChanged">
+                        <ComboBoxItem Content="TCP" Tag="TCP"/>
+                        <ComboBoxItem Content="UDP" Tag="UDP"/>
+                        <ComboBoxItem Content="ANY (TCP + UDP)" Tag="ANY"/>
+                    </ComboBox>
+
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="6">
+                        <TextBlock Text="{StaticResource Add_Direction}" FontWeight="SemiBold"/>
+                        <RadioButtons x:Name="DirectionSelector" SelectedIndex="0"
+                                      SelectionChanged="Form_SelectionChanged">
+                            <RadioButton Content="{StaticResource Add_Inbound}" Tag="in"/>
+                            <RadioButton Content="{StaticResource Add_Outbound}" Tag="out"/>
+                            <RadioButton Content="{StaticResource Add_Both}" Tag="Both"/>
+                        </RadioButtons>
+                    </StackPanel>
+
+                    <TextBox x:Name="RuleNameInput" Grid.Row="2" Grid.ColumnSpan="2"
+                             Header="{StaticResource Add_RuleName}"
+                             PlaceholderText="{StaticResource Add_RuleNamePlaceholder}"/>
+                </Grid>
             </Border>
 
-            <!-- 协议选择 -->
             <Border Style="{StaticResource CardPanel}">
-                <StackPanel>
-                    <TextBlock Text="协议类型 / Protocol" Style="{StaticResource SectionTitle}"/>
-                    <RadioButtons x:Name="ProtocolSelector" SelectedIndex="0">
-                        <RadioButton Content="TCP" Tag="TCP"/>
-                        <RadioButton Content="UDP" Tag="UDP"/>
-                        <RadioButton Content="ANY (TCP + UDP)" Tag="ANY"/>
-                    </RadioButtons>
-                </StackPanel>
-            </Border>
-
-            <!-- 方向选择 -->
-            <Border Style="{StaticResource CardPanel}">
-                <StackPanel>
-                    <TextBlock Text="规则方向 / Direction" Style="{StaticResource SectionTitle}"/>
-                    <RadioButtons x:Name="DirectionSelector" SelectedIndex="0">
-                        <RadioButton Content="入站 (Inbound)" Tag="in"/>
-                        <RadioButton Content="出站 (Outbound)" Tag="out"/>
-                        <RadioButton Content="入站 + 出站 (Both)" Tag="Both"/>
-                    </RadioButtons>
-                </StackPanel>
-            </Border>
-
-            <!-- 规则名称 -->
-            <Border Style="{StaticResource CardPanel}">
-                <StackPanel>
-                    <TextBlock Text="规则名称 / Rule name" Style="{StaticResource SectionTitle}"/>
-                    <TextBox
-                        x:Name="RuleNameInput"
-                        PlaceholderText="留空则自动生成 Custom_Port_{端口}_{协议}"/>
-                </StackPanel>
-            </Border>
-
-            <!-- 确认信息 -->
-            <Border Style="{StaticResource CardPanel}">
-                <StackPanel>
-                    <TextBlock Text="规则预览 / Preview" Style="{StaticResource SectionTitle}"/>
-                    <Grid Margin="0,8,0,0">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="{StaticResource Add_Preview}" Style="{StaticResource SectionTitle}"/>
+                    <Grid ColumnSpacing="20" RowSpacing="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -75,32 +68,32 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="端口：" Opacity="0.7"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="PreviewPort" Text="—"/>
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="协议：" Opacity="0.7"/>
-                        <TextBlock Grid.Row="0" Grid.Column="3" x:Name="PreviewProtocol" Text="TCP"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="方向：" Opacity="0.7" Margin="0,8,0,0"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="PreviewDirection" Text="入站" Margin="0,8,0,0"/>
-                        <TextBlock Grid.Row="1" Grid.Column="2" Text="动作：" Opacity="0.7" Margin="0,8,0,0"/>
-                        <TextBlock Grid.Row="1" Grid.Column="3" Text="允许" Margin="0,8,0,0"/>
+                        <TextBlock Text="{StaticResource Add_Port}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="PreviewPort" Grid.Column="1" Text="--" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Column="2" Text="{StaticResource Add_Protocol}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="PreviewProtocol" Grid.Column="3" Text="TCP" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="1" Text="{StaticResource Add_Direction}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock x:Name="PreviewDirection" Grid.Row="1" Grid.Column="1" Text="{StaticResource Add_Inbound}" FontWeight="SemiBold"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{StaticResource Add_Action}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="{StaticResource Add_Allow}" FontWeight="SemiBold"/>
                     </Grid>
                 </StackPanel>
             </Border>
 
-            <!-- 操作按钮 -->
-            <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,0,0,24">
-                <Button x:Name="AddButton" Content="添加规则 / Add" Style="{ThemeResource AccentButtonStyle}" Click="AddButton_Click"/>
-                <Button Content="重置 / Reset" Click="ResetButton_Click"/>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="AddButton" Style="{ThemeResource AccentButtonStyle}" Click="AddButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE710;"/>
+                        <TextBlock x:Name="AddButtonText" Text="{StaticResource Add_Button}"/>
+                    </StackPanel>
+                </Button>
+                <Button Click="ResetButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE777;"/>
+                        <TextBlock Text="{StaticResource Common_Reset}"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
-
-            <!-- 结果反馈 -->
-            <Border x:Name="ResultPanel" Visibility="Collapsed" Style="{StaticResource CardPanel}">
-                <StackPanel>
-                    <TextBlock x:Name="ResultTitle" Text="" FontWeight="SemiBold" FontSize="15"/>
-                    <TextBlock x:Name="ResultDetail" Text="" Opacity="0.7" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Border>
-
         </StackPanel>
     </ScrollViewer>
 </Page>

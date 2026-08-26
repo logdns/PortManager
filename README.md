@@ -1,17 +1,18 @@
 # Port Manager / 电脑端口管理 - WinUI 3
 
-基于 WinUI 3 (Windows App SDK) 的 Windows 防火墙端口管理桌面应用，提供中英文双语导航和可扩展的功能区域。
+基于 WinUI 3 (Windows App SDK) 的 Windows 防火墙端口管理桌面应用，提供可切换的中文/英文界面和可扩展的功能区域。
 
-Windows Firewall port manager built with WinUI 3. The shell includes a bilingual navigation experience and a reserved extension area for future modules.
+Windows Firewall port manager built with WinUI 3. The app includes switchable Chinese and English interfaces and a reserved extension area for future modules.
 
 ## 功能
 
 | 功能 | 说明 |
 |------|------|
-| 添加端口 | 支持 TCP / UDP / ANY 协议，入站 / 出站 / 双向 |
-| 端口列表 | 查询所有已启用的端口放行规则，支持搜索 |
+| 添加端口 | 支持 TCP / UDP / ANY 协议，入站使用本地端口，出站使用远程端口 |
+| 端口列表 | 查询所有已启用的端口放行规则，支持名称和端口搜索 |
 | 删除规则 | 按名称精确匹配删除，带二次确认 |
-| 端口查询 | 输入端口号查看该端口的防火墙状态 |
+| 端口查询 | 按本地或远程端口查询对应的防火墙规则 |
+| 界面语言 | 中文与英文即时切换，不混排两种语言 |
 | 关于 | 版本信息与技术栈说明 |
 
 ## 技术栈
@@ -44,7 +45,7 @@ Windows Firewall port manager built with WinUI 3. The shell includes a bilingual
 dotnet publish PortManager.csproj -c Release -r win-x64 --self-contained true -p:WindowsPackageType=None -o artifacts\win-x64
 ```
 
-将 `win-x64` 替换为 `win-x86` 或 `win-arm64` 即可生成对应架构。GitHub Actions 会先执行单元测试，再构建三种架构的 portable ZIP 和 Inno Setup 安装包，并在推送 `v*` 标签时创建 GitHub Release。
+将 `win-x64` 替换为 `win-x86` 或 `win-arm64` 即可生成对应架构。GitHub Actions 会先执行单元测试，再构建三种架构的 portable ZIP 和 Inno Setup 安装包，并在推送 `v*` 标签时创建 GitHub Release。发布流程会移除中文和英文之外的 .NET 卫星资源目录。
 
 发布产物：
 

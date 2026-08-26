@@ -14,6 +14,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Models\FirewallRuleModel.cs" Link="Models\FirewallRuleModel.cs" />
+    <Compile Include="..\Services\FirewallService.cs" Link="Services\FirewallService.cs" />
+    <Compile Include="..\Services\LanguageState.cs" Link="Services\LanguageState.cs" />
     <Compile Include="..\Services\PortRangeMatcher.cs" Link="Services\PortRangeMatcher.cs" />
   </ItemGroup>
 </Project>

@@ -1,19 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Page x:Class="PortManager.Views.DashboardPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel Padding="32,24" Spacing="12">
-    <TextBlock Text="概览 / Dashboard" Style="{StaticResource PageTitle}"/>
-    <TextBlock Text="端口规则 / Rules" Style="{StaticResource SectionTitle}"/>
-    <TextBlock x:Name="RuleCount" Text="--" FontSize="28"/>
-    <TextBlock Text="已启用放行规则 / Enabled allow rules" Opacity="0.65"/>
-    <StackPanel Orientation="Horizontal" Spacing="8">
-      <Button Content="添加端口 / Add port" Click="AddPort_Click"/>
-      <Button Content="端口列表 / View rules" Click="ListRules_Click"/>
-      <Button Content="端口查询 / Query port" Click="PortStatus_Click"/>
-    </StackPanel>
-    <TextBlock Text="扩展区域 / Extension area" Style="{StaticResource SectionTitle}" Margin="0,16,0,0"/>
-    <TextBlock Text="后续可加入连接监控、配置导入导出和日志审计。 / Future modules can be added here."
-               TextWrapping="Wrap" Opacity="0.7"/>
-  </StackPanel>
+<Page
+    x:Class="PortManager.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    Loaded="Page_Loaded">
+
+    <ScrollViewer Padding="32,28" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch">
+        <StackPanel MaxWidth="960" HorizontalAlignment="Stretch" Spacing="24">
+            <StackPanel>
+                <TextBlock Text="{StaticResource Dashboard_Title}" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text="{StaticResource Dashboard_Subtitle}" Style="{StaticResource PageSubtitle}"/>
+            </StackPanel>
+
+            <InfoBar x:Name="ErrorBar" IsOpen="False" Severity="Error"
+                     Title="{StaticResource Common_FirewallError}"
+                     Message="{StaticResource Common_FirewallErrorDetail}">
+                <InfoBar.ActionButton>
+                    <Button Content="{StaticResource Common_Retry}" Click="RetryButton_Click"/>
+                </InfoBar.ActionButton>
+            </InfoBar>
+
+            <Border Style="{StaticResource CardPanel}">
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="48" Height="48" CornerRadius="6"
+                            Background="{ThemeResource AccentFillColorDefaultBrush}">
+                        <FontIcon Glyph="&#xE83D;" FontSize="22" Foreground="White"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="{StaticResource Dashboard_RuleCount}" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="FirewallStatusText" Text="{StaticResource Dashboard_Loading}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <ProgressRing x:Name="LoadingRing" Width="22" Height="22" IsActive="True"/>
+                        <TextBlock x:Name="RuleCount" Text="--" FontSize="32" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <StackPanel Spacing="12">
+                <TextBlock Text="{StaticResource Dashboard_QuickActions}" Style="{StaticResource SectionTitle}"/>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                            Padding="16,12" Click="AddPort_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <FontIcon Glyph="&#xE710;"/>
+                            <TextBlock Text="{StaticResource Dashboard_Add}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                            Padding="16,12" Click="ListRules_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <FontIcon Glyph="&#xE8FD;"/>
+                            <TextBlock Text="{StaticResource Dashboard_View}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Grid.Column="2" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                            Padding="16,12" Click="PortStatus_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <FontIcon Glyph="&#xE721;"/>
+                            <TextBlock Text="{StaticResource Dashboard_Query}"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Spacing="12">
+                <TextBlock Text="{StaticResource Dashboard_Extensions}" Style="{StaticResource SectionTitle}"/>
+                <toolkit:SettingsCard Header="{StaticResource Nav_More}"
+                                      Description="{StaticResource Dashboard_ExtensionsDescription}"
+                                      IsClickEnabled="True" Click="MoreFeatures_Click">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE72A;"/>
+                    </toolkit:SettingsCard.HeaderIcon>
+                </toolkit:SettingsCard>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </Page>

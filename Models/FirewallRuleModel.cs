@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 
 namespace PortManager.Models;
@@ -19,30 +20,37 @@ public class FirewallRule
     [JsonPropertyName("LocalPort")]
     public string LocalPort { get; set; } = string.Empty;
 
+    [JsonPropertyName("RemotePort")]
+    public string RemotePort { get; set; } = string.Empty;
+
     [JsonPropertyName("Profile")]
     public string Profile { get; set; } = string.Empty;
 
     [JsonPropertyName("Enabled")]
     public string Enabled { get; set; } = string.Empty;
 
-    /// <summary>
-    /// 格式化方向显示：Inbound -> 入站, Outbound -> 出站
-    /// </summary>
     public string DirectionDisplay => Direction switch
     {
-        "Inbound"  => "入站",
-        "Outbound" => "出站",
+        "Inbound"  => Services.LanguageState.IsEnglish ? "Inbound" : "入站",
+        "Outbound" => Services.LanguageState.IsEnglish ? "Outbound" : "出站",
         _          => Direction
     };
 
-    /// <summary>
-    /// 格式化协议显示
-    /// </summary>
     public string ProtocolDisplay => Protocol switch
     {
+        "6" => "TCP",
+        "17" => "UDP",
+        "256" => "ANY",
         "Any" => "ANY",
-        _    => Protocol
+        _ => Protocol.ToUpperInvariant()
     };
+
+    public string PortDisplay => Direction == "Outbound" && IsSpecificPort(RemotePort)
+        ? RemotePort
+        : LocalPort;
+
+    private static bool IsSpecificPort(string value) =>
+        !string.IsNullOrWhiteSpace(value) && !value.Equals("Any", StringComparison.OrdinalIgnoreCase);
 }
 
 /// <summary>
@@ -54,4 +62,5 @@ public class OperationResult
     public string Message { get; set; } = string.Empty;
     public int SuccessCount { get; set; }
     public int FailedCount { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
 }

@@ -53,6 +53,21 @@ jobs:
             ForEach-Object { Get-Content $_.FullName -Raw }
       - name: Publish portable app
         run: dotnet publish PortManager.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
+      - name: Keep only Chinese and English resources
+        shell: pwsh
+        run: |
+          $publishDirectory = "artifacts/portable/${{ matrix.rid }}"
+          $allowedCultures = @("en", "en-US", "zh", "zh-CN", "zh-Hans")
+          $culturePattern = '^[a-z]{2,3}(-[A-Za-z]{2,4})?$'
+          Get-ChildItem $publishDirectory -Directory |
+            Where-Object { $_.Name -match $culturePattern -and $_.Name -notin $allowedCultures } |
+            Remove-Item -Recurse -Force
+
+          $unexpected = Get-ChildItem $publishDirectory -Directory |
+            Where-Object { $_.Name -match $culturePattern -and $_.Name -notin $allowedCultures }
+          if ($unexpected) {
+            throw "Unexpected language resources: $($unexpected.Name -join ', ')"
+          }
       - name: Zip portable app
         shell: pwsh
         run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/PortManager-${{ matrix.rid }}.zip

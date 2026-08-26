@@ -5,66 +5,78 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:models="using:PortManager.Models">
 
-    <Grid Padding="32,24,32,24">
+    <Grid Padding="32,28" RowSpacing="20">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0">
-            <TextBlock Text="端口查询 / Query port" Style="{StaticResource PageTitle}"/>
-            <TextBlock Text="输入端口号，查看该端口的防火墙放行状态 / Check firewall rules for a port" Opacity="0.6" Margin="0,0,0,16" TextWrapping="Wrap"/>
+        <StackPanel>
+            <TextBlock Text="{StaticResource Query_Title}" Style="{StaticResource PageTitle}"/>
+            <TextBlock Text="{StaticResource Query_Subtitle}" Style="{StaticResource PageSubtitle}"/>
         </StackPanel>
 
-        <!-- 搜索栏 -->
-        <Border Grid.Row="1" Style="{StaticResource CardPanel}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox x:Name="PortSearchInput" PlaceholderText="输入端口号" Width="200" KeyDown="PortSearch_KeyDown"/>
-                <Button x:Name="SearchBtn" Content="查询 / Search" Style="{ThemeResource AccentButtonStyle}" Click="SearchButton_Click"/>
-            </StackPanel>
+        <InfoBar x:Name="StatusBar" Grid.Row="1" IsOpen="False" IsClosable="True"/>
+
+        <Border Grid.Row="2" Style="{StaticResource CardPanel}" Padding="16">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <NumberBox x:Name="PortSearchInput" PlaceholderText="{StaticResource Query_PortPlaceholder}"
+                           Minimum="1" Maximum="65535" SpinButtonPlacementMode="Compact"
+                           KeyDown="PortSearch_KeyDown"/>
+                <Button x:Name="SearchButton" Grid.Column="1" Style="{ThemeResource AccentButtonStyle}"
+                        Click="SearchButton_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE721;"/>
+                        <TextBlock x:Name="SearchButtonText" Text="{StaticResource Query_Button}"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Border>
 
-        <!-- 查询结果 -->
-        <ListView
-            Grid.Row="2"
-            x:Name="ResultList"
-            ItemsSource="{x:Bind Results, Mode=OneWay}">
-
+        <ListView Grid.Row="3" ItemsSource="{x:Bind Results, Mode=OneWay}" SelectionMode="None">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Margin" Value="0,0,0,8"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:FirewallRule">
-                    <Border Style="{StaticResource CardPanel}" Margin="0,0,0,8" Padding="16,12,16,12">
-                        <Grid>
+                    <Border Style="{StaticResource CardPanel}" Padding="16,12">
+                        <Grid ColumnSpacing="16">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="70"/>
+                                <ColumnDefinition Width="80"/>
                             </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE737;" FontSize="16" VerticalAlignment="Center" Opacity="0.6"/>
-                                <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            </StackPanel>
-
-                            <Border Grid.Column="1" CornerRadius="4" Padding="8,2,8,2" Margin="8,0,0,0" VerticalAlignment="Center" Background="#E8F0FE">
-                                <TextBlock Text="{x:Bind DirectionDisplay}" FontSize="12" Foreground="#1A73E8"/>
-                            </Border>
-                            <Border Grid.Column="2" CornerRadius="4" Padding="8,2,8,2" Margin="8,0,0,0" VerticalAlignment="Center" Background="#E6F4EA">
-                                <TextBlock Text="{x:Bind ProtocolDisplay}" FontSize="12" Foreground="#137333"/>
-                            </Border>
-                            <TextBlock Grid.Column="3" Text="{x:Bind LocalPort}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="#E8710A"/>
+                            <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="1" Text="{x:Bind DirectionDisplay}" VerticalAlignment="Center"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Grid.Column="2" Text="{x:Bind ProtocolDisplay}" VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{x:Bind PortDisplay}" VerticalAlignment="Center"
+                                       HorizontalAlignment="Right" FontWeight="SemiBold"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
             </ListView.ItemTemplate>
-
         </ListView>
 
-        <StackPanel x:Name="EmptyState" Grid.Row="2"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-            <FontIcon Glyph="&#xE721;" FontSize="40" Opacity="0.35"/>
-            <TextBlock x:Name="EmptyText" Text="输入端口号进行查询 / Enter a port to search" Opacity="0.65"/>
+        <StackPanel x:Name="EmptyState" Grid.Row="3"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+            <FontIcon Glyph="&#xE721;" FontSize="36" Opacity="0.35"/>
+            <TextBlock x:Name="EmptyText" Text="{StaticResource Query_Initial}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
         </StackPanel>
     </Grid>
 </Page>
