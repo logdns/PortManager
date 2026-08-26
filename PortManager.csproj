@@ -23,6 +23,12 @@
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
+  <!-- Tests are a separate project and must not be compiled into the WinUI app. -->
+  <ItemGroup>
+    <Compile Remove="PortManager.Tests\**\*.cs" />
+    <None Remove="PortManager.Tests\**\*" />
+  </ItemGroup>
+
   <!-- Defining the "Msix" property where the appx manifest will be. -->
   <ItemGroup Condition="'$(WindowsPackageType)' != 'None'">
     <AppxManifest Include="Package.appxmanifest">
