@@ -68,6 +68,27 @@ jobs:
           if ($unexpected) {
             throw "Unexpected language resources: $($unexpected.Name -join ', ')"
           }
+      - name: Add portable package instructions
+        shell: pwsh
+        run: |
+          $architecture = '${{ matrix.installer_arch }}'
+          $instructions = @"
+          Port Manager 1.1.1
+
+          Architecture: $architecture
+
+          Choose the package matching your Windows system:
+            x64   - Intel/AMD 64-bit Windows (most PCs)
+            x86   - 32-bit Windows
+            arm64 - Windows on ARM devices
+
+          Run PortManager.exe as administrator. The app requires administrator
+          permission to read and change Windows Firewall rules.
+
+          If the program does not open, verify that the package architecture
+          matches Settings > System > About > System type.
+          "@
+          Set-Content -Path "$publishDirectory\README.txt" -Value $instructions -Encoding UTF8
       - name: Zip portable app
         shell: pwsh
         run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/PortManager-${{ matrix.rid }}.zip
