@@ -90,7 +90,9 @@ public partial class App : Application
         var details = new StringBuilder()
             .AppendLine(message)
             .AppendLine()
-            .AppendLine(exception.Message)
+            .AppendLine($"{exception.GetType().FullName}: {exception.Message}")
+            .AppendLine()
+            .AppendLine(exception.StackTrace)
             .AppendLine()
             .Append("诊断日志: ").Append(LogPath)
             .ToString();

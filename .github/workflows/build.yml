@@ -73,7 +73,7 @@ jobs:
         run: |
           $architecture = '${{ matrix.installer_arch }}'
           $instructions = @"
-          Port Manager 1.1.1
+          Port Manager 1.1.2
 
           Architecture: $architecture
 
