@@ -12,11 +12,13 @@
         x:Name="NavView"
         PaneDisplayMode="Auto"
         IsBackButtonVisible="Collapsed"
+        IsBackEnabled="False"
         IsSettingsVisible="False"
         IsPaneOpen="True"
         OpenPaneLength="240"
         CompactPaneLength="48"
         SelectionChanged="NavView_SelectionChanged"
+        BackRequested="NavView_BackRequested"
         Loaded="NavView_Loaded">
 
         <NavigationView.PaneHeader>

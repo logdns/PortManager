@@ -32,6 +32,43 @@ public static class ConnectionService
                 .ToList();
         });
 
+    public static Task TerminateProcessAsync(int processId) => Task.Run(() =>
+    {
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException("Process control is available only on Windows.");
+        if (processId <= 4)
+            throw new ConnectionOperationException("System processes cannot be terminated.");
+        try
+        {
+            using var process = Process.GetProcessById(processId);
+            process.Kill(entireProcessTree: false);
+        }
+        catch (Exception ex)
+        {
+            throw new ConnectionOperationException($"Could not terminate process {processId}: {ex.Message}");
+        }
+    });
+
+    public static Task CloseTcpConnectionAsync(ConnectionModel connection) => Task.Run(() =>
+    {
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException("Connection control is available only on Windows.");
+        if (!connection.Protocol.Equals("TCP", StringComparison.OrdinalIgnoreCase))
+            throw new ConnectionOperationException("Only TCP connections can be closed.");
+
+        var row = new MibTcpRow
+        {
+            State = 12,
+            LocalAddress = ParseAddress(connection.LocalAddress),
+            LocalPort = HostToNetworkPort(connection.LocalPort),
+            RemoteAddress = ParseAddress(connection.RemoteAddress),
+            RemotePort = HostToNetworkPort(connection.RemotePort)
+        };
+        var result = SetTcpEntry(ref row);
+        if (result != 0)
+            throw new ConnectionOperationException($"Windows could not close the TCP connection (error {result}).");
+    });
+
     private static IEnumerable<ConnectionModel> ReadTcpConnections()
     {
         var buffer = GetTable(IntPtr.Zero, out var size, TcpTableOwnerPidAll, true);
@@ -142,6 +179,12 @@ public static class ConnectionService
     private static int NetworkToHostPort(uint port) =>
         (ushort)IPAddress.NetworkToHostOrder(unchecked((short)port));
 
+    private static uint HostToNetworkPort(int port) =>
+        unchecked((uint)IPAddress.HostToNetworkOrder((short)port));
+
+    private static uint ParseAddress(string address) =>
+        BitConverter.ToUInt32(IPAddress.Parse(address).GetAddressBytes(), 0);
+
     private static string FormatTcpState(uint state) => state switch
     {
         1 => "Closed",
@@ -167,6 +210,9 @@ public static class ConnectionService
     private static extern int GetExtendedUdpTable(
         IntPtr table, ref int size, bool order, int addressFamily, int tableClass, uint reserved);
 
+    [DllImport("iphlpapi.dll", SetLastError = true)]
+    private static extern int SetTcpEntry(ref MibTcpRow row);
+
     [StructLayout(LayoutKind.Sequential)]
     private struct MibTcpRowOwnerPid
     {
@@ -184,6 +230,16 @@ public static class ConnectionService
         public uint LocalAddress;
         public uint LocalPort;
         public uint ProcessId;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MibTcpRow
+    {
+        public uint State;
+        public uint LocalAddress;
+        public uint LocalPort;
+        public uint RemoteAddress;
+        public uint RemotePort;
     }
 }
 

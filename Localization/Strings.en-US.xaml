@@ -105,6 +105,11 @@
     <x:String x:Key="Connection_LocalEndpoint">Local endpoint</x:String>
     <x:String x:Key="Connection_RemoteEndpoint">Remote endpoint</x:String>
     <x:String x:Key="Connection_Error">Could not read active connections</x:String>
+    <x:String x:Key="Connection_Close">Close TCP connection</x:String>
+    <x:String x:Key="Connection_Terminate">Terminate process</x:String>
+    <x:String x:Key="Connection_ConfirmTerminateTitle">Terminate process?</x:String>
+    <x:String x:Key="Connection_ConfirmTerminateFormat">Terminate “{0}” (PID {1})?</x:String>
+    <x:String x:Key="Connection_ActionError">Connection action failed</x:String>
 
     <x:String x:Key="Transfer_Title">Rule import and export</x:String>
     <x:String x:Key="Transfer_Subtitle">Back up or restore Windows Firewall rules as a JSON file</x:String>
@@ -131,6 +136,7 @@
 
     <x:String x:Key="About_Title">About</x:String>
     <x:String x:Key="About_Description">Windows Firewall port management utility</x:String>
+    <x:String x:Key="About_Copyright">Fengge Network · xinai.de</x:String>
     <x:String x:Key="About_Version">Version 1.2.0</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>

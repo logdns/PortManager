@@ -28,12 +28,13 @@
                     <DataTemplate x:DataType="models:ConnectionModel">
                         <Border Style="{StaticResource CardPanel}" Padding="14,11">
                             <Grid ColumnSpacing="14">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="70"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="120"/><ColumnDefinition Width="120"/></Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="70"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="120"/><ColumnDefinition Width="120"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <TextBlock Text="{x:Bind Protocol}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 <StackPanel Grid.Column="1"><TextBlock Text="{StaticResource Connection_LocalEndpoint}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="{x:Bind LocalEndpoint}" TextTrimming="CharacterEllipsis"/></StackPanel>
                                 <StackPanel Grid.Column="2"><TextBlock Text="{StaticResource Connection_RemoteEndpoint}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/><TextBlock Text="{x:Bind RemoteEndpoint}" TextTrimming="CharacterEllipsis"/></StackPanel>
                                 <TextBlock Grid.Column="3" Text="{x:Bind StateDisplay}" VerticalAlignment="Center"/>
                                 <StackPanel Grid.Column="4"><TextBlock Text="{x:Bind ProcessName}" TextTrimming="CharacterEllipsis"/><TextBlock Text="{x:Bind ProcessId}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/></StackPanel>
+                                <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="4"><Button Width="34" Height="32" Padding="0" Click="CloseConnection_Click" ToolTipService.ToolTip="{StaticResource Connection_Close}"><FontIcon Glyph="&#xE711;"/></Button><Button Width="34" Height="32" Padding="0" Click="TerminateProcess_Click" ToolTipService.ToolTip="{StaticResource Connection_Terminate}"><FontIcon Glyph="&#xE74D;"/></Button></StackPanel>
                             </Grid>
                         </Border>
                     </DataTemplate>

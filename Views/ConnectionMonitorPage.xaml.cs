@@ -22,6 +22,30 @@ public sealed partial class ConnectionMonitorPage : Page
     private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await LoadConnectionsAsync();
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => ApplyFilter();
 
+    private async void CloseConnection_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.DataContext is not ConnectionModel connection) return;
+        try { await ConnectionService.CloseTcpConnectionAsync(connection); AuditLogService.Record("CloseConnection", connection.LocalEndpoint); await LoadConnectionsAsync(); }
+        catch (Exception ex) { ShowActionError(ex); }
+    }
+
+    private async void TerminateProcess_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button || button.DataContext is not ConnectionModel connection) return;
+        var dialog = new ContentDialog { XamlRoot = XamlRoot, Title = App.Text("Connection_ConfirmTerminateTitle"), Content = string.Format(App.Text("Connection_ConfirmTerminateFormat"), connection.ProcessName, connection.ProcessId), PrimaryButtonText = App.Text("Common_Confirm"), CloseButtonText = App.Text("Common_Cancel"), DefaultButton = ContentDialogButton.Close };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+        try { await ConnectionService.TerminateProcessAsync(connection.ProcessId); AuditLogService.Record("TerminateProcess", $"PID {connection.ProcessId}"); await LoadConnectionsAsync(); }
+        catch (Exception ex) { ShowActionError(ex); }
+    }
+
+    private void ShowActionError(Exception ex)
+    {
+        ErrorBar.Title = App.Text("Connection_ActionError");
+        ErrorBar.Message = ex.Message;
+        ErrorBar.IsOpen = true;
+        AuditLogService.Record("ConnectionAction", ex.Message, false);
+    }
+
     private async Task LoadConnectionsAsync()
     {
         LoadingRing.IsActive = true;

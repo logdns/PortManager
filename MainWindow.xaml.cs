@@ -71,6 +71,14 @@ public sealed partial class MainWindow : Window
             NavigateFrame(tag);
     }
 
+    private void NavView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+    {
+        if (_currentTag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog")
+            NavigateTo("ComingSoon");
+        else if (_currentTag != "Dashboard")
+            NavigateTo("Dashboard");
+    }
+
     private void LanguageSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_isReady)
@@ -124,6 +132,10 @@ public sealed partial class MainWindow : Window
             return;
 
         _currentTag = tag;
+        NavView.IsBackButtonVisible = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog"
+            ? NavigationViewBackButtonVisible.Visible
+            : NavigationViewBackButtonVisible.Collapsed;
+        NavView.IsBackEnabled = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog";
         if ((force || ContentFrame.CurrentSourcePageType != pageType) && ContentFrame.Navigate(pageType))
             App.LogStartup($"Navigation completed: {pageType.Name}.");
     }

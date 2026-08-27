@@ -34,7 +34,10 @@ public sealed partial class RuleTransferPage : Page
         SetBusy(true, App.Text("Transfer_Exporting"));
         try
         {
-            var picker = new FileSavePicker();
+            var picker = new FileSavePicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            };
             InitializeWithWindow.Initialize(picker, WindowHandle());
             picker.SuggestedFileName = "PortManager-rules";
             picker.FileTypeChoices.Add("JSON", new List<string> { ".json" });
@@ -52,14 +55,18 @@ public sealed partial class RuleTransferPage : Page
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e)
     {
-        var picker = new FileOpenPicker();
-        InitializeWithWindow.Initialize(picker, WindowHandle());
-        picker.FileTypeFilter.Add(".json");
-        var file = await picker.PickSingleFileAsync();
-        if (file is null) return;
-        SetBusy(true, App.Text("Transfer_Importing"));
         try
         {
+            var picker = new FileOpenPicker
+            {
+                ViewMode = PickerViewMode.List,
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            };
+            InitializeWithWindow.Initialize(picker, WindowHandle());
+            picker.FileTypeFilter.Add(".json");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return;
+            SetBusy(true, App.Text("Transfer_Importing"));
             var document = RuleTransferService.Parse(await FileIO.ReadTextAsync(file));
             var dialog = new ContentDialog
             {

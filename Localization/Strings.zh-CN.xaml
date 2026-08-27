@@ -105,6 +105,11 @@
     <x:String x:Key="Connection_LocalEndpoint">本地端点</x:String>
     <x:String x:Key="Connection_RemoteEndpoint">远程端点</x:String>
     <x:String x:Key="Connection_Error">无法读取活动连接</x:String>
+    <x:String x:Key="Connection_Close">关闭 TCP 连接</x:String>
+    <x:String x:Key="Connection_Terminate">终止关联进程</x:String>
+    <x:String x:Key="Connection_ConfirmTerminateTitle">终止进程？</x:String>
+    <x:String x:Key="Connection_ConfirmTerminateFormat">确定要终止进程“{0}”（PID {1}）吗？</x:String>
+    <x:String x:Key="Connection_ActionError">连接操作失败</x:String>
 
     <x:String x:Key="Transfer_Title">规则导入导出</x:String>
     <x:String x:Key="Transfer_Subtitle">使用 JSON 文件备份或恢复 Windows 防火墙规则</x:String>
@@ -131,6 +136,7 @@
 
     <x:String x:Key="About_Title">关于</x:String>
     <x:String x:Key="About_Description">Windows 防火墙端口管理工具</x:String>
+    <x:String x:Key="About_Copyright">沨哥网络 · xinai.de</x:String>
     <x:String x:Key="About_Version">版本 1.2.0</x:String>
     <x:String x:Key="About_Features">功能</x:String>
     <x:String x:Key="About_FeatureText">添加、查询和删除 TCP/UDP 防火墙规则，支持入站、出站和双向配置。</x:String>
