@@ -1,8 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using PortManager.Services;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 using WinRT.Interop;
 
 namespace PortManager.Views;
@@ -34,18 +32,11 @@ public sealed partial class RuleTransferPage : Page
         SetBusy(true, App.Text("Transfer_Exporting"));
         try
         {
-            var picker = new FileSavePicker
-            {
-                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-            };
-            InitializeWithWindow.Initialize(picker, WindowHandle());
-            picker.SuggestedFileName = "PortManager-rules";
-            picker.FileTypeChoices.Add("JSON", new List<string> { ".json" });
-            var file = await picker.PickSaveFileAsync();
-            if (file is null) return;
+            var path = NativeFileDialogService.SaveJson(WindowHandle());
+            if (path is null) return;
             var rules = await FirewallService.ListRulesAsync();
-            await FileIO.WriteTextAsync(file, RuleTransferService.Serialize(rules));
-            FileText.Text = string.Format(App.Text("Transfer_ExportSuccess"), file.Name, rules.Count);
+            await File.WriteAllTextAsync(path, RuleTransferService.Serialize(rules), System.Text.Encoding.UTF8);
+            FileText.Text = string.Format(App.Text("Transfer_ExportSuccess"), Path.GetFileName(path), rules.Count);
             ShowStatus(InfoBarSeverity.Success, FileText.Text);
             AuditLogService.Record("ExportRules", $"Exported {rules.Count} rule(s).");
         }
@@ -57,22 +48,15 @@ public sealed partial class RuleTransferPage : Page
     {
         try
         {
-            var picker = new FileOpenPicker
-            {
-                ViewMode = PickerViewMode.List,
-                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
-            };
-            InitializeWithWindow.Initialize(picker, WindowHandle());
-            picker.FileTypeFilter.Add(".json");
-            var file = await picker.PickSingleFileAsync();
-            if (file is null) return;
+            var path = NativeFileDialogService.OpenJson(WindowHandle());
+            if (path is null) return;
             SetBusy(true, App.Text("Transfer_Importing"));
-            var document = RuleTransferService.Parse(await FileIO.ReadTextAsync(file));
+            var document = RuleTransferService.Parse(await File.ReadAllTextAsync(path));
             var dialog = new ContentDialog
             {
                 XamlRoot = XamlRoot,
                 Title = App.Text("Transfer_ConfirmImportTitle"),
-                Content = string.Format(App.Text("Transfer_ConfirmImportFormat"), file.Name, document.Rules.Count),
+                Content = string.Format(App.Text("Transfer_ConfirmImportFormat"), Path.GetFileName(path), document.Rules.Count),
                 PrimaryButtonText = App.Text("Common_Confirm"),
                 CloseButtonText = App.Text("Common_Cancel"),
                 DefaultButton = ContentDialogButton.Primary
