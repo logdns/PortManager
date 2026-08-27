@@ -79,7 +79,7 @@ jobs:
           $publishDirectory = "artifacts/portable/${{ matrix.rid }}"
           $architecture = '${{ matrix.installer_arch }}'
           $instructions = @"
-          Port Manager 1.2.0
+          Port Manager ${{ github.ref_name }}
 
           Architecture: $architecture
 

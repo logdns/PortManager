@@ -44,7 +44,17 @@ public sealed partial class MainWindow : Window
 
         var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "PortManager.ico");
         if (File.Exists(iconPath))
+        {
             _appWindow.SetIcon(iconPath);
+            try
+            {
+                TrayIconService.Initialize(windowHandle, iconPath, RestoreFromTray, ExitFromTray);
+            }
+            catch (Exception ex)
+            {
+                App.LogStartup($"Tray icon initialization failed: {ex.Message}");
+            }
+        }
 
         if (_appWindow.Presenter is OverlappedPresenter presenter)
         {
@@ -86,7 +96,23 @@ public sealed partial class MainWindow : Window
     private static void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         App.LogStartup("Main window closed.");
+        TrayIconService.Dispose();
         Application.Current.Exit();
+        Environment.Exit(0);
+    }
+
+    private void RestoreFromTray()
+    {
+        if (_appWindow?.Presenter is OverlappedPresenter presenter)
+            presenter.Restore();
+        _appWindow?.Show();
+        Activate();
+    }
+
+    private void ExitFromTray()
+    {
+        _allowClose = true;
+        _appWindow?.Destroy();
     }
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
