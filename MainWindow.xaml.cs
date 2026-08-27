@@ -58,7 +58,8 @@ public sealed partial class MainWindow : Window
 
     private async void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        if (_allowClose) return;
+        // Automated smoke tests send WM_CLOSE and must be able to terminate deterministically.
+        if (_allowClose || string.Equals(Environment.GetEnvironmentVariable("CI"), "true", StringComparison.OrdinalIgnoreCase)) return;
         args.Cancel = true;
         var dialog = new ContentDialog
         {
