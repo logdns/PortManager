@@ -7,8 +7,9 @@ namespace PortManager.Services;
 /// </summary>
 internal static class TrayIconService
 {
-    private const uint NimAdd = 0;
-    private const uint NimDelete = 2;
+    private const uint NimAdd = 0x00000000;
+    private const uint NimDelete = 0x00000002;
+    private const uint NimSetVersion = 0x00000004;
     private const uint NifMessage = 0x00000001;
     private const uint NifIcon = 0x00000002;
     private const uint NifTip = 0x00000004;
@@ -49,12 +50,16 @@ internal static class TrayIconService
             {
                 var windowClass = new WindowClassEx
                 {
-                    Size = Marshal.SizeOf<WindowClassEx>(),
+                    Size = (uint)Marshal.SizeOf<WindowClassEx>(),
+                    Style = 0,
                     WindowProc = Marshal.GetFunctionPointerForDelegate(_windowProc),
+                    ClassExtra = 0,
+                    WindowExtra = 0,
                     Instance = GetModuleHandle(null),
                     ClassName = className
                 };
-                RegisterClassEx(ref windowClass);
+                if (RegisterClassEx(ref windowClass) == 0)
+                    throw new InvalidOperationException($"Could not register the tray window class (Win32 error {Marshal.GetLastWin32Error()}).");
                 _window = CreateWindowEx(0, _className, "PortManagerTray", 0, 0, 0, 0, 0,
                     IntPtr.Zero, IntPtr.Zero, windowClass.Instance, IntPtr.Zero);
                 if (_window == IntPtr.Zero)
@@ -65,7 +70,25 @@ internal static class TrayIconService
                     _icon = LoadIcon(IntPtr.Zero, (IntPtr)32512);
 
                 var data = CreateIconData();
-                Shell_NotifyIcon(NimAdd, ref data);
+                if (!Shell_NotifyIcon(NimAdd, ref data))
+                    throw new InvalidOperationException($"Could not add the tray icon (Win32 error {Marshal.GetLastWin32Error()}).");
+
+                data.Version = 4;
+                Shell_NotifyIcon(NimSetVersion, ref data);
+                App.LogStartup("Tray icon initialized.");
+            }
+            catch
+            {
+                if (_window != IntPtr.Zero)
+                    DestroyWindow(_window);
+                if (_icon != IntPtr.Zero)
+                    DestroyIcon(_icon);
+                _window = IntPtr.Zero;
+                _icon = IntPtr.Zero;
+                _restore = null;
+                _exit = null;
+                _windowProc = null;
+                throw;
             }
             finally
             {
@@ -84,6 +107,8 @@ internal static class TrayIconService
             Shell_NotifyIcon(NimDelete, ref data);
             DestroyWindow(_window);
             if (_icon != IntPtr.Zero) DestroyIcon(_icon);
+            if (_className is not null)
+                UnregisterClass(_className, GetModuleHandle(null));
             _window = IntPtr.Zero;
             _icon = IntPtr.Zero;
             _restore = null;
@@ -94,7 +119,7 @@ internal static class TrayIconService
 
     private static NotifyIconData CreateIconData() => new()
     {
-        Size = Marshal.SizeOf<NotifyIconData>(),
+        Size = (uint)Marshal.SizeOf<NotifyIconData>(),
         Window = _window,
         Id = 1,
         Flags = NifMessage | NifIcon | NifTip,
@@ -109,7 +134,8 @@ internal static class TrayIconService
     {
         if (message == WmTrayIcon)
         {
-            var notification = unchecked((uint)lParam.ToInt64());
+            // NOTIFYICON_VERSION_4 packs the icon id in HIWORD(lParam).
+            var notification = unchecked((uint)lParam.ToInt64()) & 0xffff;
             if (notification == WmLButtonDblClk)
             {
                 _restore?.Invoke();
@@ -127,6 +153,7 @@ internal static class TrayIconService
             var command = unchecked((uint)wParam.ToInt64()) & 0xffff;
             if (command == MenuOpen) _restore?.Invoke();
             if (command == MenuExit) _exit?.Invoke();
+            PostMessage(window, 0, IntPtr.Zero, IntPtr.Zero);
             return IntPtr.Zero;
         }
         else if (message == WmDestroy)
@@ -150,6 +177,7 @@ internal static class TrayIconService
             var command = TrackPopupMenu(menu, TpmRightButton | TpmRetCmd, point.X, point.Y, 0, window, IntPtr.Zero);
             if (command == MenuOpen) _restore?.Invoke();
             if (command == MenuExit) _exit?.Invoke();
+            PostMessage(window, 0, IntPtr.Zero, IntPtr.Zero);
         }
         finally
         {
@@ -163,11 +191,11 @@ internal static class TrayIconService
     [StructLayout(LayoutKind.Sequential)]
     private struct WindowClassEx
     {
-        public int Size;
+        public uint Size;
+        public uint Style;
         public IntPtr WindowProc;
-        public int ClassStyle;
-        public IntPtr WindowExtra;
-        public IntPtr WindowClassExtra;
+        public int ClassExtra;
+        public int WindowExtra;
         public IntPtr Instance;
         public IntPtr Icon;
         public IntPtr Cursor;
@@ -180,7 +208,7 @@ internal static class TrayIconService
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct NotifyIconData
     {
-        public int Size;
+        public uint Size;
         public IntPtr Window;
         public uint Id;
         public uint Flags;
@@ -204,12 +232,16 @@ internal static class TrayIconService
         public int Y;
     }
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern ushort RegisterClassEx(ref WindowClassEx windowClass);
 
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     private static extern IntPtr CreateWindowEx(int exStyle, string className, string windowName, int style,
         int x, int y, int width, int height, IntPtr parent, IntPtr menu, IntPtr instance, IntPtr param);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnregisterClass(string className, IntPtr instance);
 
     [DllImport("user32.dll")]
     private static extern bool DestroyWindow(IntPtr window);
@@ -220,7 +252,7 @@ internal static class TrayIconService
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr GetModuleHandle(string? moduleName);
 
-    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool Shell_NotifyIcon(uint message, ref NotifyIconData data);
 
@@ -252,4 +284,8 @@ internal static class TrayIconService
 
     [DllImport("user32.dll")]
     private static extern uint TrackPopupMenu(IntPtr menu, uint flags, int x, int y, int reserved, IntPtr window, IntPtr rect);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
 }

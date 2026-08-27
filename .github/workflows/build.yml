@@ -148,6 +148,11 @@ jobs:
               throw "Dashboard did not load within 30 seconds:`n$log"
             }
 
+            $log = Get-Content $logPath -Raw
+            if ($log -notmatch 'Tray icon initialized\.') {
+              throw "The notification-area icon was not initialized:`n$log"
+            }
+
             # Keep the real GUI alive long enough to catch Loaded-event and async startup failures.
             $cleanObservationDeadline = (Get-Date).AddSeconds(10)
             while ((Get-Date) -lt $cleanObservationDeadline) {

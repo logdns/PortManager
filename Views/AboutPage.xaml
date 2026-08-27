@@ -8,7 +8,13 @@
     <ScrollViewer Padding="32,28" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch">
         <StackPanel MaxWidth="760" HorizontalAlignment="Stretch" Spacing="20">
             <TextBlock Text="{StaticResource About_Title}" Style="{StaticResource PageTitle}"/>
-            <TextBlock Text="{StaticResource About_Copyright}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="{StaticResource About_CopyrightPrefix}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <HyperlinkButton Content="{StaticResource About_Website}"
+                                 NavigateUri="http://xinai.de/"
+                                 Padding="0"
+                                 Foreground="{ThemeResource AccentFillColorDefaultBrush}"/>
+            </StackPanel>
 
             <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,8">
                 <Image Source="ms-appx:///Assets/Square150x150Logo.png" Width="72" Height="72"/>

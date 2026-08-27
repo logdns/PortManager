@@ -12,7 +12,9 @@ public sealed partial class MainWindow : Window
 {
     private bool _isReady;
     private bool _allowClose;
+    private bool _shutdownStarted;
     private AppWindow? _appWindow;
+    private IntPtr _windowHandle;
     private string _currentTag = "Dashboard";
 
     public MainWindow()
@@ -36,8 +38,8 @@ public sealed partial class MainWindow : Window
     private void ConfigureWindow()
     {
         Title = App.Text("App_Title");
-        var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
+        _windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var windowId = Win32Interop.GetWindowIdFromWindow(_windowHandle);
         _appWindow = AppWindow.GetFromWindowId(windowId);
         _appWindow.Closing += AppWindow_Closing;
         _appWindow.Resize(new SizeInt32(1100, 720));
@@ -48,7 +50,7 @@ public sealed partial class MainWindow : Window
             _appWindow.SetIcon(iconPath);
             try
             {
-                TrayIconService.Initialize(windowHandle, iconPath, RestoreFromTray, ExitFromTray);
+                TrayIconService.Initialize(_windowHandle, iconPath, RestoreFromTray, ExitFromTray);
             }
             catch (Exception ex)
             {
@@ -84,25 +86,33 @@ public sealed partial class MainWindow : Window
         var result = await dialog.ShowAsync();
         if (result == ContentDialogResult.Secondary)
         {
-            if (sender.Presenter is OverlappedPresenter presenter) presenter.Minimize();
+            MinimizeToTray();
         }
         else if (result == ContentDialogResult.Primary)
         {
-            _allowClose = true;
-            sender.Destroy();
+            ExitApplication();
         }
     }
 
-    private static void MainWindow_Closed(object sender, WindowEventArgs args)
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         App.LogStartup("Main window closed.");
-        TrayIconService.Dispose();
-        Application.Current.Exit();
-        Environment.Exit(0);
+        ExitApplication();
+    }
+
+    private void MinimizeToTray()
+    {
+        if (_windowHandle == IntPtr.Zero)
+            return;
+
+        ShowWindow(_windowHandle, SwHide);
+        App.LogStartup("Main window hidden to the notification area.");
     }
 
     private void RestoreFromTray()
     {
+        if (_windowHandle != IntPtr.Zero)
+            ShowWindow(_windowHandle, SwShow);
         if (_appWindow?.Presenter is OverlappedPresenter presenter)
             presenter.Restore();
         _appWindow?.Show();
@@ -111,8 +121,20 @@ public sealed partial class MainWindow : Window
 
     private void ExitFromTray()
     {
+        ExitApplication();
+    }
+
+    private void ExitApplication()
+    {
+        if (_shutdownStarted)
+            return;
+
+        _shutdownStarted = true;
         _allowClose = true;
-        _appWindow?.Destroy();
+        App.LogStartup("Application shutdown requested.");
+        TrayIconService.Dispose();
+        Application.Current.Exit();
+        ExitProcess(0);
     }
 
     private void NavView_Loaded(object sender, RoutedEventArgs e)
@@ -206,4 +228,14 @@ public sealed partial class MainWindow : Window
 
         return null;
     }
+
+    private const int SwHide = 0;
+    private const int SwShow = 5;
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+    private static extern bool ShowWindow(IntPtr window, int command);
+
+    [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+    private static extern void ExitProcess(uint exitCode);
 }
