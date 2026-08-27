@@ -1,12 +1,11 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace PortManager.Services;
 
 /// <summary>
-/// Uses the Windows common dialogs instead of the brokered WinUI picker.
-/// The brokered picker can fail with E_FAIL when the unpackaged app is elevated.
+/// Windows common file dialogs. These work when the unpackaged app is elevated,
+/// where the brokered WinUI picker may return E_FAIL.
 /// </summary>
 internal static class NativeFileDialogService
 {
@@ -19,34 +18,61 @@ internal static class NativeFileDialogService
 
     public static string? OpenJson(IntPtr owner)
     {
-        var file = CreateFileName(owner, "Open firewall rules", OfnExplorer | OfnFileMustExist | OfnPathMustExist | OfnNoChangeDir);
-        return GetOpenFileName(ref file) ? file.FileName.ToString() : ThrowIfDialogFailed();
+        return Show(owner, "Open firewall rules", OfnExplorer | OfnFileMustExist | OfnPathMustExist | OfnNoChangeDir, null);
     }
 
     public static string? SaveJson(IntPtr owner)
     {
-        var file = CreateFileName(owner, "Export firewall rules", OfnExplorer | OfnPathMustExist | OfnOverwritePrompt | OfnNoChangeDir);
-        file.DefaultExtension = "json";
-        file.FileName.Append("PortManager-rules.json");
-        return GetSaveFileName(ref file) ? file.FileName.ToString() : ThrowIfDialogFailed();
+        return Show(owner, "Export firewall rules", OfnExplorer | OfnPathMustExist | OfnOverwritePrompt | OfnNoChangeDir, "json");
     }
 
-    private static OpenFileName CreateFileName(IntPtr owner, string title, int flags) => new()
+    private static string? Show(IntPtr owner, string title, int flags, string? defaultExtension)
     {
-        StructSize = Marshal.SizeOf<OpenFileName>(),
-        Owner = owner,
-        Filter = "JSON files (*.json)\0*.json\0All files (*.*)\0*.*\0\0",
-        FileName = new StringBuilder(MaxPath),
-        MaxFile = MaxPath,
-        Title = title,
-        Flags = flags
-    };
+        var filter = Marshal.StringToHGlobalUni("JSON files (*.json)\0*.json\0All files (*.*)\0*.*\0\0");
+        var fileBuffer = Marshal.AllocHGlobal(MaxPath * sizeof(char));
+        var titleBuffer = Marshal.StringToHGlobalUni(title);
+        var extensionBuffer = defaultExtension is null ? IntPtr.Zero : Marshal.StringToHGlobalUni(defaultExtension);
+        try
+        {
+            for (var index = 0; index < MaxPath; index++)
+                Marshal.WriteInt16(fileBuffer, index * sizeof(char), 0);
 
-    private static string? ThrowIfDialogFailed()
-    {
-        var error = CommDlgExtendedError();
-        if (error == 0) return null; // User cancelled.
-        throw new Win32Exception((int)error, $"Windows file dialog failed (0x{error:X8}).");
+            if (defaultExtension is not null)
+            {
+                var initialName = "PortManager-rules.json";
+                for (var index = 0; index < initialName.Length; index++)
+                    Marshal.WriteInt16(fileBuffer, index * sizeof(char), initialName[index]);
+            }
+
+            var dialog = new OpenFileName
+            {
+                StructSize = Marshal.SizeOf<OpenFileName>(),
+                Owner = owner,
+                Filter = filter,
+                FileName = fileBuffer,
+                MaxFile = MaxPath,
+                Title = titleBuffer,
+                DefaultExtension = extensionBuffer,
+                Flags = flags
+            };
+
+            var succeeded = defaultExtension is null
+                ? GetOpenFileName(ref dialog)
+                : GetSaveFileName(ref dialog);
+            if (succeeded)
+                return Marshal.PtrToStringUni(dialog.FileName);
+
+            var error = CommDlgExtendedError();
+            if (error == 0) return null; // User cancelled.
+            throw new Win32Exception((int)error, $"Windows file dialog failed (0x{error:X8}).");
+        }
+        finally
+        {
+            if (extensionBuffer != IntPtr.Zero) Marshal.FreeHGlobal(extensionBuffer);
+            Marshal.FreeHGlobal(titleBuffer);
+            Marshal.FreeHGlobal(fileBuffer);
+            Marshal.FreeHGlobal(filter);
+        }
     }
 
     [DllImport("comdlg32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -60,29 +86,29 @@ internal static class NativeFileDialogService
     [DllImport("comdlg32.dll")]
     private static extern uint CommDlgExtendedError();
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential)]
     private struct OpenFileName
     {
         public int StructSize;
         public IntPtr Owner;
         public IntPtr Instance;
-        [MarshalAs(UnmanagedType.LPWStr)] public string Filter;
+        public IntPtr Filter;
         public IntPtr CustomFilter;
         public int MaxCustFilter;
         public int FilterIndex;
-        [MarshalAs(UnmanagedType.LPWStr)] public StringBuilder FileName;
+        public IntPtr FileName;
         public int MaxFile;
-        [MarshalAs(UnmanagedType.LPWStr)] public string FileTitle;
+        public IntPtr FileTitle;
         public int MaxFileTitle;
-        [MarshalAs(UnmanagedType.LPWStr)] public string InitialDirectory;
-        [MarshalAs(UnmanagedType.LPWStr)] public string Title;
+        public IntPtr InitialDirectory;
+        public IntPtr Title;
         public int Flags;
         public short FileOffset;
         public short FileExtension;
-        [MarshalAs(UnmanagedType.LPWStr)] public string DefaultExtension;
+        public IntPtr DefaultExtension;
         public IntPtr CustData;
         public IntPtr Hook;
-        [MarshalAs(UnmanagedType.LPWStr)] public string TemplateName;
+        public IntPtr TemplateName;
         public IntPtr ReservedPtr;
         public int Reserved;
         public int FlagsEx;
