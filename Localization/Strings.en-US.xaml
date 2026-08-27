@@ -23,6 +23,10 @@
     <x:String x:Key="Common_Retry">Retry</x:String>
     <x:String x:Key="Common_FirewallError">Windows Firewall is unavailable</x:String>
     <x:String x:Key="Common_FirewallErrorDetail">Confirm that the app is running as administrator and the Windows Defender Firewall service is active.</x:String>
+    <x:String x:Key="Window_CloseTitle">Close Port Manager</x:String>
+    <x:String x:Key="Window_CloseContent">Choose whether to minimize to the taskbar or exit the application.</x:String>
+    <x:String x:Key="Window_Exit">Exit</x:String>
+    <x:String x:Key="Window_Minimize">Minimize</x:String>
 
     <x:String x:Key="Dashboard_Title">Dashboard</x:String>
     <x:String x:Key="Dashboard_Subtitle">Manage Windows Firewall port rules on this PC</x:String>

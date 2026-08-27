@@ -11,6 +11,8 @@ namespace PortManager;
 public sealed partial class MainWindow : Window
 {
     private bool _isReady;
+    private bool _allowClose;
+    private AppWindow? _appWindow;
     private string _currentTag = "Dashboard";
 
     public MainWindow()
@@ -36,20 +38,47 @@ public sealed partial class MainWindow : Window
         Title = App.Text("App_Title");
         var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
         var windowId = Win32Interop.GetWindowIdFromWindow(windowHandle);
-        var appWindow = AppWindow.GetFromWindowId(windowId);
-        appWindow.Resize(new SizeInt32(1100, 720));
+        _appWindow = AppWindow.GetFromWindowId(windowId);
+        _appWindow.Closing += AppWindow_Closing;
+        _appWindow.Resize(new SizeInt32(1100, 720));
 
         var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "PortManager.ico");
         if (File.Exists(iconPath))
-            appWindow.SetIcon(iconPath);
+            _appWindow.SetIcon(iconPath);
 
-        if (appWindow.Presenter is OverlappedPresenter presenter)
+        if (_appWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.PreferredMinimumWidth = 760;
             presenter.PreferredMinimumHeight = 520;
             presenter.IsMinimizable = true;
             presenter.IsMaximizable = true;
             presenter.IsResizable = true;
+        }
+    }
+
+    private async void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
+    {
+        if (_allowClose) return;
+        args.Cancel = true;
+        var dialog = new ContentDialog
+        {
+            XamlRoot = NavView.XamlRoot,
+            Title = App.Text("Window_CloseTitle"),
+            Content = App.Text("Window_CloseContent"),
+            PrimaryButtonText = App.Text("Window_Exit"),
+            SecondaryButtonText = App.Text("Window_Minimize"),
+            CloseButtonText = App.Text("Common_Cancel"),
+            DefaultButton = ContentDialogButton.Close
+        };
+        var result = await dialog.ShowAsync();
+        if (result == ContentDialogResult.Secondary)
+        {
+            if (sender.Presenter is OverlappedPresenter presenter) presenter.Minimize();
+        }
+        else if (result == ContentDialogResult.Primary)
+        {
+            _allowClose = true;
+            sender.Destroy();
         }
     }
 

@@ -23,6 +23,10 @@
     <x:String x:Key="Common_Retry">重试</x:String>
     <x:String x:Key="Common_FirewallError">无法访问 Windows 防火墙</x:String>
     <x:String x:Key="Common_FirewallErrorDetail">请确认应用已获得管理员权限，并检查 Windows Defender 防火墙服务是否正在运行。</x:String>
+    <x:String x:Key="Window_CloseTitle">关闭端口管理器</x:String>
+    <x:String x:Key="Window_CloseContent">请选择要最小化到任务栏，还是退出程序。</x:String>
+    <x:String x:Key="Window_Exit">退出程序</x:String>
+    <x:String x:Key="Window_Minimize">最小化</x:String>
 
     <x:String x:Key="Dashboard_Title">概览</x:String>
     <x:String x:Key="Dashboard_Subtitle">管理此电脑的 Windows 防火墙端口规则</x:String>
