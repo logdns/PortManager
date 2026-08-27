@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -290,7 +291,7 @@ public static class FirewallService
             {
                 existingRule = ((dynamic)rules).Item(ruleName);
             }
-            catch (COMException ex) when (IsNotFound(ex))
+            catch (Exception ex) when (IsNotFound(ex))
             {
                 return false;
             }
@@ -345,8 +346,10 @@ public static class FirewallService
         return names.Count == 0 ? profiles.ToString(CultureInfo.InvariantCulture) : string.Join(", ", names);
     }
 
-    private static bool IsNotFound(COMException exception) =>
-        exception.HResult is FileNotFoundHResult or ElementNotFoundHResult;
+    private static bool IsNotFound(Exception exception) =>
+        exception is FileNotFoundException ||
+        exception is COMException comException &&
+        comException.HResult is FileNotFoundHResult or ElementNotFoundHResult;
 
     private static void InvalidateCache()
     {
