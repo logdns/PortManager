@@ -5,7 +5,7 @@
   #error BuildArch is required
 #endif
 #ifndef AppVersion
-  #define AppVersion "1.1.5"
+  #define AppVersion "1.2.0"
 #endif
 
 [Setup]

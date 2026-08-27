@@ -30,9 +30,11 @@ public sealed partial class ListRulesPage : Page
         {
             _allRules = await FirewallService.ListRulesAsync();
             ApplyFilter();
+            AuditLogService.Record("ListRules", $"Loaded {_allRules.Count} rule(s).");
         }
         catch (FirewallOperationException ex)
         {
+            AuditLogService.Record("ListRules", ex.Message, false);
             _allRules.Clear();
             RulesList.ItemsSource = null;
             EmptyState.Visibility = Visibility.Collapsed;

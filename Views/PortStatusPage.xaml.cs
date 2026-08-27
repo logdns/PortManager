@@ -36,6 +36,7 @@ public sealed partial class PortStatusPage : Page
         {
             var rules = await FirewallService.QueryPortAsync(port);
             ResultsList.ItemsSource = rules;
+            AuditLogService.Record("QueryPort", $"Port {port}: {rules.Count} rule(s).");
 
             if (rules.Count == 0)
             {
@@ -50,6 +51,7 @@ public sealed partial class PortStatusPage : Page
         }
         catch (FirewallOperationException ex)
         {
+            AuditLogService.Record("QueryPort", ex.Message, false);
             ShowStatus(InfoBarSeverity.Error, App.Text("Common_FirewallError"),
                 $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}");
         }

@@ -90,14 +90,48 @@
     <x:String x:Key="More_Live">实时连接</x:String>
     <x:String x:Key="More_Process">进程关联</x:String>
     <x:String x:Key="More_Planned">规划中</x:String>
+    <x:String x:Key="More_Implemented">已实现，点击打开</x:String>
     <x:String x:Key="More_Import">规则导入导出</x:String>
     <x:String x:Key="More_ImportDescription">备份和恢复防火墙规则</x:String>
     <x:String x:Key="More_Audit">审计日志</x:String>
     <x:String x:Key="More_AuditDescription">记录端口规则变更</x:String>
 
+    <x:String x:Key="Connection_Title">连接监控</x:String>
+    <x:String x:Key="Connection_Subtitle">查看当前 TCP/UDP 活动连接及其关联进程</x:String>
+    <x:String x:Key="Connection_Refresh">刷新连接</x:String>
+    <x:String x:Key="Connection_SearchPlaceholder">搜索进程、PID、地址或端口</x:String>
+    <x:String x:Key="Connection_Empty">没有找到活动连接</x:String>
+    <x:String x:Key="Connection_CountFormat">共 {0} 个连接</x:String>
+    <x:String x:Key="Connection_LocalEndpoint">本地端点</x:String>
+    <x:String x:Key="Connection_RemoteEndpoint">远程端点</x:String>
+    <x:String x:Key="Connection_Error">无法读取活动连接</x:String>
+
+    <x:String x:Key="Transfer_Title">规则导入导出</x:String>
+    <x:String x:Key="Transfer_Subtitle">使用 JSON 文件备份或恢复 Windows 防火墙规则</x:String>
+    <x:String x:Key="Transfer_Export">导出规则</x:String>
+    <x:String x:Key="Transfer_Import">导入规则</x:String>
+    <x:String x:Key="Transfer_Exporting">正在导出...</x:String>
+    <x:String x:Key="Transfer_Importing">正在导入...</x:String>
+    <x:String x:Key="Transfer_RuleCountFormat">当前共有 {0} 条规则</x:String>
+    <x:String x:Key="Transfer_ExportSuccess">已导出 {1} 条规则到 {0}</x:String>
+    <x:String x:Key="Transfer_ImportSuccess">导入完成：成功 {0} 条，失败 {1} 条</x:String>
+    <x:String x:Key="Transfer_ConfirmImportTitle">确认导入规则</x:String>
+    <x:String x:Key="Transfer_ConfirmImportFormat">将从“{0}”导入 {1} 条规则，是否继续？</x:String>
+    <x:String x:Key="Transfer_Error">规则传输失败</x:String>
+
+    <x:String x:Key="Audit_Title">审计日志</x:String>
+    <x:String x:Key="Audit_Subtitle">查看端口规则和扩展功能的操作记录</x:String>
+    <x:String x:Key="Audit_Refresh">刷新</x:String>
+    <x:String x:Key="Audit_Clear">清空日志</x:String>
+    <x:String x:Key="Audit_ClearConfirmTitle">清空审计日志？</x:String>
+    <x:String x:Key="Audit_ClearConfirmFormat">此操作会永久删除本机上的全部审计记录。</x:String>
+    <x:String x:Key="Audit_Empty">暂无审计记录</x:String>
+    <x:String x:Key="Audit_CountFormat">共 {0} 条记录</x:String>
+    <x:String x:Key="Audit_Error">无法读取审计日志</x:String>
+
     <x:String x:Key="About_Title">关于</x:String>
     <x:String x:Key="About_Description">Windows 防火墙端口管理工具</x:String>
-    <x:String x:Key="About_Version">版本 1.1.5</x:String>
+    <x:String x:Key="About_Version">版本 1.2.0</x:String>
     <x:String x:Key="About_Features">功能</x:String>
     <x:String x:Key="About_FeatureText">添加、查询和删除 TCP/UDP 防火墙规则，支持入站、出站和双向配置。</x:String>
     <x:String x:Key="About_Frameworks">技术框架</x:String>

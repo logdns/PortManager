@@ -63,9 +63,11 @@ public sealed partial class AddPortPage : Page
             if (!string.IsNullOrWhiteSpace(result.ErrorMessage))
                 message += $"\n{result.ErrorMessage}";
             ShowResult(result.Success ? InfoBarSeverity.Success : InfoBarSeverity.Error, title, message);
+            AuditLogService.Record("AddRule", message, result.Success);
         }
         catch (FirewallOperationException ex)
         {
+            AuditLogService.Record("AddRule", ex.Message, false);
             ShowResult(InfoBarSeverity.Error, App.Text("Common_FirewallError"),
                 $"{App.Text("Common_FirewallErrorDetail")}\n{ex.Message}");
         }

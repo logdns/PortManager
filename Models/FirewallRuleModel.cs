@@ -29,6 +29,7 @@ public class FirewallRule
     [JsonPropertyName("Enabled")]
     public string Enabled { get; set; } = string.Empty;
 
+    [JsonIgnore]
     public string DirectionDisplay => Direction switch
     {
         "Inbound"  => Services.LanguageState.IsEnglish ? "Inbound" : "入站",
@@ -36,6 +37,7 @@ public class FirewallRule
         _          => Direction
     };
 
+    [JsonIgnore]
     public string ProtocolDisplay => Protocol switch
     {
         "6" => "TCP",
@@ -45,6 +47,7 @@ public class FirewallRule
         _ => Protocol.ToUpperInvariant()
     };
 
+    [JsonIgnore]
     public string PortDisplay => Direction == "Outbound" && IsSpecificPort(RemotePort)
         ? RemotePort
         : LocalPort;

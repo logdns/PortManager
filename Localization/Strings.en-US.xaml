@@ -90,14 +90,48 @@
     <x:String x:Key="More_Live">Live connections</x:String>
     <x:String x:Key="More_Process">Process mapping</x:String>
     <x:String x:Key="More_Planned">Planned</x:String>
+    <x:String x:Key="More_Implemented">Implemented, click to open</x:String>
     <x:String x:Key="More_Import">Rule import and export</x:String>
     <x:String x:Key="More_ImportDescription">Back up and restore firewall rules</x:String>
     <x:String x:Key="More_Audit">Audit log</x:String>
     <x:String x:Key="More_AuditDescription">Track port rule changes</x:String>
 
+    <x:String x:Key="Connection_Title">Connection monitor</x:String>
+    <x:String x:Key="Connection_Subtitle">Inspect active TCP/UDP connections and their processes</x:String>
+    <x:String x:Key="Connection_Refresh">Refresh connections</x:String>
+    <x:String x:Key="Connection_SearchPlaceholder">Search process, PID, address, or port</x:String>
+    <x:String x:Key="Connection_Empty">No active connections found</x:String>
+    <x:String x:Key="Connection_CountFormat">{0} connection(s)</x:String>
+    <x:String x:Key="Connection_LocalEndpoint">Local endpoint</x:String>
+    <x:String x:Key="Connection_RemoteEndpoint">Remote endpoint</x:String>
+    <x:String x:Key="Connection_Error">Could not read active connections</x:String>
+
+    <x:String x:Key="Transfer_Title">Rule import and export</x:String>
+    <x:String x:Key="Transfer_Subtitle">Back up or restore Windows Firewall rules as a JSON file</x:String>
+    <x:String x:Key="Transfer_Export">Export rules</x:String>
+    <x:String x:Key="Transfer_Import">Import rules</x:String>
+    <x:String x:Key="Transfer_Exporting">Exporting...</x:String>
+    <x:String x:Key="Transfer_Importing">Importing...</x:String>
+    <x:String x:Key="Transfer_RuleCountFormat">{0} rule(s) currently available</x:String>
+    <x:String x:Key="Transfer_ExportSuccess">Exported {1} rule(s) to {0}</x:String>
+    <x:String x:Key="Transfer_ImportSuccess">Import complete: {0} succeeded, {1} failed</x:String>
+    <x:String x:Key="Transfer_ConfirmImportTitle">Import firewall rules?</x:String>
+    <x:String x:Key="Transfer_ConfirmImportFormat">Import {1} rule(s) from “{0}”?</x:String>
+    <x:String x:Key="Transfer_Error">Rule transfer failed</x:String>
+
+    <x:String x:Key="Audit_Title">Audit log</x:String>
+    <x:String x:Key="Audit_Subtitle">Review operations performed by Port Manager</x:String>
+    <x:String x:Key="Audit_Refresh">Refresh</x:String>
+    <x:String x:Key="Audit_Clear">Clear log</x:String>
+    <x:String x:Key="Audit_ClearConfirmTitle">Clear audit log?</x:String>
+    <x:String x:Key="Audit_ClearConfirmFormat">This permanently deletes all audit records on this PC.</x:String>
+    <x:String x:Key="Audit_Empty">No audit records</x:String>
+    <x:String x:Key="Audit_CountFormat">{0} record(s)</x:String>
+    <x:String x:Key="Audit_Error">Could not read the audit log</x:String>
+
     <x:String x:Key="About_Title">About</x:String>
     <x:String x:Key="About_Description">Windows Firewall port management utility</x:String>
-    <x:String x:Key="About_Version">Version 1.1.5</x:String>
+    <x:String x:Key="About_Version">Version 1.2.0</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>

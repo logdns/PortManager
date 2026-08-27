@@ -86,15 +86,18 @@ public sealed partial class DeleteRulePage : Page
                 await LoadRulesAsync();
                 ShowStatus(InfoBarSeverity.Success,
                     string.Format(App.Text("Delete_SuccessFormat"), ruleName), string.Empty);
+                AuditLogService.Record("DeleteRule", $"Deleted rule '{ruleName}'.");
             }
             else
             {
                 ShowStatus(InfoBarSeverity.Error,
                     string.Format(App.Text("Delete_FailedFormat"), ruleName), string.Empty);
+                AuditLogService.Record("DeleteRule", $"Rule '{ruleName}' was not found.", false);
             }
         }
         catch (FirewallOperationException ex)
         {
+            AuditLogService.Record("DeleteRule", ex.Message, false);
             ShowStatus(InfoBarSeverity.Error, App.Text("Common_FirewallError"), ex.Message);
         }
         finally

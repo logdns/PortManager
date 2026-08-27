@@ -107,6 +107,25 @@ public static class FirewallService
         return await AddRuleAsync(port, protocol, direction, newName).ConfigureAwait(false);
     }
 
+    public static async Task<OperationResult> ImportRulesAsync(IEnumerable<FirewallRule> rules)
+    {
+        var imported = rules?.ToList() ?? throw new ArgumentNullException(nameof(rules));
+        await OperationGate.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            var result = await RunNativeAsync(
+                    () => ImportRulesCore(imported),
+                    "Could not import the Windows Firewall rules.")
+                .ConfigureAwait(false);
+            InvalidateCache();
+            return result;
+        }
+        finally
+        {
+            OperationGate.Release();
+        }
+    }
+
     internal static FirewallRule CreateRuleModel(
         string name,
         int direction,
@@ -248,6 +267,137 @@ public static class FirewallService
             ReleaseComObject(rules);
             ReleaseComObject(policy);
         }
+    }
+
+    private static OperationResult ImportRulesCore(IReadOnlyList<FirewallRule> imported)
+    {
+        object? policy = null;
+        object? rules = null;
+        try
+        {
+            policy = CreateComObject("HNetCfg.FwPolicy2");
+            rules = ((dynamic)policy).Rules;
+            var result = new OperationResult();
+            var errors = new List<string>();
+            foreach (var source in imported)
+            {
+                try
+                {
+                    var protocols = ParseProtocols(source.Protocol);
+                    var directions = ParseDirections(source.Direction);
+                    var profiles = ParseProfiles(source.Profile);
+                    foreach (var protocol in protocols)
+                    foreach (var direction in directions)
+                    {
+                        var suffix = protocols.Count > 1 || directions.Count > 1
+                            ? $"_{protocol}_{direction}"
+                            : string.Empty;
+                        var name = protocols.Count > 1 || directions.Count > 1
+                            ? source.Name + suffix
+                            : source.Name;
+                        AddImportedRule(rules, name, source, protocol, direction, profiles);
+                        result.SuccessCount++;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result.FailedCount++;
+                    errors.Add($"{source.Name}: {ex.Message}");
+                }
+            }
+
+            result.Success = result.FailedCount == 0;
+            result.Message = result.Success
+                ? $"Imported {result.SuccessCount} firewall rule(s)."
+                : $"Imported {result.SuccessCount}; failed {result.FailedCount}.";
+            result.ErrorMessage = string.Join(Environment.NewLine, errors.Distinct());
+            return result;
+        }
+        finally
+        {
+            ReleaseComObject(rules);
+            ReleaseComObject(policy);
+        }
+    }
+
+    private static void AddImportedRule(object rules, string name, FirewallRule source, string protocol, string direction, int profiles)
+    {
+        object? ruleObject = null;
+        try
+        {
+            ruleObject = CreateComObject("HNetCfg.FWRule");
+            dynamic rule = ruleObject;
+            rule.Name = name;
+            rule.Description = "Managed by Port Manager";
+            rule.Grouping = "Port Manager";
+            rule.Protocol = protocol switch
+            {
+                "TCP" => ProtocolTcp,
+                "UDP" => ProtocolUdp,
+                _ => 256
+            };
+            rule.Direction = direction == "Outbound" ? DirectionOutbound : DirectionInbound;
+            if (direction == "Outbound")
+            {
+                if (HasSpecificPort(source.RemotePort)) rule.RemotePorts = source.RemotePort;
+                if (HasSpecificPort(source.LocalPort)) rule.LocalPorts = source.LocalPort;
+            }
+            else
+            {
+                if (HasSpecificPort(source.LocalPort)) rule.LocalPorts = source.LocalPort;
+                if (HasSpecificPort(source.RemotePort)) rule.RemotePorts = source.RemotePort;
+            }
+            rule.Enabled = !source.Enabled.Equals("False", StringComparison.OrdinalIgnoreCase) &&
+                           !source.Enabled.Equals("0", StringComparison.OrdinalIgnoreCase);
+            rule.Profiles = profiles;
+            rule.Action = ActionAllow;
+            ((dynamic)rules).Add(rule);
+        }
+        finally
+        {
+            ReleaseComObject(ruleObject);
+        }
+    }
+
+    private static List<string> ParseProtocols(string? value)
+    {
+        var normalized = value?.Trim().ToUpperInvariant();
+        return normalized is "ANY" or "256" or "*" or ""
+            ? new List<string> { "ANY" }
+            : normalized is "TCP" or "6" ? new List<string> { "TCP" }
+            : normalized is "UDP" or "17" ? new List<string> { "UDP" }
+            : throw new FirewallOperationException($"Unsupported protocol: {value}");
+    }
+
+    private static List<string> ParseDirections(string? value)
+    {
+        var normalized = value?.Trim().ToUpperInvariant();
+        return normalized switch
+        {
+            "INBOUND" or "IN" or "1" => new List<string> { "Inbound" },
+            "OUTBOUND" or "OUT" or "2" => new List<string> { "Outbound" },
+            "BOTH" or "ANY" or "" => new List<string> { "Inbound", "Outbound" },
+            _ => throw new FirewallOperationException($"Unsupported direction: {value}")
+        };
+    }
+
+    private static int ParseProfiles(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value.Equals("Any", StringComparison.OrdinalIgnoreCase) || value == "*" || value == "2147483647")
+            return AllProfiles;
+
+        var profiles = 0;
+        foreach (var token in value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            profiles |= token.ToUpperInvariant() switch
+            {
+                "DOMAIN" or "1" => 1,
+                "PRIVATE" or "2" => 2,
+                "PUBLIC" or "4" => 4,
+                _ => 0
+            };
+        }
+        return profiles == 0 ? AllProfiles : profiles;
     }
 
     private static void AddSingleRule(object rules, string name, int port, string protocol, string direction)

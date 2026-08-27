@@ -12,6 +12,9 @@ Windows Firewall port manager built with WinUI 3. The app includes switchable Ch
 | 端口列表 | 查询所有已启用的端口放行规则，支持名称和端口搜索 |
 | 删除规则 | 按名称精确匹配删除，带二次确认 |
 | 端口查询 | 按本地或远程端口查询对应的防火墙规则 |
+| 连接监控 | 读取 TCP/UDP 活动连接并关联进程、PID 和端点 |
+| 规则导入导出 | 以 JSON 文件备份和恢复规则 |
+| 审计日志 | 记录规则查询、添加、删除及传输操作 |
 | 界面语言 | 中文与英文即时切换，不混排两种语言 |
 | 关于 | 版本信息与技术栈说明 |
 
@@ -21,7 +24,7 @@ Windows Firewall port manager built with WinUI 3. The app includes switchable Ch
 - **Windows Community Toolkit 8.2** (`SettingsCard` / `SettingsExpander`)
 - **.NET 8** / C# 12
 - **Fluent Design** + Mica 材质
-- **netsh + PowerShell** 防火墙操作
+- **Windows Firewall COM API**（`HNetCfg.FwPolicy2` / `FWRule`）
 
 ## 构建环境
 
@@ -66,16 +69,17 @@ PortManager/
 ├── MainWindow.xaml / .cs    # 主窗口 + NavigationView 导航
 ├── Views/
 │   ├── DashboardPage        # 双语概览与扩展入口
-│   ├── ComingSoonPage       # 后续功能占位页
+│   ├── ComingSoonPage       # 更多功能入口
+│   ├── ConnectionMonitorPage # 活动连接监控
+│   ├── RuleTransferPage      # JSON 规则导入导出
+│   ├── AuditLogPage          # 审计日志
 │   ├── AddPortPage           # 添加端口
 │   ├── ListRulesPage         # 端口列表
 │   ├── DeleteRulePage        # 删除规则
 │   ├── PortStatusPage        # 端口查询
 │   └── AboutPage             # 关于
-├── Models/
-│   └── FirewallRuleModel.cs  # 数据模型
-├── Services/
-│   └── FirewallService.cs     # 防火墙操作服务
+├── Models/                   # 防火墙规则、连接和传输模型
+├── Services/                 # 防火墙、连接、传输和审计服务
 ├── PortManager.Tests/        # 规则模型单元测试
 ├── Properties/PublishProfiles/ # x86/x64/ARM64 发布配置
 ├── .github/workflows/build.yml # GitHub Actions 构建与打包
@@ -100,5 +104,6 @@ PortManager/
 - `AddRuleAsync()` — 原生 COM 添加规则
 - `DeleteRuleAsync()` — 原生 COM 删除规则
 - `QueryPortAsync()` — 按端口过滤查询
+- `ImportRulesAsync()` — 通过原生 COM 批量恢复规则
 
 ANY 协议自动拆成 TCP + UDP 两条规则分别添加，保证端口条件明确且可分别管理。

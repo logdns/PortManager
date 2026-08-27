@@ -27,6 +27,8 @@ public partial class App : Application
 
     public static string Text(string key) => Current.Resources[key]?.ToString() ?? key;
 
+    internal MainWindow? MainWindow => _mainWindow;
+
     public static void NavigateTo(string tag) => ((App)Current)._mainWindow?.NavigateTo(tag);
 
     public static void SetLanguage(AppLanguage language)

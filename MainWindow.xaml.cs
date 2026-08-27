@@ -113,6 +113,9 @@ public sealed partial class MainWindow : Window
             "DeleteRule" => typeof(DeleteRulePage),
             "PortStatus" => typeof(PortStatusPage),
             "ComingSoon" => typeof(ComingSoonPage),
+            "ConnectionMonitor" => typeof(ConnectionMonitorPage),
+            "RuleTransfer" => typeof(RuleTransferPage),
+            "AuditLog" => typeof(AuditLogPage),
             "About" => typeof(AboutPage),
             _ => null
         };

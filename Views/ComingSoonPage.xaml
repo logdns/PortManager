@@ -16,13 +16,15 @@
                                       Description="{StaticResource More_ConnectionDescription}">
                 <toolkit:SettingsExpander.Items>
                     <toolkit:SettingsCard Header="{StaticResource More_Live}"
-                                          Description="{StaticResource More_Planned}">
+                                          Description="{StaticResource More_Implemented}"
+                                          IsClickEnabled="True" Tapped="ConnectionMonitor_Click">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE9D9;" Opacity="0.55"/>
                         </toolkit:SettingsCard.HeaderIcon>
                     </toolkit:SettingsCard>
                     <toolkit:SettingsCard Header="{StaticResource More_Process}"
-                                          Description="{StaticResource More_Planned}">
+                                          Description="{StaticResource More_Implemented}"
+                                          IsClickEnabled="True" Tapped="ConnectionMonitor_Click">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE77B;" Opacity="0.55"/>
                         </toolkit:SettingsCard.HeaderIcon>
@@ -31,14 +33,16 @@
             </toolkit:SettingsExpander>
 
             <toolkit:SettingsCard Header="{StaticResource More_Import}"
-                                  Description="{StaticResource More_ImportDescription}">
+                                  Description="{StaticResource More_ImportDescription}"
+                                  IsClickEnabled="True" Tapped="RuleTransfer_Click">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE8B5;" Opacity="0.55"/>
                 </toolkit:SettingsCard.HeaderIcon>
             </toolkit:SettingsCard>
 
             <toolkit:SettingsCard Header="{StaticResource More_Audit}"
-                                  Description="{StaticResource More_AuditDescription}">
+                                  Description="{StaticResource More_AuditDescription}"
+                                  IsClickEnabled="True" Tapped="AuditLog_Click">
                 <toolkit:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE9D5;" Opacity="0.55"/>
                 </toolkit:SettingsCard.HeaderIcon>
