@@ -3,3 +3,8 @@ bin/
 obj/
 artifacts/
 .vs/
+.idea/
+TestResults/
+*.user
+*.suo
+*.csproj.user
