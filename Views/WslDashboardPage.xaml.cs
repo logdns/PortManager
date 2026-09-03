@@ -79,7 +79,7 @@ public sealed partial class WslDashboardPage : Page
         => await RunInstallAsync("InstallWsl", WslService.InstallAsync, "wsl.exe --install");
 
     private async void InstallDistributionButton_Click(object sender, RoutedEventArgs e)
-        => await RunInstallAsync("InstallWslDistribution", WslService.InstallDistributionAsync, "Ubuntu");
+        => await RunInstallAsync("InstallWslDistribution", () => WslService.InstallDistributionAsync(), "Ubuntu");
 
     private void HelpButton_Click(object sender, RoutedEventArgs e)
     {
