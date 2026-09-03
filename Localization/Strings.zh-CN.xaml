@@ -237,7 +237,7 @@
     <x:String x:Key="About_Description">Windows 原生网络与防火墙管理工具</x:String>
     <x:String x:Key="About_CopyrightPrefix">沨哥网络 -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">版本 1.4.0</x:String>
+    <x:String x:Key="About_Version">版本 1.4.1</x:String>
     <x:String x:Key="About_Features">功能</x:String>
     <x:String x:Key="About_FeatureText">添加、查询和删除 TCP/UDP 防火墙规则，支持入站、出站和双向配置。</x:String>
     <x:String x:Key="About_Frameworks">技术框架</x:String>

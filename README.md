@@ -4,9 +4,9 @@
 
 ## 当前版本
 
-**v1.4.0**
+**v1.4.1**
 
-稳定版下载：[GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.4.0)
+稳定版下载：[GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.4.1)
 
 ## 功能
 
@@ -48,9 +48,9 @@
 
 | 架构 | 免安装版 | 安装版 |
 |---|---|---|
-| x86 | [Win-XinAi-De-Tools-win-x86.zip](https://github.com/logdns/PortManager/releases/download/v1.4.0/Win-XinAi-De-Tools-win-x86.zip) | [Win-XinAi-De-Tools-Setup-x86.exe](https://github.com/logdns/PortManager/releases/download/v1.4.0/Win-XinAi-De-Tools-Setup-x86.exe) |
-| x64 | [Win-XinAi-De-Tools-win-x64.zip](https://github.com/logdns/PortManager/releases/download/v1.4.0/Win-XinAi-De-Tools-win-x64.zip) | [Win-XinAi-De-Tools-Setup-x64.exe](https://github.com/logdns/PortManager/releases/download/v1.4.0/Win-XinAi-De-Tools-Setup-x64.exe) |
-| ARM64 | [Win-XinAi-De-Tools-win-arm64.zip](https://github.com/logdns/PortManager/releases/download/v1.4.0/Win-XinAi-De-Tools-win-arm64.zip) | [Win-XinAi-De-Tools-Setup-arm64.exe](https://github.com/logdns/PortManager/releases/download/v1.4.0/Win-XinAi-De-Tools-Setup-arm64.exe) |
+| x86 | [Win-XinAi-De-Tools-win-x86.zip](https://github.com/logdns/PortManager/releases/download/v1.4.1/Win-XinAi-De-Tools-win-x86.zip) | [Win-XinAi-De-Tools-Setup-x86.exe](https://github.com/logdns/PortManager/releases/download/v1.4.1/Win-XinAi-De-Tools-Setup-x86.exe) |
+| x64 | [Win-XinAi-De-Tools-win-x64.zip](https://github.com/logdns/PortManager/releases/download/v1.4.1/Win-XinAi-De-Tools-win-x64.zip) | [Win-XinAi-De-Tools-Setup-x64.exe](https://github.com/logdns/PortManager/releases/download/v1.4.1/Win-XinAi-De-Tools-Setup-x64.exe) |
+| ARM64 | [Win-XinAi-De-Tools-win-arm64.zip](https://github.com/logdns/PortManager/releases/download/v1.4.1/Win-XinAi-De-Tools-win-arm64.zip) | [Win-XinAi-De-Tools-Setup-arm64.exe](https://github.com/logdns/PortManager/releases/download/v1.4.1/Win-XinAi-De-Tools-Setup-arm64.exe) |
 
 ## 从源码构建
 
@@ -153,9 +153,9 @@ Win-XinAi-De-Tools is a native Windows desktop utility for managing Windows Defe
 
 ## Current Version
 
-**v1.4.0**
+**v1.4.1**
 
-Stable release: [GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.4.0)
+Stable release: [GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.4.1)
 
 ## Features
 
