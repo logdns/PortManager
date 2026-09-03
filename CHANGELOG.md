@@ -18,6 +18,6 @@
 
 ### CI and security
 
-- Pin GitHub Actions to immutable commit hashes, move artifact handling to the Node.js 24-based v6 actions, restrict write access to the release job, validate tag/version consistency, and test both optional native helpers.
+- Pin GitHub Actions to immutable commit hashes, move artifact handling to Node.js 24-based actions, restrict write access to the release job, validate tag/version consistency, and test both optional native helpers.
 - Treat moderate, high, and critical NuGet vulnerability warnings as build errors.
 - Publish SHA-256 checksums alongside release packages.
