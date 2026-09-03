@@ -132,6 +132,11 @@ public sealed partial class MainWindow : Window
         _shutdownStarted = true;
         _allowClose = true;
         App.LogStartup("Application shutdown requested.");
+        if (WslService.ShutdownOnExit)
+        {
+            try { WslService.ShutdownAll(); App.LogStartup("WSL distributions terminated on exit."); }
+            catch (Exception ex) { App.LogStartup($"WSL shutdown on exit failed: {ex.Message}"); }
+        }
         TrayIconService.Dispose();
         Application.Current.Exit();
         ExitProcess(0);

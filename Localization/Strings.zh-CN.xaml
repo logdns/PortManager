@@ -165,7 +165,7 @@
     <x:String x:Key="Wsl_Title">WSL 管理</x:String>
     <x:String x:Key="Wsl_Subtitle">使用 Windows 原生 WSL 命令检测、安装和管理 Linux 发行版</x:String>
     <x:String x:Key="Wsl_HelpTitle">原生 WSL 管理</x:String>
-    <x:String x:Key="Wsl_HelpMessage">这是基于 WinUI 的原生 WSL 管理页面，借鉴了 owu/wsl-dashboard 的功能方向，但本仓库不复制或捆绑其 GPL-3.0 源代码。</x:String>
+    <x:String x:Key="Wsl_HelpMessage">这是原生 WinUI 的 WSL、网络、计划任务、磁盘和 USB 管理页面，Rust 与 Go 辅助组件均为可选本地组件，不捆绑第三方仪表板源代码。</x:String>
     <x:String x:Key="Wsl_Distributions">Linux 发行版</x:String>
     <x:String x:Key="Wsl_Refresh">刷新发行版</x:String>
     <x:String x:Key="Wsl_Empty">未检测到 WSL 发行版。</x:String>
@@ -179,7 +179,6 @@
     <x:String x:Key="Wsl_Started">发行版已启动。</x:String>
     <x:String x:Key="Wsl_Stopped">发行版已停止。</x:String>
     <x:String x:Key="Wsl_DefaultSet">默认发行版已更新。</x:String>
-    <x:String x:Key="Wsl_ExternalLink">打开 owu/wsl-dashboard 参考项目</x:String>
     <x:String x:Key="Wsl_Error">WSL 操作失败</x:String>
     <x:String x:Key="Wsl_NotInstalledTitle">尚未安装适用于 Linux 的 Windows 子系统</x:String>
     <x:String x:Key="Wsl_NotInstalledMessage">可以使用微软官方安装程序安装 WSL。可能需要管理员确认，Windows 也可能要求重启。</x:String>
@@ -192,6 +191,7 @@
     <x:String x:Key="Wsl_StatusReady">WSL 已就绪。</x:String>
     <x:String x:Key="Wsl_StatusNotInstalled">尚未安装 WSL。</x:String>
     <x:String x:Key="Wsl_StatusNoDistribution">WSL 已安装，但尚未注册发行版。</x:String>
+    <x:String x:Key="Wsl_InstanceControl">实例控制</x:String><x:String x:Key="Wsl_Terminate">终止</x:String><x:String x:Key="Wsl_Unregister">注销</x:String><x:String x:Key="Wsl_OpenExplorer">打开资源管理器</x:String><x:String x:Key="Wsl_OpenVsCode">打开 VS Code</x:String><x:String x:Key="Wsl_DiskUsage">磁盘使用</x:String><x:String x:Key="Wsl_Autostart">登录时启动此发行版</x:String><x:String x:Key="Wsl_AutostartHelp">创建 Windows 任务计划程序登录任务。</x:String><x:String x:Key="Wsl_ShutdownOnExit">退出应用时终止发行版</x:String><x:String x:Key="Wsl_ShutdownOnExitHelp">此设置预留给全局退出策略。</x:String><x:String x:Key="Wsl_Backup">备份、恢复和迁移</x:String><x:String x:Key="Wsl_BackupHelp">导出或导入 TAR 存档，并将发行版迁移到其他磁盘。</x:String><x:String x:Key="Wsl_Export">导出 TAR</x:String><x:String x:Key="Wsl_Import">导入 TAR</x:String><x:String x:Key="Wsl_Move">迁移</x:String><x:String x:Key="Wsl_DiskMount">VHDX 磁盘挂载</x:String><x:String x:Key="Wsl_DiskMountHelp">使用原生 WSL 命令挂载或卸载 VHDX 文件。</x:String><x:String x:Key="Wsl_Mount">挂载</x:String><x:String x:Key="Wsl_Unmount">卸载</x:String><x:String x:Key="Wsl_TaskScheduler">任务计划</x:String><x:String x:Key="Wsl_TaskHelp">使用 Windows 任务计划程序在所选发行版中定时执行 Shell 命令。</x:String><x:String x:Key="Wsl_Schedule">计划任务</x:String><x:String x:Key="Wsl_RemoveSchedule">删除任务</x:String><x:String x:Key="Wsl_Network">网络管理</x:String><x:String x:Key="Wsl_NetworkHelp">配置 WinHTTP 代理和 IPv4 端口转发。</x:String><x:String x:Key="Wsl_SetProxy">设置代理</x:String><x:String x:Key="Wsl_AddPortForward">添加转发</x:String><x:String x:Key="Wsl_RemovePortForward">删除转发</x:String><x:String x:Key="Wsl_Usb">USB 设备</x:String><x:String x:Key="Wsl_UsbHelp">需要安装 usbipd-win，可绑定、附加和分离 WSL USB 设备。</x:String><x:String x:Key="Wsl_UsbRefresh">刷新设备</x:String><x:String x:Key="Wsl_UsbBind">绑定</x:String><x:String x:Key="Wsl_UsbAttach">附加</x:String><x:String x:Key="Wsl_UsbDetach">分离</x:String><x:String x:Key="Wsl_ActionComplete">操作已完成。</x:String><x:String x:Key="Wsl_Terminated">发行版已终止。</x:String><x:String x:Key="Wsl_Unregistered">发行版已注销。</x:String>
 
     <x:String x:Key="More_Title">更多功能</x:String>
     <x:String x:Key="More_Subtitle">后续模块采用独立页面接入，不影响现有端口管理功能</x:String>

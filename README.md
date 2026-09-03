@@ -35,9 +35,9 @@ The WSL page is implemented as a native WinUI management surface in this reposit
 
 WSL 页面是本仓库中的原生 WinUI 管理界面。未安装 WSL 时，界面会显示可操作的安装面板，提供提升权限的 `wsl.exe --install`、Ubuntu 安装和微软安装帮助链接；已安装 WSL 但没有发行版时，可直接安装 Ubuntu 并刷新列表。
 
-The workflow is feature-inspired by [owu/wsl-dashboard](https://github.com/owu/wsl-dashboard), but this project does not copy, link, bundle, or redistribute its source code or assets. The two projects remain independent.
+The workflow follows common WSL dashboard patterns, but this project is an independent implementation and does not copy or bundle third-party dashboard source code or assets.
 
-该工作流参考了 [owu/wsl-dashboard](https://github.com/owu/wsl-dashboard) 的功能方向，但本项目没有复制、链接、捆绑或再分发其源代码和资源，两个项目彼此独立。
+该工作流借鉴了常见 WSL 仪表板的设计思路，但本项目为独立实现，不复制或捆绑第三方仪表板源代码和资源。
 
 ## Installation / 安装
 
@@ -89,6 +89,10 @@ Replace `win-x64`/`x64` with `win-x86`/`x86` or `win-arm64`/`ARM64` for other ta
 
 `Views/` 存放原生 WinUI 页面；`Services/` 存放防火墙、网络、SMB、WSL、连接、传输、审计和托盘服务；`Models/` 存放领域模型；`Win-XinAi-De-Tools.Tests/` 存放测试；`installer/` 存放 Inno Setup 定义；`Assets/` 存放图标和资源。
 
+Optional Rust and Go WSL bridges live under `native/wsl-helper-rust/` and `native/wsl-helper-go/`. The WinUI application calls `wsl.exe` directly by default; set `WINXINAI_WSL_HELPER` to use a compiled bridge. See [`native/README.md`](native/README.md) for the build commands.
+
+可选的 Rust 和 Go WSL 桥接程序位于 `native/wsl-helper-rust/` 和 `native/wsl-helper-go/`。WinUI 应用默认直接调用 `wsl.exe`；设置 `WINXINAI_WSL_HELPER` 可使用已编译的桥接程序，构建命令见 [`native/README.md`](native/README.md)。
+
 ## Security / 安全
 
 Run the application as administrator only when required. SMB 1.0/CIFS is a legacy protocol with known security risks. Import only trusted JSON files. Network, process, and connection information is read locally and is not transmitted to a remote service.
@@ -97,13 +101,9 @@ Run the application as administrator only when required. SMB 1.0/CIFS is a legac
 
 ## License / 开源协议
 
-Win-XinAi-De-Tools is released under the [MIT License](LICENSE). The native WSL page is original work in this repository and is not a derivative or distribution of `owu/wsl-dashboard`.
+Win-XinAi-De-Tools is released under the [MIT License](LICENSE). The native WSL page and the optional Rust and Go helpers are original work in this repository.
 
-Win-XinAi-De-Tools 使用 [MIT License](LICENSE) 发布。本仓库的原生 WSL 页面为独立实现，不是 `owu/wsl-dashboard` 的衍生或再分发版本。
-
-`owu/wsl-dashboard` is a separate GPL-3.0 project. Its license applies to that project only; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) and its [official repository](https://github.com/owu/wsl-dashboard) for details.
-
-`owu/wsl-dashboard` 是独立的 GPL-3.0 项目，其许可仅适用于该项目；详情请参阅 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 和[官方仓库](https://github.com/owu/wsl-dashboard)。
+Win-XinAi-De-Tools 使用 [MIT License](LICENSE) 发布。本仓库的原生 WSL 页面以及可选 Rust、Go 辅助组件均为独立实现。
 
 Issues and pull requests should include the Windows version, architecture, application version, reproduction steps, and relevant logs from `%LOCALAPPDATA%\Win-XinAi-De-Tools\startup.log` or `audit.log`. Remove private data before publishing logs.
 

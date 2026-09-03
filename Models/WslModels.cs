@@ -9,8 +9,17 @@ public sealed class WslDistributionModel
     public string State { get; init; } = string.Empty;
     public int Version { get; init; }
     public bool IsDefault { get; init; }
+    public string VersionLabel => Version > 0 ? $"WSL {Version}" : string.Empty;
 
     public string DisplayName => IsDefault ? $"{Name} (default)" : Name;
+}
+
+public sealed class WslTaskModel
+{
+    public string Name { get; init; } = string.Empty;
+    public string Distribution { get; init; } = string.Empty;
+    public string Command { get; init; } = string.Empty;
+    public string Schedule { get; init; } = string.Empty;
 }
 
 public sealed class WslStatusModel

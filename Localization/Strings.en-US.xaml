@@ -165,7 +165,7 @@
     <x:String x:Key="Wsl_Title">WSL manager</x:String>
     <x:String x:Key="Wsl_Subtitle">Detect, install, and manage Linux distributions with native Windows WSL commands</x:String>
     <x:String x:Key="Wsl_HelpTitle">Native WSL management</x:String>
-    <x:String x:Key="Wsl_HelpMessage">A native WinUI manager for WSL distributions. This feature is inspired by owu/wsl-dashboard, but this repository does not copy or bundle its GPL-3.0 source.</x:String>
+    <x:String x:Key="Wsl_HelpMessage">A native WinUI manager for WSL distributions, networking, scheduled tasks, disks, and USB devices. Rust and Go helpers are optional local components; no third-party dashboard source is bundled.</x:String>
     <x:String x:Key="Wsl_Distributions">Linux distributions</x:String>
     <x:String x:Key="Wsl_Refresh">Refresh distributions</x:String>
     <x:String x:Key="Wsl_Empty">No WSL distributions were detected.</x:String>
@@ -179,7 +179,6 @@
     <x:String x:Key="Wsl_Started">Distribution started.</x:String>
     <x:String x:Key="Wsl_Stopped">Distribution stopped.</x:String>
     <x:String x:Key="Wsl_DefaultSet">Default distribution updated.</x:String>
-    <x:String x:Key="Wsl_ExternalLink">Open the owu/wsl-dashboard reference project</x:String>
     <x:String x:Key="Wsl_Error">WSL operation failed</x:String>
     <x:String x:Key="Wsl_NotInstalledTitle">Windows Subsystem for Linux is not installed</x:String>
     <x:String x:Key="Wsl_NotInstalledMessage">Install WSL with Microsoft's supported installer. Administrator approval may be required and Windows may ask you to restart.</x:String>
@@ -192,6 +191,7 @@
     <x:String x:Key="Wsl_StatusReady">WSL is ready.</x:String>
     <x:String x:Key="Wsl_StatusNotInstalled">WSL is not installed.</x:String>
     <x:String x:Key="Wsl_StatusNoDistribution">WSL is installed; no distribution is registered.</x:String>
+    <x:String x:Key="Wsl_InstanceControl">Instance control</x:String><x:String x:Key="Wsl_Terminate">Terminate</x:String><x:String x:Key="Wsl_Unregister">Unregister</x:String><x:String x:Key="Wsl_OpenExplorer">Open Explorer</x:String><x:String x:Key="Wsl_OpenVsCode">Open VS Code</x:String><x:String x:Key="Wsl_DiskUsage">Disk usage</x:String><x:String x:Key="Wsl_Autostart">Start this distribution at logon</x:String><x:String x:Key="Wsl_AutostartHelp">Creates a Windows Task Scheduler logon task.</x:String><x:String x:Key="Wsl_ShutdownOnExit">Terminate distributions when the app exits</x:String><x:String x:Key="Wsl_ShutdownOnExitHelp">The setting is reserved for the global exit policy.</x:String><x:String x:Key="Wsl_Backup">Backup, restore, and move</x:String><x:String x:Key="Wsl_BackupHelp">Export or import TAR archives and move a distribution to another drive.</x:String><x:String x:Key="Wsl_Export">Export TAR</x:String><x:String x:Key="Wsl_Import">Import TAR</x:String><x:String x:Key="Wsl_Move">Move</x:String><x:String x:Key="Wsl_DiskMount">VHDX disk mount</x:String><x:String x:Key="Wsl_DiskMountHelp">Mount or unmount a VHDX file using the native WSL command.</x:String><x:String x:Key="Wsl_Mount">Mount</x:String><x:String x:Key="Wsl_Unmount">Unmount</x:String><x:String x:Key="Wsl_TaskScheduler">Task scheduler</x:String><x:String x:Key="Wsl_TaskHelp">Schedule a shell command in the selected distribution with Windows Task Scheduler.</x:String><x:String x:Key="Wsl_Schedule">Schedule</x:String><x:String x:Key="Wsl_RemoveSchedule">Remove task</x:String><x:String x:Key="Wsl_Network">Networking</x:String><x:String x:Key="Wsl_NetworkHelp">Configure WinHTTP proxy and IPv4 port forwarding.</x:String><x:String x:Key="Wsl_SetProxy">Set proxy</x:String><x:String x:Key="Wsl_AddPortForward">Add forwarding</x:String><x:String x:Key="Wsl_RemovePortForward">Remove forwarding</x:String><x:String x:Key="Wsl_Usb">USB devices</x:String><x:String x:Key="Wsl_UsbHelp">Requires usbipd-win. Bind, attach, and detach USB devices for WSL.</x:String><x:String x:Key="Wsl_UsbRefresh">Refresh devices</x:String><x:String x:Key="Wsl_UsbBind">Bind</x:String><x:String x:Key="Wsl_UsbAttach">Attach</x:String><x:String x:Key="Wsl_UsbDetach">Detach</x:String><x:String x:Key="Wsl_ActionComplete">Action completed.</x:String><x:String x:Key="Wsl_Terminated">Distribution terminated.</x:String><x:String x:Key="Wsl_Unregistered">Distribution unregistered.</x:String>
 
     <x:String x:Key="More_Title">More features</x:String>
     <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>

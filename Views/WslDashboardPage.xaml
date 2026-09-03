@@ -57,7 +57,31 @@
                     </StackPanel>
                     <ProgressRing x:Name="LoadingRing" Width="20" Height="20" IsActive="False"/>
                     <InfoBar x:Name="ErrorBar" IsOpen="False" IsClosable="True" Severity="Error"/>
-                    <HyperlinkButton Content="{StaticResource Wsl_ExternalLink}" NavigateUri="https://github.com/owu/wsl-dashboard" HorizontalAlignment="Left"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="TerminateButton" Margin="0,0,8,8" Click="TerminateButton_Click"><StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE711;"/><TextBlock Text="{StaticResource Wsl_Terminate}"/></StackPanel></Button>
+                        <Button x:Name="UnregisterButton" Margin="0,0,8,8" Click="UnregisterButton_Click"><StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE74D;"/><TextBlock Text="{StaticResource Wsl_Unregister}"/></StackPanel></Button>
+                        <Button x:Name="ExplorerButton" Margin="0,0,8,8" Click="ExplorerButton_Click"><StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE8B7;"/><TextBlock Text="{StaticResource Wsl_OpenExplorer}"/></StackPanel></Button>
+                        <Button x:Name="VsCodeButton" Margin="0,0,8,8" Click="VsCodeButton_Click"><StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE943;"/><TextBlock Text="{StaticResource Wsl_OpenVsCode}"/></StackPanel></Button>
+                        <Button x:Name="DiskUsageButton" Margin="0,0,8,8" Click="DiskUsageButton_Click"><StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE958;"/><TextBlock Text="{StaticResource Wsl_DiskUsage}"/></StackPanel></Button>
+                    </StackPanel>
+                    <CheckBox x:Name="AutostartCheckBox" Content="{StaticResource Wsl_Autostart}" Click="AutostartCheckBox_Click" ToolTipService.ToolTip="{StaticResource Wsl_AutostartHelp}"/>
+                    <CheckBox x:Name="ShutdownOnExitCheckBox" Content="{StaticResource Wsl_ShutdownOnExit}" Click="ShutdownOnExitCheckBox_Click" ToolTipService.ToolTip="{StaticResource Wsl_ShutdownOnExitHelp}"/>
+                    <TextBlock x:Name="DiskUsageText" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="{StaticResource Wsl_Backup}" Style="{StaticResource SectionTitle}" Margin="0,8,0,0"/>
+                    <TextBox x:Name="ArchivePathBox" PlaceholderText="C:\Backups\distro.tar"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8"><Button Click="ExportButton_Click"><TextBlock Text="{StaticResource Wsl_Export}"/></Button><Button Click="ImportButton_Click"><TextBlock Text="{StaticResource Wsl_Import}"/></Button><Button Click="MoveButton_Click"><TextBlock Text="{StaticResource Wsl_Move}"/></Button></StackPanel>
+                    <TextBox x:Name="MovePathBox" PlaceholderText="D:\WSL\Ubuntu"/>
+                    <TextBlock Text="{StaticResource Wsl_DiskMount}" Style="{StaticResource SectionTitle}" Margin="0,8,0,0"/>
+                    <TextBox x:Name="DiskPathBox" PlaceholderText="C:\WSL\ext4.vhdx"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8"><Button Click="MountButton_Click"><TextBlock Text="{StaticResource Wsl_Mount}"/></Button><Button Click="UnmountButton_Click"><TextBlock Text="{StaticResource Wsl_Unmount}"/></Button></StackPanel>
+                    <TextBlock Text="{StaticResource Wsl_TaskScheduler}" Style="{StaticResource SectionTitle}" Margin="0,8,0,0"/>
+                    <TextBox x:Name="TaskNameBox" PlaceholderText="Backup task"/><TextBox x:Name="TaskCommandBox" PlaceholderText="/usr/local/bin/backup.sh"/><TextBox x:Name="TaskStartTimeBox" PlaceholderText="23:00"/>
+                    <ComboBox x:Name="TaskScheduleSelector" SelectedIndex="0"><ComboBoxItem Content="DAILY"/><ComboBoxItem Content="WEEKLY"/><ComboBoxItem Content="ONCE"/></ComboBox>
+                    <StackPanel Orientation="Horizontal" Spacing="8"><Button Click="ScheduleButton_Click"><TextBlock Text="{StaticResource Wsl_Schedule}"/></Button><Button Click="RemoveScheduleButton_Click"><TextBlock Text="{StaticResource Wsl_RemoveSchedule}"/></Button></StackPanel>
+                    <TextBlock Text="{StaticResource Wsl_Network}" Style="{StaticResource SectionTitle}" Margin="0,8,0,0"/>
+                    <TextBox x:Name="ProxyBox" PlaceholderText="proxy.example:8080"/><Button Click="ProxyButton_Click"><TextBlock Text="{StaticResource Wsl_SetProxy}"/></Button>
+                    <TextBox x:Name="ListenPortBox" PlaceholderText="Listen port"/><TextBox x:Name="ConnectAddressBox" PlaceholderText="127.0.0.1"/><TextBox x:Name="ConnectPortBox" PlaceholderText="22"/><StackPanel Orientation="Horizontal" Spacing="8"><Button Click="AddProxyButton_Click"><TextBlock Text="{StaticResource Wsl_AddPortForward}"/></Button><Button Click="RemoveProxyButton_Click"><TextBlock Text="{StaticResource Wsl_RemovePortForward}"/></Button></StackPanel>
+                    <TextBlock Text="{StaticResource Wsl_Usb}" Style="{StaticResource SectionTitle}" Margin="0,8,0,0"/><ListView x:Name="UsbList" Height="100"/><StackPanel Orientation="Horizontal" Spacing="8"><Button Click="UsbRefreshButton_Click"><TextBlock Text="{StaticResource Wsl_UsbRefresh}"/></Button><Button Click="UsbBindButton_Click"><TextBlock Text="{StaticResource Wsl_UsbBind}"/></Button><Button Click="UsbAttachButton_Click"><TextBlock Text="{StaticResource Wsl_UsbAttach}"/></Button><Button Click="UsbDetachButton_Click"><TextBlock Text="{StaticResource Wsl_UsbDetach}"/></Button></StackPanel>
                 </StackPanel>
             </Border>
         </Grid>

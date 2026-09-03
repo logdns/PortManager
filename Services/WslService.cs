@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using PortManager.Models;
 
@@ -11,6 +12,7 @@ namespace PortManager.Services;
 
 public static class WslService
 {
+    public static bool ShutdownOnExit { get; set; }
     public static async Task<WslStatusModel> GetStatusAsync()
     {
         EnsureWindows();
@@ -76,12 +78,115 @@ public static class WslService
 
     public static Task StartAsync(string name) => RunCheckedAsync("--distribution", name, "--exec", "true");
     public static Task StopAsync(string name) => RunCheckedAsync("--terminate", name);
+    public static Task TerminateAsync(string name) => RunCheckedAsync("--terminate", name);
+    public static void ShutdownAll()
+    {
+        EnsureWindows();
+        using var process = Process.Start(new ProcessStartInfo { FileName = ResolveWslExecutable(), UseShellExecute = false, CreateNoWindow = true, ArgumentList = { "--shutdown" } });
+        process?.WaitForExit(10_000);
+    }
     public static Task SetDefaultAsync(string name) => RunCheckedAsync("--set-default", name);
+    public static Task UnregisterAsync(string name) => RunCheckedAsync("--unregister", name);
+
+    public static Task ExportAsync(string name, string archivePath) => RunCheckedAsync("--export", name, archivePath);
+
+    public static Task ImportAsync(string name, string installPath, string archivePath, int version = 2)
+        => RunCheckedAsync("--import", name, installPath, archivePath, "--version", version.ToString());
+
+    public static Task MoveAsync(string name, string targetPath) => RunCheckedAsync("--manage", name, "--move", targetPath);
+
+    public static async Task<string> GetDiskUsageAsync(string name)
+    {
+        EnsureWindows();
+        var result = await RunAsync("--distribution", name, "--exec", "df", "-h", "/");
+        if (result.ExitCode != 0)
+            throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? "Could not read disk usage." : result.Error.Trim());
+        return result.Output.Trim();
+    }
+
+    public static void OpenExplorer(string name)
+    {
+        EnsureWindows();
+        Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = $"\\\\wsl$\\{name}", UseShellExecute = true });
+    }
+
+    public static void OpenVsCode(string name)
+    {
+        EnsureWindows();
+        Process.Start(new ProcessStartInfo { FileName = "code", Arguments = $"--remote wsl+{name}", UseShellExecute = true });
+    }
+
+    public static Task SetAutostartAsync(string name, bool enabled)
+    {
+        EnsureWindows();
+        var taskName = $"Win-XinAi-De-Tools\\WSL\\{name}";
+        return RunWindowsCommandAsync("schtasks.exe", enabled
+            ? $"/Create /TN \"{taskName}\" /SC ONLOGON /TR \"wsl.exe --distribution {name} --exec true\" /F"
+            : $"/Delete /TN \"{taskName}\" /F");
+    }
+
+    public static Task ScheduleCommandAsync(string taskName, string name, string command, string schedule, string startTime)
+    {
+        EnsureWindows();
+        var fullName = $"Win-XinAi-De-Tools\\WSL\\{taskName}";
+        var trigger = schedule.Equals("once", StringComparison.OrdinalIgnoreCase) ? $"/SC ONCE /ST {startTime}" : $"/SC {schedule.ToUpperInvariant()} /ST {startTime}";
+        var taskCommand = $"wsl.exe --distribution {Quote(name)} --exec sh -lc {Quote(command)}";
+        return RunWindowsCommandAsync("schtasks.exe", $"/Create /TN \"{fullName}\" {trigger} /TR \"{taskCommand}\" /F");
+    }
+
+    public static Task RemoveScheduledCommandAsync(string taskName)
+    {
+        EnsureWindows();
+        return RunWindowsCommandAsync("schtasks.exe", $"/Delete /TN \"Win-XinAi-De-Tools\\WSL\\{taskName}\" /F");
+    }
+
+    public static Task AddPortProxyAsync(int listenPort, string address, int port)
+    {
+        EnsureWindows();
+        return RunWindowsCommandAsync("netsh.exe", $"interface portproxy add v4tov4 listenport={listenPort} listenaddress=0.0.0.0 connectport={port} connectaddress={address}");
+    }
+
+    public static Task RemovePortProxyAsync(int listenPort)
+    {
+        EnsureWindows();
+        return RunWindowsCommandAsync("netsh.exe", $"interface portproxy delete v4tov4 listenport={listenPort} listenaddress=0.0.0.0");
+    }
+
+    public static Task SetHttpProxyAsync(string? proxy)
+    {
+        EnsureWindows();
+        return RunWindowsCommandAsync("netsh.exe", string.IsNullOrWhiteSpace(proxy) ? "winhttp reset proxy" : $"winhttp set proxy {proxy}");
+    }
+
+    public static Task MountVhdAsync(string diskPath, int? partition = null)
+    {
+        EnsureWindows();
+        var arguments = $"--mount {Quote(diskPath)}" + (partition.HasValue ? $" --partition {partition.Value}" : string.Empty);
+        return RunWindowsCommandAsync("wsl.exe", arguments);
+    }
+
+    public static Task UnmountVhdAsync(string diskPath)
+    {
+        EnsureWindows();
+        return RunWindowsCommandAsync("wsl.exe", $"--unmount {Quote(diskPath)}");
+    }
+
+    public static async Task<IReadOnlyList<string>> ListUsbDevicesAsync()
+    {
+        EnsureWindows();
+        var result = await RunWindowsCommandCaptureAsync("usbipd.exe", "list");
+        if (result.ExitCode != 0) throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? "usbipd-win is not installed." : result.Error.Trim());
+        return result.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
+    public static Task BindUsbDeviceAsync(string busId) => RunWindowsCommandAsync("usbipd.exe", $"bind --busid {Quote(busId)}");
+    public static Task AttachUsbDeviceAsync(string busId, string distribution) => RunWindowsCommandAsync("usbipd.exe", $"attach --wsl --busid {Quote(busId)}");
+    public static Task DetachUsbDeviceAsync(string busId) => RunWindowsCommandAsync("usbipd.exe", $"detach --busid {Quote(busId)}");
 
     public static void OpenTerminal(string name)
     {
         EnsureWindows();
-        var info = new ProcessStartInfo { FileName = "wsl.exe", UseShellExecute = true };
+        var info = new ProcessStartInfo { FileName = ResolveWslExecutable(), UseShellExecute = true };
         info.ArgumentList.Add("--distribution");
         info.ArgumentList.Add(name);
         Process.Start(info);
@@ -117,9 +222,34 @@ public static class WslService
         if (result.ExitCode != 0) throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? "WSL command failed." : result.Error.Trim());
     }
 
+    private static async Task RunWindowsCommandAsync(string fileName, string arguments)
+    {
+        var result = await RunWindowsCommandCaptureAsync(fileName, arguments);
+        if (result.ExitCode != 0)
+            throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? $"Command failed: {fileName}" : result.Error.Trim());
+    }
+
+    private static async Task<(int ExitCode, string Output, string Error)> RunWindowsCommandCaptureAsync(string fileName, string arguments)
+    {
+        var info = new ProcessStartInfo { FileName = fileName, Arguments = arguments, UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
+        Process process;
+        try { process = Process.Start(info) ?? throw new WslOperationException($"Could not start {fileName}."); }
+        catch (Win32Exception exception) when (exception.NativeErrorCode is 2 or 3)
+        { throw new WslOperationException($"{fileName} was not found. Install the required Windows component first."); }
+        using (process)
+        {
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+            return (process.ExitCode, await outputTask, await errorTask);
+        }
+    }
+
+    private static string Quote(string value) => $"\"{value.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
+
     private static async Task<(int ExitCode, string Output, string Error)> RunAsync(params string[] arguments)
     {
-        var info = new ProcessStartInfo { FileName = "wsl.exe", UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true, StandardOutputEncoding = Encoding.Unicode, StandardErrorEncoding = Encoding.Unicode };
+        var info = new ProcessStartInfo { FileName = ResolveWslExecutable(), UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true, StandardOutputEncoding = Encoding.Unicode, StandardErrorEncoding = Encoding.Unicode };
         foreach (var argument in arguments) info.ArgumentList.Add(argument);
         Process process;
         try
@@ -144,7 +274,7 @@ public static class WslService
     {
         var info = new ProcessStartInfo
         {
-            FileName = "wsl.exe",
+            FileName = ResolveWslExecutable(),
             UseShellExecute = true,
             Verb = "runas",
             WindowStyle = ProcessWindowStyle.Normal
@@ -159,6 +289,12 @@ public static class WslService
         {
             throw new WslOperationException("The administrator approval was cancelled.");
         }
+    }
+
+    private static string ResolveWslExecutable()
+    {
+        var helper = Environment.GetEnvironmentVariable("WINXINAI_WSL_HELPER");
+        return !string.IsNullOrWhiteSpace(helper) && File.Exists(helper) ? helper : "wsl.exe";
     }
 
     internal static bool IsNotInstalledMessage(string? message)
