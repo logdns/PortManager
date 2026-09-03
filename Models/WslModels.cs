@@ -20,7 +20,7 @@ public sealed class WslStatusModel
     public bool HasDistributions => Distributions.Count > 0;
 }
 
-public sealed class WslOperationException : Exception
+public class WslOperationException : Exception
 {
     public WslOperationException(string message) : base(message) { }
 }
