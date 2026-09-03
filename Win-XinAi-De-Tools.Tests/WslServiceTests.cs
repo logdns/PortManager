@@ -49,6 +49,35 @@ public sealed class WslServiceTests
     }
 
     [Fact]
+    public void ApplyRunningStates_DoesNotTrustLocalizedVerboseState()
+    {
+        var rows = WslService.ParseDistributions("名称 状态 版本\n* Ubuntu 已停止 2\n  Debian 正在运行 2\n");
+
+        var normalized = WslService.ApplyRunningStates(rows, new[] { "Ubuntu" });
+
+        Assert.Equal("Running", Assert.Single(normalized, row => row.Name == "Ubuntu").State);
+        Assert.Equal("Stopped", Assert.Single(normalized, row => row.Name == "Debian").State);
+    }
+
+    [Fact]
+    public void ParseQuietDistributionNames_HandlesUtf16NullsAndWhitespace()
+    {
+        var rows = WslService.ParseQuietDistributionNames("Ubuntu\0\r\n Debian \0\r\n");
+
+        Assert.Equal(new[] { "Ubuntu", "Debian" }, rows);
+    }
+
+    [Fact]
+    public void ParseOnlineDistributions_HandlesLocalizedHeaders()
+    {
+        var english = WslService.ParseOnlineDistributions("The following distributions can be installed.\n\nNAME FRIENDLY NAME\nUbuntu Ubuntu\nDebian Debian GNU/Linux\n");
+        var chinese = WslService.ParseOnlineDistributions("以下是可安装的有效发行版列表。\n\n名称 友好名称\nUbuntu Ubuntu\nkali-linux Kali Linux Rolling\n");
+
+        Assert.Equal(new[] { "Ubuntu", "Debian" }, english);
+        Assert.Equal(new[] { "Ubuntu", "kali-linux" }, chinese);
+    }
+
+    [Fact]
     public void EnsureSuccessfulInstallerExitCode_AcceptsSuccess()
     {
         WslService.EnsureSuccessfulInstallerExitCode(0);

@@ -53,7 +53,8 @@
                 <Grid RowSpacing="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/><RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid ColumnSpacing="8">
                         <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -61,17 +62,28 @@
                         <Button x:Name="RefreshButton" Grid.Column="1" Click="RefreshButton_Click" ToolTipService.ToolTip="{StaticResource Wsl_Refresh}"><FontIcon Glyph="&#xE72C;"/></Button>
                     </Grid>
                     <TextBlock x:Name="StatusText" Grid.Row="1" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <ListView x:Name="DistributionList" Grid.Row="2" SelectionChanged="DistributionList_SelectionChanged" MinHeight="120">
+                    <ListView x:Name="DistributionList" Grid.Row="2" SelectionChanged="DistributionList_SelectionChanged" MinHeight="80" MaxHeight="320">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Spacing="2" Padding="2,4">
                                     <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding State}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding StateLabel}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                     <TextBlock x:Name="EmptyText" Grid.Row="3" Text="{StaticResource Wsl_Empty}" Visibility="Collapsed" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <StackPanel Grid.Row="4" Spacing="8" Margin="0,8,0,0">
+                        <Rectangle Height="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{StaticResource Wsl_AddDistribution}" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Text="{StaticResource Wsl_AddDistributionHelp}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <Button x:Name="InstallAnotherDistributionButton" HorizontalAlignment="Stretch" Click="InstallAnotherDistributionButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="7"><FontIcon Glyph="&#xE710;"/><TextBlock Text="{StaticResource Wsl_InstallOtherDistribution}"/></StackPanel>
+                        </Button>
+                        <Button HorizontalAlignment="Stretch" Click="OpenImportButton_Click">
+                            <StackPanel Orientation="Horizontal" Spacing="7"><FontIcon Glyph="&#xE8B5;"/><TextBlock Text="{StaticResource Wsl_ImportExistingDistribution}"/></StackPanel>
+                        </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
 
@@ -87,7 +99,7 @@
                         <ProgressRing x:Name="LoadingRing" Grid.Column="1" Width="20" Height="20" IsActive="False" VerticalAlignment="Center"/>
                     </Grid>
 
-                    <TabView Grid.Row="1" IsAddTabButtonVisible="False">
+                    <TabView x:Name="ManagementTabs" Grid.Row="1" IsAddTabButtonVisible="False">
                         <TabViewItem Header="{StaticResource Wsl_TabOverview}" IsClosable="False">
                             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                                 <StackPanel Spacing="12" Padding="0,10,8,10">
@@ -145,6 +157,7 @@
                                 <StackPanel Spacing="12" Padding="0,10,8,10">
                                     <TextBlock Text="{StaticResource Wsl_Backup}" Style="{StaticResource SectionTitle}"/>
                                     <TextBlock Text="{StaticResource Wsl_BackupHelp}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                    <TextBox x:Name="ImportNameBox" Header="{StaticResource Wsl_ImportName}" PlaceholderText="MyLinux"/>
                                     <TextBox x:Name="ArchivePathBox" Header="{StaticResource Wsl_ArchivePath}" PlaceholderText="C:\Backups\distro.tar"/>
                                     <StackPanel Orientation="Horizontal" Spacing="8"><Button Click="ExportButton_Click"><TextBlock Text="{StaticResource Wsl_Export}"/></Button><Button Click="ImportButton_Click"><TextBlock Text="{StaticResource Wsl_Import}"/></Button></StackPanel>
                                     <TextBox x:Name="MovePathBox" Header="{StaticResource Wsl_InstallPath}" PlaceholderText="D:\WSL\Ubuntu"/>

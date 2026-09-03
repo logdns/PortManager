@@ -218,6 +218,18 @@
     <x:String x:Key="Wsl_ListenPort">监听端口</x:String>
     <x:String x:Key="Wsl_ConnectAddress">目标地址</x:String>
     <x:String x:Key="Wsl_ConnectPort">目标端口</x:String>
+    <x:String x:Key="Wsl_StateRunning">运行中</x:String>
+    <x:String x:Key="Wsl_StateStopped">已停止</x:String>
+    <x:String x:Key="Wsl_AddDistribution">添加或恢复发行版</x:String>
+    <x:String x:Key="Wsl_AddDistributionHelp">从 WSL 在线目录安装其他发行版，或导入已有的 TAR 存档。</x:String>
+    <x:String x:Key="Wsl_InstallOtherDistribution">安装其他发行版</x:String>
+    <x:String x:Key="Wsl_ImportExistingDistribution">导入已有发行版</x:String>
+    <x:String x:Key="Wsl_ChooseDistributionTitle">选择 Linux 发行版</x:String>
+    <x:String x:Key="Wsl_ChooseDistributionMessage">请选择可用发行版。WSL 将下载并注册它，且不会打开首次运行终端。</x:String>
+    <x:String x:Key="Wsl_InstallSelected">安装所选发行版</x:String>
+    <x:String x:Key="Wsl_NoAdditionalDistribution">WSL 在线目录返回的发行版均已安装。</x:String>
+    <x:String x:Key="Wsl_ImportName">新发行版名称</x:String>
+    <x:String x:Key="Wsl_ImportFieldsRequired">请输入新发行版名称和 TAR 存档路径。</x:String>
 
     <x:String x:Key="More_Title">更多功能</x:String>
     <x:String x:Key="More_Subtitle">后续模块采用独立页面接入，不影响现有端口管理功能</x:String>
@@ -274,7 +286,7 @@
     <x:String x:Key="About_Description">Windows 原生网络、防火墙与 WSL 管理工具</x:String>
     <x:String x:Key="About_CopyrightPrefix">沨哥网络 -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">版本 1.6.1</x:String>
+    <x:String x:Key="About_Version">版本 1.6.2</x:String>
     <x:String x:Key="About_Features">功能</x:String>
     <x:String x:Key="About_FeatureText">在一个原生 WinUI 应用中管理网络配置、防火墙规则、SMB 共享和 WSL 发行版。</x:String>
     <x:String x:Key="About_Frameworks">技术框架</x:String>

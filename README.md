@@ -6,9 +6,9 @@ Win-XinAi-De-Tools 是一款原生 Windows 工具，用于网络配置、Windows
 
 ## Current release / 当前版本
 
-**v1.6.1**
+**v1.6.2**
 
-Download: [GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.1)  ·  下载：[GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.1)
+Download: [GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.2)  ·  下载：[GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.2)
 
 Release history: [CHANGELOG.md](CHANGELOG.md) · 版本记录：[CHANGELOG.md](CHANGELOG.md)
 
@@ -26,8 +26,8 @@ Release history: [CHANGELOG.md](CHANGELOG.md) · 版本记录：[CHANGELOG.md](C
   监控 TCP/UDP 活动连接，关联进程，关闭 TCP 连接或在确认后终止进程。
 - Back up and restore firewall rules as JSON and review an append-only audit log.
   使用 JSON 备份和恢复防火墙规则，并查看追加式审计日志。
-- Manage WSL distributions through the native `wsl.exe` command: detect installation state, install WSL or Ubuntu, start, stop, set default, refresh, and open a terminal.
-  通过原生 `wsl.exe` 管理 WSL 发行版：检测安装状态、安装 WSL 或 Ubuntu、启动、停止、设置默认、刷新和打开终端。
+- Manage WSL distributions through the native `wsl.exe` command: detect installation and runtime state, browse and install additional distributions, import TAR archives, start, stop, set default, refresh, and open a terminal.
+  通过原生 `wsl.exe` 管理 WSL 发行版：检测安装及运行状态、浏览并安装其他发行版、导入 TAR 存档、启动、停止、设置默认、刷新和打开终端。
 - Smart startup supports `/silent`, logon auto-start, minimize-to-tray startup, and optional WSL shutdown on application exit.
   智能启动支持 `/silent` 参数、登录自启、启动时最小化到托盘，以及退出应用时可选关闭 WSL。
 - Advanced WSL operations include terminate/unregister, disk usage, Explorer and VS Code integration, TAR export/import, VHDX mounting, migration, scheduled commands, HTTP proxy, IPv4 port forwarding, and usbipd-win device actions.
@@ -37,9 +37,9 @@ Release history: [CHANGELOG.md](CHANGELOG.md) · 版本记录：[CHANGELOG.md](C
 
 ### WSL integration / WSL 集成
 
-The WSL page is implemented as a native WinUI management surface in this repository. When WSL is missing, it shows an actionable setup panel with an elevated `wsl.exe --install` action, waits for the installer, reports its exit result, and links to Microsoft's installation help. When WSL is installed without a distribution, the page offers to install Ubuntu without launching an interactive first-run shell. Distribution actions and advanced settings are separated into responsive, scrollable tabs. The settings tab also exposes native WSL version, update, and shutdown commands.
+The WSL page is implemented as a native WinUI management surface in this repository. When WSL is missing, it shows an actionable setup panel with an elevated `wsl.exe --install` action, waits for the installer, reports its exit result, and links to Microsoft's installation help. The distribution panel always offers installation from WSL's online catalog and TAR import. Runtime state is obtained from WSL's running-distribution list instead of localized status text, while Linux command output is decoded as UTF-8. Distribution actions and advanced settings are separated into responsive, scrollable tabs.
 
-WSL 页面是本仓库中的原生 WinUI 管理界面。未安装 WSL 时，界面会显示可操作的安装面板，提供提升权限的 `wsl.exe --install`，等待安装结束、报告退出结果，并链接微软安装帮助；已安装 WSL 但没有发行版时，可安装 Ubuntu 而不立即启动交互式首次配置。发行版操作与高级设置现已拆分到响应式、可滚动的标签页中；设置页还提供原生 WSL 版本、更新和全部关闭命令。
+WSL 页面是本仓库中的原生 WinUI 管理界面。未安装 WSL 时，界面会显示可操作的安装面板，提供提升权限的 `wsl.exe --install`，等待安装结束并报告退出结果。发行版面板始终提供从 WSL 在线目录安装其他发行版和导入 TAR 的入口；运行状态取自 WSL 的运行中发行版名单，不再依赖本地化状态文本，Linux 命令输出则按 UTF-8 解码。发行版操作与高级设置位于响应式、可滚动的标签页中。
 
 The workflow follows common WSL dashboard patterns, but this project is an independent implementation and does not copy or bundle third-party dashboard source code or assets.
 
@@ -53,9 +53,9 @@ Windows 10 version 1809 (build 17763) or later is required. The one-command `wsl
 
 | Architecture / 架构 | Portable ZIP / 免安装 ZIP | Installer / 安装包 |
 |---|---|---|
-| x86 | [Win-XinAi-De-Tools-win-x86.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-win-x86.zip) | [Win-XinAi-De-Tools-Setup-x86.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-Setup-x86.exe) |
-| x64 | [Win-XinAi-De-Tools-win-x64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-win-x64.zip) | [Win-XinAi-De-Tools-Setup-x64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-Setup-x64.exe) |
-| ARM64 | [Win-XinAi-De-Tools-win-arm64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-win-arm64.zip) | [Win-XinAi-De-Tools-Setup-arm64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-Setup-arm64.exe) |
+| x86 | [Win-XinAi-De-Tools-win-x86.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.2/Win-XinAi-De-Tools-win-x86.zip) | [Win-XinAi-De-Tools-Setup-x86.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.2/Win-XinAi-De-Tools-Setup-x86.exe) |
+| x64 | [Win-XinAi-De-Tools-win-x64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.2/Win-XinAi-De-Tools-win-x64.zip) | [Win-XinAi-De-Tools-Setup-x64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.2/Win-XinAi-De-Tools-Setup-x64.exe) |
+| ARM64 | [Win-XinAi-De-Tools-win-arm64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.2/Win-XinAi-De-Tools-win-arm64.zip) | [Win-XinAi-De-Tools-Setup-arm64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.2/Win-XinAi-De-Tools-Setup-arm64.exe) |
 
 The portable build is self-contained and does not require a separate .NET or Windows App SDK installation. Extract the ZIP and run `Win-XinAi-De-Tools.exe` as administrator. The installer creates Start menu and optional desktop shortcuts.
 

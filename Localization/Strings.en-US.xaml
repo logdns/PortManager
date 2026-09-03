@@ -218,6 +218,18 @@
     <x:String x:Key="Wsl_ListenPort">Listen port</x:String>
     <x:String x:Key="Wsl_ConnectAddress">Destination address</x:String>
     <x:String x:Key="Wsl_ConnectPort">Destination port</x:String>
+    <x:String x:Key="Wsl_StateRunning">Running</x:String>
+    <x:String x:Key="Wsl_StateStopped">Stopped</x:String>
+    <x:String x:Key="Wsl_AddDistribution">Add or restore a distribution</x:String>
+    <x:String x:Key="Wsl_AddDistributionHelp">Install another distribution from the WSL online catalog, or import an existing TAR archive.</x:String>
+    <x:String x:Key="Wsl_InstallOtherDistribution">Install another distribution</x:String>
+    <x:String x:Key="Wsl_ImportExistingDistribution">Import an existing distribution</x:String>
+    <x:String x:Key="Wsl_ChooseDistributionTitle">Choose a Linux distribution</x:String>
+    <x:String x:Key="Wsl_ChooseDistributionMessage">Select an available distribution. WSL will download and register it without opening the first-run terminal.</x:String>
+    <x:String x:Key="Wsl_InstallSelected">Install selected</x:String>
+    <x:String x:Key="Wsl_NoAdditionalDistribution">Every distribution returned by the WSL online catalog is already installed.</x:String>
+    <x:String x:Key="Wsl_ImportName">New distribution name</x:String>
+    <x:String x:Key="Wsl_ImportFieldsRequired">Enter a new distribution name and a TAR archive path.</x:String>
 
     <x:String x:Key="More_Title">More features</x:String>
     <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>
@@ -274,7 +286,7 @@
     <x:String x:Key="About_Description">Native Windows network, firewall, and WSL management utility</x:String>
     <x:String x:Key="About_CopyrightPrefix">Fengge Network -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">Version 1.6.1</x:String>
+    <x:String x:Key="About_Version">Version 1.6.2</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Manage Windows network settings, firewall rules, SMB sharing, and WSL distributions from one native WinUI application.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>

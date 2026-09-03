@@ -49,7 +49,29 @@ public static class WslService
                 return new List<WslDistributionModel>();
             throw new WslOperationException(string.IsNullOrWhiteSpace(details) ? "WSL is not available." : details.Trim());
         }
-        return ParseDistributions(result.Output);
+        var distributions = ParseDistributions(result.Output);
+        var runningResult = await RunAsync("--list", "--running", "--quiet");
+        return runningResult.ExitCode == 0
+            ? ApplyRunningStates(distributions, ParseQuietDistributionNames(runningResult.Output))
+            : distributions;
+    }
+
+    public static async Task<IReadOnlyList<string>> ListOnlineDistributionsAsync()
+    {
+        EnsureWindows();
+        var result = await RunAsync("--list", "--online");
+        if (result.ExitCode != 0)
+        {
+            var details = string.IsNullOrWhiteSpace(result.Error) ? result.Output : result.Error;
+            throw new WslOperationException(string.IsNullOrWhiteSpace(details)
+                ? "Could not retrieve the available Linux distributions."
+                : details.Trim());
+        }
+
+        var distributions = ParseOnlineDistributions(result.Output);
+        if (distributions.Count == 0)
+            throw new WslOperationException("WSL did not return any available Linux distributions.");
+        return distributions;
     }
 
     public static Task InstallAsync()
@@ -108,7 +130,7 @@ public static class WslService
     public static async Task<string> GetDiskUsageAsync(string name)
     {
         EnsureWindows();
-        var result = await RunAsync("--distribution", name, "--exec", "df", "-h", "/");
+        var result = await RunLinuxCommandAsync(name, "df", "-h", "/");
         if (result.ExitCode != 0)
             throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? "Could not read disk usage." : result.Error.Trim());
         return result.Output.Trim();
@@ -232,6 +254,51 @@ public static class WslService
         return rows.OrderBy(item => item.Name, StringComparer.OrdinalIgnoreCase).ToList();
     }
 
+    internal static List<string> ParseQuietDistributionNames(string output)
+        => output.Replace("\0", string.Empty, StringComparison.Ordinal)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(name => name.Length > 0)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+    internal static List<WslDistributionModel> ApplyRunningStates(
+        IEnumerable<WslDistributionModel> distributions,
+        IEnumerable<string> runningNames)
+    {
+        var running = new HashSet<string>(runningNames, StringComparer.OrdinalIgnoreCase);
+        return distributions.Select(distribution => new WslDistributionModel
+        {
+            Name = distribution.Name,
+            State = running.Contains(distribution.Name) ? "Running" : "Stopped",
+            Version = distribution.Version,
+            IsDefault = distribution.IsDefault
+        }).ToList();
+    }
+
+    internal static List<string> ParseOnlineDistributions(string output)
+    {
+        var distributions = new List<string>();
+        var tableStarted = false;
+        foreach (var rawLine in output.Replace("\0", string.Empty, StringComparison.Ordinal).Split('\n'))
+        {
+            var line = rawLine.Trim();
+            if (!tableStarted)
+            {
+                tableStarted = line.StartsWith("NAME", StringComparison.OrdinalIgnoreCase) ||
+                               line.StartsWith("名称", StringComparison.OrdinalIgnoreCase);
+                continue;
+            }
+
+            if (line.Length == 0 || line.All(character => character is '-' or '='))
+                continue;
+            var name = line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(name))
+                distributions.Add(name);
+        }
+
+        return distributions.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+    }
+
     private static async Task RunCheckedAsync(params string[] arguments)
     {
         EnsureWindows();
@@ -295,8 +362,18 @@ public static class WslService
         => $"wsl.exe --distribution {QuoteWindowsArgument(distribution)} --exec sh -lc {QuoteWindowsArgument(command)}";
 
     private static async Task<(int ExitCode, string Output, string Error)> RunAsync(params string[] arguments)
+        => await RunWslProcessAsync(Encoding.Unicode, arguments);
+
+    private static async Task<(int ExitCode, string Output, string Error)> RunLinuxCommandAsync(string distribution, params string[] arguments)
     {
-        var info = new ProcessStartInfo { FileName = ResolveWslExecutable(), UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true, StandardOutputEncoding = Encoding.Unicode, StandardErrorEncoding = Encoding.Unicode };
+        var wslArguments = new List<string> { "--distribution", distribution, "--exec" };
+        wslArguments.AddRange(arguments);
+        return await RunWslProcessAsync(new UTF8Encoding(false), wslArguments.ToArray());
+    }
+
+    private static async Task<(int ExitCode, string Output, string Error)> RunWslProcessAsync(Encoding encoding, params string[] arguments)
+    {
+        var info = new ProcessStartInfo { FileName = ResolveWslExecutable(), UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true, StandardOutputEncoding = encoding, StandardErrorEncoding = encoding };
         foreach (var argument in arguments) info.ArgumentList.Add(argument);
         Process process;
         try

@@ -7,6 +7,7 @@ public sealed class WslDistributionModel
 {
     public string Name { get; init; } = string.Empty;
     public string State { get; init; } = string.Empty;
+    public string StateLabel { get; set; } = string.Empty;
     public int Version { get; init; }
     public bool IsDefault { get; init; }
     public string VersionLabel => Version > 0 ? $"WSL {Version}" : string.Empty;

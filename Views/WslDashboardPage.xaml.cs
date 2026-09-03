@@ -34,6 +34,8 @@ public sealed partial class WslDashboardPage : Page
             var status = await WslService.GetStatusAsync();
             _wslInstalled = status.IsInstalled;
             var rows = status.Distributions.ToList();
+            foreach (var row in rows)
+                row.StateLabel = LocalizeState(row.State);
             DistributionList.ItemsSource = rows;
             var selected = rows.FirstOrDefault(row => row.Name == selectedName) ?? rows.FirstOrDefault();
             DistributionList.SelectedItem = selected;
@@ -70,7 +72,7 @@ public sealed partial class WslDashboardPage : Page
     private void DistributionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var distro = DistributionList.SelectedItem as WslDistributionModel;
-        SelectedText.Text = distro is null ? App.Text("Wsl_Select") : string.Format(App.Text("Wsl_SelectedFormat"), distro.Name, distro.State, distro.Version);
+        SelectedText.Text = distro is null ? App.Text("Wsl_Select") : string.Format(App.Text("Wsl_SelectedFormat"), distro.Name, distro.StateLabel, distro.Version);
         var enabled = distro is not null && _wslInstalled && !_busy;
         StartButton.IsEnabled = enabled; StopButton.IsEnabled = enabled; DefaultButton.IsEnabled = enabled; UnregisterButton.IsEnabled = enabled; TerminalButton.IsEnabled = enabled; ExplorerButton.IsEnabled = enabled; VsCodeButton.IsEnabled = enabled; DiskUsageButton.IsEnabled = enabled; AutostartCheckBox.IsEnabled = enabled;
     }
@@ -80,6 +82,65 @@ public sealed partial class WslDashboardPage : Page
 
     private async void InstallDistributionButton_Click(object sender, RoutedEventArgs e)
         => await RunInstallAsync("InstallWslDistribution", () => WslService.InstallDistributionAsync(), "Ubuntu");
+
+    private async void InstallAnotherDistributionButton_Click(object sender, RoutedEventArgs e)
+    {
+        IReadOnlyList<string> distributions;
+        SetBusy(true);
+        try
+        {
+            distributions = await WslService.ListOnlineDistributionsAsync();
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex.Message);
+            AuditLogService.Record("ListOnlineWslDistributions", ex.Message, false);
+            return;
+        }
+        finally
+        {
+            SetBusy(false);
+        }
+
+        var installed = (DistributionList.ItemsSource as IEnumerable<WslDistributionModel>)?
+            .Select(distribution => distribution.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var available = distributions.Where(distribution => !installed.Contains(distribution)).ToList();
+        if (available.Count == 0)
+        {
+            ShowNotice(InfoBarSeverity.Informational, App.Text("Wsl_InstallOtherDistribution"), App.Text("Wsl_NoAdditionalDistribution"));
+            return;
+        }
+
+        var picker = new ComboBox
+        {
+            ItemsSource = available,
+            SelectedIndex = 0,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        };
+        var content = new StackPanel { Spacing = 10 };
+        content.Children.Add(new TextBlock { Text = App.Text("Wsl_ChooseDistributionMessage"), TextWrapping = TextWrapping.Wrap });
+        content.Children.Add(picker);
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = App.Text("Wsl_ChooseDistributionTitle"),
+            Content = content,
+            PrimaryButtonText = App.Text("Wsl_InstallSelected"),
+            CloseButtonText = App.Text("Common_Cancel"),
+            DefaultButton = ContentDialogButton.Primary
+        };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary || picker.SelectedItem is not string name)
+            return;
+
+        await RunInstallAsync("InstallWslDistribution", () => WslService.InstallDistributionAsync(name), name);
+    }
+
+    private void OpenImportButton_Click(object sender, RoutedEventArgs e)
+    {
+        ManagementTabs.SelectedIndex = 2;
+        ImportNameBox.Focus(FocusState.Programmatic);
+    }
 
     private void HelpButton_Click(object sender, RoutedEventArgs e)
     {
@@ -132,8 +193,12 @@ public sealed partial class WslDashboardPage : Page
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(ArchivePathBox.Text)) return;
-        var name = string.IsNullOrWhiteSpace(TaskNameBox.Text) ? "ImportedDistro" : TaskNameBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(ImportNameBox.Text) || string.IsNullOrWhiteSpace(ArchivePathBox.Text))
+        {
+            ShowError(App.Text("Wsl_ImportFieldsRequired"));
+            return;
+        }
+        var name = ImportNameBox.Text.Trim();
         var target = string.IsNullOrWhiteSpace(MovePathBox.Text) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WSL", name) : MovePathBox.Text.Trim();
         await RunShellActionAsync("ImportWsl", () => WslService.ImportAsync(name, target, ArchivePathBox.Text.Trim()));
         await RefreshAsync();
@@ -217,6 +282,12 @@ public sealed partial class WslDashboardPage : Page
     }
 
     private string SelectedName() => (DistributionList.SelectedItem as WslDistributionModel)?.Name ?? string.Empty;
+    private static string LocalizeState(string state)
+        => state.Equals("Running", StringComparison.OrdinalIgnoreCase)
+            ? App.Text("Wsl_StateRunning")
+            : state.Equals("Stopped", StringComparison.OrdinalIgnoreCase)
+                ? App.Text("Wsl_StateStopped")
+                : state;
     private bool TrySelected(out string name) { name = SelectedName(); return !string.IsNullOrWhiteSpace(name); }
     private void RunShellAction(string action, Action operation) { try { operation(); AuditLogService.Record(action, SelectedName()); } catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record(action, ex.Message, false); } }
     private async Task RunShellActionAsync(string action, Func<Task> operation)
@@ -275,6 +346,7 @@ public sealed partial class WslDashboardPage : Page
         DistributionList.IsEnabled = !busy;
         InstallButton.IsEnabled = !busy;
         InstallDistributionButton.IsEnabled = !busy;
+        InstallAnotherDistributionButton.IsEnabled = !busy;
         UpdateButton.IsEnabled = _wslInstalled && !busy;
         ShutdownButton.IsEnabled = _wslInstalled && !busy;
         DistributionList_SelectionChanged(DistributionList, null!);

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.2 - 2026-09-03
+
+### Fixed
+
+- Decode Linux command output as UTF-8 so disk usage is readable instead of mojibake.
+- Determine running state from `wsl --list --running --quiet`, independent of Windows or application display language.
+- Keep an always-visible entry for installing additional distributions from the WSL online catalog.
+- Add a direct TAR-import entry and a dedicated name field instead of reusing the scheduled-task name.
+
 ## 1.6.1 - 2026-09-03
 
 ### Changed
