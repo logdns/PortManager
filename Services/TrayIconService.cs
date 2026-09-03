@@ -125,7 +125,7 @@ internal static class TrayIconService
         Flags = NifMessage | NifIcon | NifTip,
         CallbackMessage = WmTrayIcon,
         Icon = _icon,
-        Tip = LanguageState.IsEnglish ? "Port Manager" : "端口管理器",
+        Tip = "win-xinai-de-tools",
         Info = string.Empty,
         InfoTitle = string.Empty
     };
@@ -170,7 +170,7 @@ internal static class TrayIconService
         if (menu == IntPtr.Zero) return;
         try
         {
-            AppendMenu(menu, MenuString, MenuOpen, LanguageState.IsEnglish ? "Open Port Manager" : "打开端口管理器");
+            AppendMenu(menu, MenuString, MenuOpen, LanguageState.IsEnglish ? "Open win-xinai-de-tools" : "打开 win-xinai-de-tools");
             AppendMenu(menu, MenuString, MenuExit, LanguageState.IsEnglish ? "Exit" : "退出程序");
             SetForegroundWindow(window);
             GetCursorPos(out var point);

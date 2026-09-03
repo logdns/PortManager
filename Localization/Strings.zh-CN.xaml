@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <x:String x:Key="App_Title">端口管理器</x:String>
+    <x:String x:Key="App_Title">win-xinai-de-tools</x:String>
     <x:String x:Key="Nav_Dashboard">概览</x:String>
     <x:String x:Key="Nav_AddPort">添加端口</x:String>
     <x:String x:Key="Nav_Rules">防火墙规则</x:String>
     <x:String x:Key="Nav_Delete">删除规则</x:String>
     <x:String x:Key="Nav_Query">端口查询</x:String>
+    <x:String x:Key="Nav_Network">网络配置</x:String>
     <x:String x:Key="Nav_More">更多功能</x:String>
     <x:String x:Key="Nav_About">关于</x:String>
     <x:String x:Key="Language_Header">界面语言</x:String>
@@ -23,7 +24,7 @@
     <x:String x:Key="Common_Retry">重试</x:String>
     <x:String x:Key="Common_FirewallError">无法访问 Windows 防火墙</x:String>
     <x:String x:Key="Common_FirewallErrorDetail">请确认应用已获得管理员权限，并检查 Windows Defender 防火墙服务是否正在运行。</x:String>
-    <x:String x:Key="Window_CloseTitle">关闭端口管理器</x:String>
+    <x:String x:Key="Window_CloseTitle">关闭 win-xinai-de-tools</x:String>
     <x:String x:Key="Window_CloseContent">请选择要最小化到任务栏，还是退出程序。</x:String>
     <x:String x:Key="Window_Exit">退出程序</x:String>
     <x:String x:Key="Window_Minimize">最小化</x:String>
@@ -87,6 +88,43 @@
     <x:String x:Key="Query_EmptyFormat">没有规则允许端口 {0}</x:String>
     <x:String x:Key="Query_ResultFormat">端口 {0} 找到 {1} 条规则</x:String>
 
+    <x:String x:Key="Network_Title">网络配置</x:String>
+    <x:String x:Key="Network_Subtitle">配置 IPv4 地址、DNS、网关和默认路由</x:String>
+    <x:String x:Key="Network_HelpTitle">请谨慎修改网络设置</x:String>
+    <x:String x:Key="Network_HelpMessage">修改后可能暂时中断网络连接。静态地址需要填写 IP 和前缀长度；网关用于创建 0.0.0.0/0 默认路由，跃点越小优先级越高。留空 DNS 将使用系统默认设置。</x:String>
+    <x:String x:Key="Network_Adapter">网络适配器</x:String>
+    <x:String x:Key="Network_AdapterPlaceholder">选择网络适配器</x:String>
+    <x:String x:Key="Network_Refresh">刷新</x:String>
+    <x:String x:Key="Network_Mode">IPv4 地址模式</x:String>
+    <x:String x:Key="Network_Dhcp">自动获取（DHCP）</x:String>
+    <x:String x:Key="Network_Static">手动设置（静态）</x:String>
+    <x:String x:Key="Network_IpAddress">IPv4 地址</x:String>
+    <x:String x:Key="Network_PrefixLength">前缀长度</x:String>
+    <x:String x:Key="Network_Gateway">默认网关</x:String>
+    <x:String x:Key="Network_PrimaryDns">首选 DNS</x:String>
+    <x:String x:Key="Network_SecondaryDns">备用 DNS</x:String>
+    <x:String x:Key="Network_RouteMetric">路由跃点</x:String>
+    <x:String x:Key="Network_DefaultRoute">默认路由</x:String>
+    <x:String x:Key="Network_DefaultRouteHelp">网关不为空时创建 0.0.0.0/0 路由。</x:String>
+    <x:String x:Key="Network_ModeHelp">DHCP 自动获取 IP、网关和 DNS；静态模式使用下面填写的配置。</x:String>
+    <x:String x:Key="Network_IpHelp">填写此网卡使用的 IPv4 地址，例如 192.168.1.100。</x:String>
+    <x:String x:Key="Network_PrefixHelp">常见家庭网络使用 24，等同于子网掩码 255.255.255.0。</x:String>
+    <x:String x:Key="Network_GatewayHelp">默认网关通常是路由器的局域网地址；留空则不创建默认路由。</x:String>
+    <x:String x:Key="Network_DnsHelp">填写 IPv4 DNS 服务器地址；两项都留空时恢复系统默认 DNS。</x:String>
+    <x:String x:Key="Network_MetricHelp">默认路由跃点范围为 1 到 9999，数字越小优先级越高。</x:String>
+    <x:String x:Key="Network_Apply">应用设置</x:String>
+    <x:String x:Key="Network_Automatic">自动</x:String>
+    <x:String x:Key="Network_CurrentFormat">当前：模式 {0}，地址 {1}，网关 {2}，DNS {3}，默认路由跃点 {4}</x:String>
+    <x:String x:Key="Network_ConfirmTitle">确认网络设置</x:String>
+    <x:String x:Key="Network_ConfirmFormat">适配器：{0}&#x0A;模式：{1}&#x0A;IPv4：{2}&#x0A;网关：{3}&#x0A;首选 DNS：{4}&#x0A;备用 DNS：{5}&#x0A;&#x0A;应用后网络可能会短暂中断，是否继续？</x:String>
+    <x:String x:Key="Network_Applied">网络设置已应用</x:String>
+    <x:String x:Key="Network_NoAdapters">未找到可用的网络适配器。</x:String>
+    <x:String x:Key="Network_SelectAdapter">请先选择网络适配器。</x:String>
+    <x:String x:Key="Network_InvalidAddress">请输入有效的 IPv4 地址、网关或 DNS。</x:String>
+    <x:String x:Key="Network_InvalidPrefix">前缀长度必须是 1 到 32 的数字。</x:String>
+    <x:String x:Key="Network_InvalidMetric">路由跃点必须是 1 到 9999 的数字。</x:String>
+    <x:String x:Key="Network_Error">网络配置失败</x:String>
+
     <x:String x:Key="More_Title">更多功能</x:String>
     <x:String x:Key="More_Subtitle">后续模块采用独立页面接入，不影响现有端口管理功能</x:String>
     <x:String x:Key="More_Connection">连接监控</x:String>
@@ -139,10 +177,10 @@
     <x:String x:Key="Audit_Error">无法读取审计日志</x:String>
 
     <x:String x:Key="About_Title">关于</x:String>
-    <x:String x:Key="About_Description">Windows 防火墙端口管理工具</x:String>
+    <x:String x:Key="About_Description">Windows 原生网络与防火墙管理工具</x:String>
     <x:String x:Key="About_CopyrightPrefix">沨哥网络 -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">版本 1.2.7</x:String>
+    <x:String x:Key="About_Version">版本 1.3.0</x:String>
     <x:String x:Key="About_Features">功能</x:String>
     <x:String x:Key="About_FeatureText">添加、查询和删除 TCP/UDP 防火墙规则，支持入站、出站和双向配置。</x:String>
     <x:String x:Key="About_Frameworks">技术框架</x:String>

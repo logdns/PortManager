@@ -54,6 +54,11 @@
                     <FontIcon Glyph="&#xE721;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem x:Name="NetworkItem" Tag="NetworkSettings">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE968;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItemSeparator/>
             <NavigationViewItem x:Name="MoreItem" Tag="ComingSoon">
                 <NavigationViewItem.Icon>

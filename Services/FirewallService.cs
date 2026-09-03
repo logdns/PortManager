@@ -328,8 +328,8 @@ public static class FirewallService
             ruleObject = CreateComObject("HNetCfg.FWRule");
             dynamic rule = ruleObject;
             rule.Name = name;
-            rule.Description = "Managed by Port Manager";
-            rule.Grouping = "Port Manager";
+            rule.Description = "Managed by win-xinai-de-tools";
+            rule.Grouping = "win-xinai-de-tools";
             rule.Protocol = protocol switch
             {
                 "TCP" => ProtocolTcp,
@@ -408,8 +408,8 @@ public static class FirewallService
             ruleObject = CreateComObject("HNetCfg.FWRule");
             dynamic rule = ruleObject;
             rule.Name = name;
-            rule.Description = "Managed by Port Manager";
-            rule.Grouping = "Port Manager";
+            rule.Description = "Managed by win-xinai-de-tools";
+            rule.Grouping = "win-xinai-de-tools";
             rule.Protocol = protocol == "UDP" ? ProtocolUdp : ProtocolTcp;
             rule.Direction = direction == "out" ? DirectionOutbound : DirectionInbound;
             if (direction == "out")

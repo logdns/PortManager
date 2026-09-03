@@ -151,7 +151,7 @@ public sealed partial class MainWindow : Window
 
     private void NavView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
     {
-        if (_currentTag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog")
+        if (_currentTag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings")
             NavigateTo("ComingSoon");
         else if (_currentTag != "Dashboard")
             NavigateTo("Dashboard");
@@ -182,6 +182,7 @@ public sealed partial class MainWindow : Window
         RulesItem.Content = App.Text("Nav_Rules");
         DeleteItem.Content = App.Text("Nav_Delete");
         QueryItem.Content = App.Text("Nav_Query");
+        NetworkItem.Content = App.Text("Nav_Network");
         MoreItem.Content = App.Text("Nav_More");
         AboutItem.Content = App.Text("Nav_About");
         LanguageHeader.Text = App.Text("Language_Header");
@@ -198,6 +199,7 @@ public sealed partial class MainWindow : Window
             "ListRules" => typeof(ListRulesPage),
             "DeleteRule" => typeof(DeleteRulePage),
             "PortStatus" => typeof(PortStatusPage),
+            "NetworkSettings" => typeof(NetworkSettingsPage),
             "ComingSoon" => typeof(ComingSoonPage),
             "ConnectionMonitor" => typeof(ConnectionMonitorPage),
             "RuleTransfer" => typeof(RuleTransferPage),
@@ -210,10 +212,10 @@ public sealed partial class MainWindow : Window
             return;
 
         _currentTag = tag;
-        NavView.IsBackButtonVisible = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog"
+        NavView.IsBackButtonVisible = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings"
             ? NavigationViewBackButtonVisible.Visible
             : NavigationViewBackButtonVisible.Collapsed;
-        NavView.IsBackEnabled = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog";
+        NavView.IsBackEnabled = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings";
         if ((force || ContentFrame.CurrentSourcePageType != pageType) && ContentFrame.Navigate(pageType))
             App.LogStartup($"Navigation completed: {pageType.Name}.");
     }

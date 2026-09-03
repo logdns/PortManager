@@ -1,12 +1,12 @@
-# 端口管理器 Port Manager
+# win-xinai-de-tools
 
-中文是默认说明语言。Port Manager 是一个原生 Windows 桌面端口管理工具，用于管理 Windows Defender 防火墙端口规则。项目使用 WinUI 3、Windows App SDK 和 Windows Community Toolkit，并提供中文、英文双语界面。
+中文是默认说明语言。win-xinai-de-tools 是一个原生 Windows 桌面网络与端口管理工具，用于管理 Windows Defender 防火墙端口规则和本机网络配置。项目使用 WinUI 3、Windows App SDK 和 Windows Community Toolkit，并提供中文、英文双语界面。
 
 ## 当前版本
 
-**v1.2.7**
+**v1.3.0**
 
-稳定版下载：[GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.2.7)
+稳定版下载：[GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.3.0)
 
 ## 功能
 
@@ -16,6 +16,7 @@
 - 删除规则并进行二次确认，同时记录审计日志。
 - 监控 TCP/UDP 活动连接，显示进程名、PID 和端点。
 - 使用 JSON 文件导入和导出防火墙规则备份。
+- 配置网卡 IPv4、DHCP、DNS、网关和默认路由。
 - 查看规则和导入导出操作的审计日志。
 - 最小化到 Windows 通知区域，可从托盘菜单恢复。
 - 运行时切换简体中文和英文界面。
@@ -23,7 +24,7 @@
 ## 安装和使用
 
 - Windows 10 版本 1809（Build 17763）或更高版本。
-- 读取和修改 Windows 防火墙规则需要管理员权限。
+- 读取和修改 Windows 防火墙规则及网络配置需要管理员权限。
 - 必须下载与系统架构匹配的版本：x86、x64 或 ARM64。
 
 程序为免安装、自包含版本，不需要另外安装 .NET 或 Windows App SDK。
@@ -32,21 +33,21 @@
 
 1. 下载对应架构的 ZIP 文件。
 2. 将完整 ZIP 文件解压到本地目录。
-3. 右键 `PortManager.exe`，选择“以管理员身份运行”。
+3. 右键 `win-xinai-de-tools.exe`，选择“以管理员身份运行”。
 
 ### 安装版
 
-1. 下载对应架构的 `PortManager-Setup-*.exe`。
+1. 下载对应架构的 `win-xinai-de-tools-Setup-*.exe`。
 2. 按安装向导完成安装。
-3. 从开始菜单或安装目录启动端口管理器。
+3. 从开始菜单或安装目录启动 win-xinai-de-tools。
 
 ### 下载文件
 
 | 架构 | 免安装版 | 安装版 |
 |---|---|---|
-| x86 | [PortManager-win-x86.zip](https://github.com/logdns/PortManager/releases/download/v1.2.7/PortManager-win-x86.zip) | [PortManager-Setup-x86.exe](https://github.com/logdns/PortManager/releases/download/v1.2.7/PortManager-Setup-x86.exe) |
-| x64 | [PortManager-win-x64.zip](https://github.com/logdns/PortManager/releases/download/v1.2.7/PortManager-win-x64.zip) | [PortManager-Setup-x64.exe](https://github.com/logdns/PortManager/releases/download/v1.2.7/PortManager-Setup-x64.exe) |
-| ARM64 | [PortManager-win-arm64.zip](https://github.com/logdns/PortManager/releases/download/v1.2.7/PortManager-win-arm64.zip) | [PortManager-Setup-arm64.exe](https://github.com/logdns/PortManager/releases/download/v1.2.7/PortManager-Setup-arm64.exe) |
+| x86 | [win-xinai-de-tools-win-x86.zip](https://github.com/logdns/PortManager/releases/download/v1.3.0/win-xinai-de-tools-win-x86.zip) | [win-xinai-de-tools-Setup-x86.exe](https://github.com/logdns/PortManager/releases/download/v1.3.0/win-xinai-de-tools-Setup-x86.exe) |
+| x64 | [win-xinai-de-tools-win-x64.zip](https://github.com/logdns/PortManager/releases/download/v1.3.0/win-xinai-de-tools-win-x64.zip) | [win-xinai-de-tools-Setup-x64.exe](https://github.com/logdns/PortManager/releases/download/v1.3.0/win-xinai-de-tools-Setup-x64.exe) |
+| ARM64 | [win-xinai-de-tools-win-arm64.zip](https://github.com/logdns/PortManager/releases/download/v1.3.0/win-xinai-de-tools-win-arm64.zip) | [win-xinai-de-tools-Setup-arm64.exe](https://github.com/logdns/PortManager/releases/download/v1.3.0/win-xinai-de-tools-Setup-arm64.exe) |
 
 ## 从源码构建
 
@@ -123,7 +124,7 @@ Assets/                        图标和应用资源
 
 ## 权限与安全
 
-程序请求管理员权限是因为修改 Windows 防火墙规则需要提升权限。规则导入应只使用可信的 JSON 文件。连接监控只读取本机网络和进程信息，不会将数据发送到远程服务。
+程序请求管理员权限是因为修改 Windows 防火墙规则、IP、DNS、网关和路由需要提升权限。应用网络配置前会显示确认提示，修改后网络连接可能暂时中断。规则导入应只使用可信的 JSON 文件。连接监控只读取本机网络和进程信息，不会将数据发送到远程服务。
 
 安全问题请通过仓库维护者私下报告，不要在公开 Issue 中发布可利用细节。
 
@@ -139,15 +140,15 @@ Assets/                        图标和应用资源
 
 ---
 
-# Port Manager (English)
+# win-xinai-de-tools (English)
 
-Port Manager is a native Windows desktop utility for managing Windows Defender Firewall port rules. It is built with WinUI 3, Windows App SDK, and Windows Community Toolkit, with Simplified Chinese and English interfaces.
+win-xinai-de-tools is a native Windows desktop utility for managing Windows Defender Firewall port rules and local network settings. It is built with WinUI 3, Windows App SDK, and Windows Community Toolkit, with Simplified Chinese and English interfaces.
 
 ## Current Version
 
-**v1.2.7**
+**v1.3.0**
 
-Stable release: [GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.2.7)
+Stable release: [GitHub Releases](https://github.com/logdns/PortManager/releases/tag/v1.3.0)
 
 ## Features
 
@@ -157,6 +158,7 @@ Stable release: [GitHub Releases](https://github.com/logdns/PortManager/releases
 - Delete rules with confirmation and audit logging.
 - Monitor active TCP/UDP connections, including process name, PID, and endpoints.
 - Import and export firewall rule backups as JSON.
+- Configure adapter IPv4, DHCP, DNS, gateway, and the default route metric.
 - Review audit logs for rule and transfer operations.
 - Minimize to the Windows notification area and restore from the tray menu.
 - Switch between Simplified Chinese and English at runtime.
@@ -164,7 +166,7 @@ Stable release: [GitHub Releases](https://github.com/logdns/PortManager/releases
 ## Installation and Usage
 
 - Windows 10 version 1809 (build 17763) or later.
-- Administrator privileges are required to read or change Windows Firewall rules.
+- Administrator privileges are required to read or change Windows Firewall rules and network settings.
 - Download the package matching the system architecture: x86, x64, or ARM64.
 
 The application is unpackaged and self-contained. .NET and Windows App SDK do not need to be installed separately.
@@ -173,13 +175,13 @@ Portable usage:
 
 1. Download the ZIP for the matching architecture.
 2. Extract the complete archive to a local directory.
-3. Run `PortManager.exe` as administrator.
+3. Run `win-xinai-de-tools.exe` as administrator.
 
 Installer usage:
 
-1. Download the matching `PortManager-Setup-*.exe`.
+1. Download the matching `win-xinai-de-tools-Setup-*.exe`.
 2. Complete the installation wizard.
-3. Start Port Manager from the Start menu or installation directory.
+3. Start win-xinai-de-tools from the Start menu or installation directory.
 
 ## Build From Source
 
@@ -193,6 +195,6 @@ Open `PortManager.csproj`, restore NuGet packages, select `x86`, `x64`, or `ARM6
 
 ## Security, Contributing, and License
 
-Firewall changes require administrator privileges. Import only trusted JSON files. Connection monitoring reads local network and process information and does not transmit it remotely.
+Firewall and network configuration changes require administrator privileges. The app asks for confirmation before applying IP, DNS, gateway, or route changes, which may briefly interrupt connectivity. Import only trusted JSON files. Connection monitoring reads local network and process information and does not transmit it remotely.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements. Port Manager is released under the [MIT License](LICENSE).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution requirements. win-xinai-de-tools is released under the [MIT License](LICENSE).

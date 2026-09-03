@@ -3,12 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <x:String x:Key="App_Title">Port Manager</x:String>
+    <x:String x:Key="App_Title">win-xinai-de-tools</x:String>
     <x:String x:Key="Nav_Dashboard">Dashboard</x:String>
     <x:String x:Key="Nav_AddPort">Add port</x:String>
     <x:String x:Key="Nav_Rules">Firewall rules</x:String>
     <x:String x:Key="Nav_Delete">Delete rules</x:String>
     <x:String x:Key="Nav_Query">Port query</x:String>
+    <x:String x:Key="Nav_Network">Network settings</x:String>
     <x:String x:Key="Nav_More">More features</x:String>
     <x:String x:Key="Nav_About">About</x:String>
     <x:String x:Key="Language_Header">Interface language</x:String>
@@ -23,7 +24,7 @@
     <x:String x:Key="Common_Retry">Retry</x:String>
     <x:String x:Key="Common_FirewallError">Windows Firewall is unavailable</x:String>
     <x:String x:Key="Common_FirewallErrorDetail">Confirm that the app is running as administrator and the Windows Defender Firewall service is active.</x:String>
-    <x:String x:Key="Window_CloseTitle">Close Port Manager</x:String>
+    <x:String x:Key="Window_CloseTitle">Close win-xinai-de-tools</x:String>
     <x:String x:Key="Window_CloseContent">Choose whether to minimize to the taskbar or exit the application.</x:String>
     <x:String x:Key="Window_Exit">Exit</x:String>
     <x:String x:Key="Window_Minimize">Minimize</x:String>
@@ -87,6 +88,43 @@
     <x:String x:Key="Query_EmptyFormat">No rules allow port {0}</x:String>
     <x:String x:Key="Query_ResultFormat">Found {1} rule(s) for port {0}</x:String>
 
+    <x:String x:Key="Network_Title">Network settings</x:String>
+    <x:String x:Key="Network_Subtitle">Configure IPv4, DNS, gateway, and the default route</x:String>
+    <x:String x:Key="Network_HelpTitle">Change network settings carefully</x:String>
+    <x:String x:Key="Network_HelpMessage">Applying changes may briefly interrupt connectivity. Static mode requires an IPv4 address and prefix length. A gateway creates the 0.0.0.0/0 default route; lower metrics have higher priority. Leave DNS fields empty to use the system default.</x:String>
+    <x:String x:Key="Network_Adapter">Network adapter</x:String>
+    <x:String x:Key="Network_AdapterPlaceholder">Select a network adapter</x:String>
+    <x:String x:Key="Network_Refresh">Refresh</x:String>
+    <x:String x:Key="Network_Mode">IPv4 address mode</x:String>
+    <x:String x:Key="Network_Dhcp">Automatic (DHCP)</x:String>
+    <x:String x:Key="Network_Static">Manual (static)</x:String>
+    <x:String x:Key="Network_IpAddress">IPv4 address</x:String>
+    <x:String x:Key="Network_PrefixLength">Prefix length</x:String>
+    <x:String x:Key="Network_Gateway">Default gateway</x:String>
+    <x:String x:Key="Network_PrimaryDns">Preferred DNS</x:String>
+    <x:String x:Key="Network_SecondaryDns">Alternate DNS</x:String>
+    <x:String x:Key="Network_RouteMetric">Route metric</x:String>
+    <x:String x:Key="Network_DefaultRoute">Default route</x:String>
+    <x:String x:Key="Network_DefaultRouteHelp">Creates a 0.0.0.0/0 route when a gateway is supplied.</x:String>
+    <x:String x:Key="Network_ModeHelp">DHCP obtains the IP address, gateway, and DNS automatically. Static mode uses the values below.</x:String>
+    <x:String x:Key="Network_IpHelp">Enter the IPv4 address for this adapter, such as 192.168.1.100.</x:String>
+    <x:String x:Key="Network_PrefixHelp">Most home networks use 24, equivalent to subnet mask 255.255.255.0.</x:String>
+    <x:String x:Key="Network_GatewayHelp">The default gateway is usually the router's LAN address. Leave it empty to omit the default route.</x:String>
+    <x:String x:Key="Network_DnsHelp">Enter IPv4 DNS server addresses. Leave both empty to restore the system defaults.</x:String>
+    <x:String x:Key="Network_MetricHelp">Default route metric range is 1 to 9999. Lower values have higher priority.</x:String>
+    <x:String x:Key="Network_Apply">Apply settings</x:String>
+    <x:String x:Key="Network_Automatic">Automatic</x:String>
+    <x:String x:Key="Network_CurrentFormat">Current: mode {0}, address {1}, gateway {2}, DNS {3}, default route metric {4}</x:String>
+    <x:String x:Key="Network_ConfirmTitle">Confirm network settings</x:String>
+    <x:String x:Key="Network_ConfirmFormat">Adapter: {0}&#x0A;Mode: {1}&#x0A;IPv4: {2}&#x0A;Gateway: {3}&#x0A;Preferred DNS: {4}&#x0A;Alternate DNS: {5}&#x0A;&#x0A;Connectivity may be interrupted briefly. Continue?</x:String>
+    <x:String x:Key="Network_Applied">Network settings applied</x:String>
+    <x:String x:Key="Network_NoAdapters">No usable network adapters were found.</x:String>
+    <x:String x:Key="Network_SelectAdapter">Select a network adapter first.</x:String>
+    <x:String x:Key="Network_InvalidAddress">Enter valid IPv4, gateway, and DNS addresses.</x:String>
+    <x:String x:Key="Network_InvalidPrefix">Prefix length must be a number from 1 to 32.</x:String>
+    <x:String x:Key="Network_InvalidMetric">Route metric must be a number from 1 to 9999.</x:String>
+    <x:String x:Key="Network_Error">Network configuration failed</x:String>
+
     <x:String x:Key="More_Title">More features</x:String>
     <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>
     <x:String x:Key="More_Connection">Connection monitor</x:String>
@@ -129,7 +167,7 @@
     <x:String x:Key="Transfer_Error">Rule transfer failed</x:String>
 
     <x:String x:Key="Audit_Title">Audit log</x:String>
-    <x:String x:Key="Audit_Subtitle">Review operations performed by Port Manager</x:String>
+    <x:String x:Key="Audit_Subtitle">Review operations performed by win-xinai-de-tools</x:String>
     <x:String x:Key="Audit_Refresh">Refresh</x:String>
     <x:String x:Key="Audit_Clear">Clear log</x:String>
     <x:String x:Key="Audit_ClearConfirmTitle">Clear audit log?</x:String>
@@ -139,10 +177,10 @@
     <x:String x:Key="Audit_Error">Could not read the audit log</x:String>
 
     <x:String x:Key="About_Title">About</x:String>
-    <x:String x:Key="About_Description">Windows Firewall port management utility</x:String>
+    <x:String x:Key="About_Description">Native Windows network and firewall utility</x:String>
     <x:String x:Key="About_CopyrightPrefix">Fengge Network -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">Version 1.2.7</x:String>
+    <x:String x:Key="About_Version">Version 1.3.0</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>

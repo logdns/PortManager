@@ -39,7 +39,7 @@ internal static class NativeFileDialogService
 
             if (defaultExtension is not null)
             {
-                var initialName = "PortManager-rules.json";
+                var initialName = "win-xinai-de-tools-rules.json";
                 for (var index = 0; index < initialName.Length; index++)
                     Marshal.WriteInt16(fileBuffer, index * sizeof(char), initialName[index]);
             }

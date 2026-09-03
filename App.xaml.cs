@@ -116,7 +116,7 @@ public partial class App : Application
 
         try
         {
-            MessageBoxW(IntPtr.Zero, details, "Port Manager", 0x10 | 0x1000);
+            MessageBoxW(IntPtr.Zero, details, "win-xinai-de-tools", 0x10 | 0x1000);
         }
         catch
         {

@@ -19,5 +19,6 @@
     <Compile Include="..\Services\PortRangeMatcher.cs" Link="Services\PortRangeMatcher.cs" />
     <Compile Include="..\Services\RuleTransferService.cs" Link="Services\RuleTransferService.cs" />
     <Compile Include="..\Models\RuleTransferDocument.cs" Link="Models\RuleTransferDocument.cs" />
+    <Compile Include="..\Models\NetworkModels.cs" Link="Models\NetworkModels.cs" />
   </ItemGroup>
 </Project>
