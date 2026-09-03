@@ -17,13 +17,15 @@ public sealed partial class MainWindow : Window
     private IntPtr _windowHandle;
     private string _currentTag = "Dashboard";
 
-    public MainWindow()
+    public MainWindow(bool startHidden = false)
     {
         InitializeComponent();
         ConfigureWindow();
         ApplyLanguage();
         Closed += MainWindow_Closed;
         _isReady = true;
+        if (startHidden)
+            DispatcherQueue.TryEnqueue(MinimizeToTray);
     }
 
     public void NavigateTo(string tag)

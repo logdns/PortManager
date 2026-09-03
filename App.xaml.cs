@@ -68,7 +68,8 @@ public partial class App : Application
         try
         {
             LogStartup("OnLaunched started.");
-            _mainWindow = new MainWindow();
+            var silent = args.Arguments?.Contains("/silent", StringComparison.OrdinalIgnoreCase) == true;
+            _mainWindow = new MainWindow(silent);
             _mainWindow.Activate();
             LogStartup("MainWindow activated.");
         }

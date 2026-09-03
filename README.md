@@ -26,6 +26,10 @@ Download: [GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/release
   使用 JSON 备份和恢复防火墙规则，并查看追加式审计日志。
 - Manage WSL distributions through the native `wsl.exe` command: detect installation state, install WSL or Ubuntu, start, stop, set default, refresh, and open a terminal.
   通过原生 `wsl.exe` 管理 WSL 发行版：检测安装状态、安装 WSL 或 Ubuntu、启动、停止、设置默认、刷新和打开终端。
+- Smart startup supports `/silent`, logon auto-start, minimize-to-tray startup, and optional WSL shutdown on application exit.
+  智能启动支持 `/silent` 参数、登录自启、启动时最小化到托盘，以及退出应用时可选关闭 WSL。
+- Advanced WSL operations include terminate/unregister, disk usage, Explorer and VS Code integration, TAR export/import, VHDX mounting, migration, scheduled commands, HTTP proxy, IPv4 port forwarding, and usbipd-win device actions.
+  高级 WSL 操作包括终止/注销、磁盘使用、资源管理器和 VS Code 集成、TAR 导入导出、VHDX 挂载、迁移、计划命令、HTTP 代理、IPv4 端口转发和 usbipd-win 设备操作。
 - Minimize to the Windows notification area and restore from the tray menu.
   最小化到 Windows 通知区域，并可从托盘菜单恢复。
 
