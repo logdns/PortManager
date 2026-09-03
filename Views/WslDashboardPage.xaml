@@ -4,13 +4,33 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Loaded="Page_Loaded">
     <Grid Padding="32,28" RowSpacing="18">
-        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
         <StackPanel Spacing="4">
             <TextBlock Text="{StaticResource Wsl_Title}" Style="{StaticResource PageTitle}"/>
             <TextBlock Text="{StaticResource Wsl_Subtitle}" Style="{StaticResource PageSubtitle}"/>
         </StackPanel>
         <InfoBar Grid.Row="1" IsOpen="True" IsClosable="False" Severity="Informational" Title="{StaticResource Wsl_HelpTitle}" Message="{StaticResource Wsl_HelpMessage}"/>
-        <Grid Grid.Row="2" ColumnSpacing="18">
+        <Border x:Name="SetupPanel" Grid.Row="2" Style="{StaticResource CardPanel}" Visibility="Collapsed">
+            <Grid ColumnSpacing="18">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="SetupTitle" FontSize="16" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="SetupMessage" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button x:Name="InstallButton" Click="InstallButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE896;"/><TextBlock Text="{StaticResource Wsl_Install}"/></StackPanel>
+                    </Button>
+                    <Button x:Name="InstallDistributionButton" Click="InstallDistributionButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE710;"/><TextBlock Text="{StaticResource Wsl_InstallDistribution}"/></StackPanel>
+                    </Button>
+                    <Button x:Name="HelpButton" Click="HelpButton_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="8"><FontIcon Glyph="&#xE897;"/><TextBlock Text="{StaticResource Wsl_OpenInstallHelp}"/></StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <Grid Grid.Row="3" ColumnSpacing="18">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
             <Border Grid.Column="0" Style="{StaticResource CardPanel}">
                 <StackPanel Spacing="12">
@@ -18,6 +38,7 @@
                         <TextBlock Text="{StaticResource Wsl_Distributions}" Style="{StaticResource SectionTitle}"/>
                         <Button x:Name="RefreshButton" HorizontalAlignment="Right" Click="RefreshButton_Click" ToolTipService.ToolTip="{StaticResource Wsl_Refresh}"><FontIcon Glyph="&#xE72C;"/></Button>
                     </StackPanel>
+                    <TextBlock x:Name="StatusText" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <ListView x:Name="DistributionList" SelectionChanged="DistributionList_SelectionChanged" MinHeight="260">
                         <ListView.ItemTemplate><DataTemplate><StackPanel Spacing="2"><TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"/><TextBlock Text="{Binding State}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/></StackPanel></DataTemplate></ListView.ItemTemplate>
                     </ListView>

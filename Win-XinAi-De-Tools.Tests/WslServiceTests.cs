@@ -19,4 +19,31 @@ public sealed class WslServiceTests
         var debian = Assert.Single(rows.Where(row => row.Name == "Debian"));
         Assert.False(debian.IsDefault);
     }
+
+    [Theory]
+    [InlineData("WslRegisterDistribution failed because WSL is not installed.")]
+    [InlineData("未安装适用于 Linux 的 Windows 子系统。")]
+    [InlineData("Please enable the Virtual Machine Platform Windows feature.")]
+    public void IsNotInstalledMessage_RecognizesSetupErrors(string message)
+    {
+        Assert.True(WslService.IsNotInstalledMessage(message));
+    }
+
+    [Theory]
+    [InlineData("There are no installed distributions.")]
+    [InlineData("没有安装发行版。")]
+    public void IsNoDistributionMessage_RecognizesEmptyInstall(string message)
+    {
+        Assert.True(WslService.IsNoDistributionMessage(message));
+    }
+
+    [Fact]
+    public void ParseDistributions_SkipsLocalizedHeader()
+    {
+        var rows = WslService.ParseDistributions("名称 状态 版本\n* Ubuntu Running 2\n");
+
+        var distro = Assert.Single(rows);
+        Assert.Equal("Ubuntu", distro.Name);
+        Assert.True(distro.IsDefault);
+    }
 }

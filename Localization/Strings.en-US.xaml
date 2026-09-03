@@ -163,9 +163,9 @@
     <x:String x:Key="Smb_Error">SMB operation failed</x:String>
 
     <x:String x:Key="Wsl_Title">WSL manager</x:String>
-    <x:String x:Key="Wsl_Subtitle">Manage Linux distributions with native Windows WSL commands</x:String>
-    <x:String x:Key="Wsl_HelpTitle">WSL Dashboard integration</x:String>
-    <x:String x:Key="Wsl_HelpMessage">This page provides a lightweight native manager without copying third-party code. owu/wsl-dashboard is GPL-3.0; use the link below to obtain the full project separately.</x:String>
+    <x:String x:Key="Wsl_Subtitle">Detect, install, and manage Linux distributions with native Windows WSL commands</x:String>
+    <x:String x:Key="Wsl_HelpTitle">Native WSL management</x:String>
+    <x:String x:Key="Wsl_HelpMessage">A native WinUI manager for WSL distributions. This feature is inspired by owu/wsl-dashboard, but this repository does not copy or bundle its GPL-3.0 source.</x:String>
     <x:String x:Key="Wsl_Distributions">Linux distributions</x:String>
     <x:String x:Key="Wsl_Refresh">Refresh distributions</x:String>
     <x:String x:Key="Wsl_Empty">No WSL distributions were detected.</x:String>
@@ -179,8 +179,19 @@
     <x:String x:Key="Wsl_Started">Distribution started.</x:String>
     <x:String x:Key="Wsl_Stopped">Distribution stopped.</x:String>
     <x:String x:Key="Wsl_DefaultSet">Default distribution updated.</x:String>
-    <x:String x:Key="Wsl_ExternalLink">Open the owu/wsl-dashboard project</x:String>
+    <x:String x:Key="Wsl_ExternalLink">Open the owu/wsl-dashboard reference project</x:String>
     <x:String x:Key="Wsl_Error">WSL operation failed</x:String>
+    <x:String x:Key="Wsl_NotInstalledTitle">Windows Subsystem for Linux is not installed</x:String>
+    <x:String x:Key="Wsl_NotInstalledMessage">Install WSL with Microsoft's supported installer. Administrator approval may be required and Windows may ask you to restart.</x:String>
+    <x:String x:Key="Wsl_NoDistributionTitle">WSL is installed, but no Linux distribution is available</x:String>
+    <x:String x:Key="Wsl_NoDistributionMessage">Install Ubuntu as a starting distribution, or open Microsoft's help page to choose another distribution.</x:String>
+    <x:String x:Key="Wsl_Install">Install WSL</x:String>
+    <x:String x:Key="Wsl_InstallDistribution">Install Ubuntu</x:String>
+    <x:String x:Key="Wsl_OpenInstallHelp">Installation help</x:String>
+    <x:String x:Key="Wsl_InstallStarted">The WSL installer was started. Finish the steps in the elevated window, then refresh this page.</x:String>
+    <x:String x:Key="Wsl_StatusReady">WSL is ready.</x:String>
+    <x:String x:Key="Wsl_StatusNotInstalled">WSL is not installed.</x:String>
+    <x:String x:Key="Wsl_StatusNoDistribution">WSL is installed; no distribution is registered.</x:String>
 
     <x:String x:Key="More_Title">More features</x:String>
     <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>
@@ -234,12 +245,12 @@
     <x:String x:Key="Audit_Error">Could not read the audit log</x:String>
 
     <x:String x:Key="About_Title">About</x:String>
-    <x:String x:Key="About_Description">Native Windows network and firewall utility</x:String>
+    <x:String x:Key="About_Description">Native Windows network, firewall, and WSL management utility</x:String>
     <x:String x:Key="About_CopyrightPrefix">Fengge Network -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
     <x:String x:Key="About_Version">Version 1.4.2</x:String>
     <x:String x:Key="About_Features">Features</x:String>
-    <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>
+    <x:String x:Key="About_FeatureText">Manage Windows network settings, firewall rules, SMB sharing, and WSL distributions from one native WinUI application.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>
     <x:String x:Key="About_FrameworkText">Microsoft WinUI 3 · Windows Community Toolkit · .NET 8</x:String>
     <x:String x:Key="About_Admin">Administrator access</x:String>

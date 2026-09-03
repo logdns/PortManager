@@ -9,6 +9,7 @@ public sealed partial class WslDashboardPage : Page
 {
     private bool _loaded;
     private bool _busy;
+    private bool _wslInstalled;
 
     public WslDashboardPage() => InitializeComponent();
 
@@ -21,23 +22,77 @@ public sealed partial class WslDashboardPage : Page
         try
         {
             var selectedName = (DistributionList.SelectedItem as WslDistributionModel)?.Name;
-            var rows = await WslService.ListDistributionsAsync();
+            var status = await WslService.GetStatusAsync();
+            _wslInstalled = status.IsInstalled;
+            var rows = status.Distributions.ToList();
             DistributionList.ItemsSource = rows;
             var selected = rows.FirstOrDefault(row => row.Name == selectedName) ?? rows.FirstOrDefault();
             DistributionList.SelectedItem = selected;
             EmptyText.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             ErrorBar.IsOpen = false;
+            UpdateSetupPanel(status);
         }
-        catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record("ListWslDistributions", ex.Message, false); }
+        catch (Exception ex)
+        {
+            _wslInstalled = false;
+            SetupPanel.Visibility = Visibility.Collapsed;
+            ShowError(ex.Message);
+            AuditLogService.Record("ListWslDistributions", ex.Message, false);
+        }
         finally { SetBusy(false); }
+    }
+
+    private void UpdateSetupPanel(WslStatusModel status)
+    {
+        var needsInstall = !status.IsInstalled;
+        var needsDistribution = status.IsInstalled && !status.HasDistributions;
+        SetupPanel.Visibility = needsInstall || needsDistribution ? Visibility.Visible : Visibility.Collapsed;
+        InstallButton.Visibility = needsInstall ? Visibility.Visible : Visibility.Collapsed;
+        InstallDistributionButton.Visibility = needsDistribution ? Visibility.Visible : Visibility.Collapsed;
+        HelpButton.Visibility = needsInstall ? Visibility.Visible : Visibility.Collapsed;
+        SetupTitle.Text = App.Text(needsInstall ? "Wsl_NotInstalledTitle" : "Wsl_NoDistributionTitle");
+        SetupMessage.Text = App.Text(needsInstall ? "Wsl_NotInstalledMessage" : "Wsl_NoDistributionMessage");
+        StatusText.Text = App.Text(needsInstall ? "Wsl_StatusNotInstalled" : needsDistribution ? "Wsl_StatusNoDistribution" : "Wsl_StatusReady");
     }
 
     private void DistributionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         var distro = DistributionList.SelectedItem as WslDistributionModel;
         SelectedText.Text = distro is null ? App.Text("Wsl_Select") : string.Format(App.Text("Wsl_SelectedFormat"), distro.Name, distro.State, distro.Version);
-        var enabled = distro is not null && !_busy;
+        var enabled = distro is not null && _wslInstalled && !_busy;
         StartButton.IsEnabled = enabled; StopButton.IsEnabled = enabled; DefaultButton.IsEnabled = enabled; TerminalButton.IsEnabled = enabled;
+    }
+
+    private async void InstallButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await WslService.InstallAsync();
+            StatusText.Text = App.Text("Wsl_InstallStarted");
+            AuditLogService.Record("InstallWsl", "wsl.exe --install");
+        }
+        catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record("InstallWsl", ex.Message, false); }
+    }
+
+    private async void InstallDistributionButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await WslService.InstallDistributionAsync();
+            StatusText.Text = App.Text("Wsl_InstallStarted");
+            AuditLogService.Record("InstallWslDistribution", "Ubuntu");
+        }
+        catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record("InstallWslDistribution", ex.Message, false); }
+    }
+
+    private void HelpButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            WslService.OpenInstallHelp();
+            AuditLogService.Record("OpenWslInstallHelp", "https://aka.ms/wslinstall");
+        }
+        catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record("OpenWslInstallHelp", ex.Message, false); }
     }
 
     private async void StartButton_Click(object sender, RoutedEventArgs e) => await RunActionAsync("WslStart", WslService.StartAsync, App.Text("Wsl_Started"));

@@ -163,9 +163,9 @@
     <x:String x:Key="Smb_Error">SMB 操作失败</x:String>
 
     <x:String x:Key="Wsl_Title">WSL 管理</x:String>
-    <x:String x:Key="Wsl_Subtitle">使用 Windows 原生 WSL 命令管理 Linux 发行版</x:String>
-    <x:String x:Key="Wsl_HelpTitle">WSL Dashboard 集成说明</x:String>
-    <x:String x:Key="Wsl_HelpMessage">本页面提供轻量原生管理功能，不复制第三方代码。owu/wsl-dashboard 使用 GPL-3.0，完整项目可从下方链接单独获取。</x:String>
+    <x:String x:Key="Wsl_Subtitle">使用 Windows 原生 WSL 命令检测、安装和管理 Linux 发行版</x:String>
+    <x:String x:Key="Wsl_HelpTitle">原生 WSL 管理</x:String>
+    <x:String x:Key="Wsl_HelpMessage">这是基于 WinUI 的原生 WSL 管理页面，借鉴了 owu/wsl-dashboard 的功能方向，但本仓库不复制或捆绑其 GPL-3.0 源代码。</x:String>
     <x:String x:Key="Wsl_Distributions">Linux 发行版</x:String>
     <x:String x:Key="Wsl_Refresh">刷新发行版</x:String>
     <x:String x:Key="Wsl_Empty">未检测到 WSL 发行版。</x:String>
@@ -179,8 +179,19 @@
     <x:String x:Key="Wsl_Started">发行版已启动。</x:String>
     <x:String x:Key="Wsl_Stopped">发行版已停止。</x:String>
     <x:String x:Key="Wsl_DefaultSet">默认发行版已更新。</x:String>
-    <x:String x:Key="Wsl_ExternalLink">打开 owu/wsl-dashboard 项目</x:String>
+    <x:String x:Key="Wsl_ExternalLink">打开 owu/wsl-dashboard 参考项目</x:String>
     <x:String x:Key="Wsl_Error">WSL 操作失败</x:String>
+    <x:String x:Key="Wsl_NotInstalledTitle">尚未安装适用于 Linux 的 Windows 子系统</x:String>
+    <x:String x:Key="Wsl_NotInstalledMessage">可以使用微软官方安装程序安装 WSL。可能需要管理员确认，Windows 也可能要求重启。</x:String>
+    <x:String x:Key="Wsl_NoDistributionTitle">WSL 已安装，但没有可用的 Linux 发行版</x:String>
+    <x:String x:Key="Wsl_NoDistributionMessage">可以先安装 Ubuntu，也可以打开微软帮助页面选择其他发行版。</x:String>
+    <x:String x:Key="Wsl_Install">安装 WSL</x:String>
+    <x:String x:Key="Wsl_InstallDistribution">安装 Ubuntu</x:String>
+    <x:String x:Key="Wsl_OpenInstallHelp">安装帮助</x:String>
+    <x:String x:Key="Wsl_InstallStarted">已启动 WSL 安装程序。请在提升权限窗口中完成步骤，然后刷新本页面。</x:String>
+    <x:String x:Key="Wsl_StatusReady">WSL 已就绪。</x:String>
+    <x:String x:Key="Wsl_StatusNotInstalled">尚未安装 WSL。</x:String>
+    <x:String x:Key="Wsl_StatusNoDistribution">WSL 已安装，但尚未注册发行版。</x:String>
 
     <x:String x:Key="More_Title">更多功能</x:String>
     <x:String x:Key="More_Subtitle">后续模块采用独立页面接入，不影响现有端口管理功能</x:String>
@@ -234,12 +245,12 @@
     <x:String x:Key="Audit_Error">无法读取审计日志</x:String>
 
     <x:String x:Key="About_Title">关于</x:String>
-    <x:String x:Key="About_Description">Windows 原生网络与防火墙管理工具</x:String>
+    <x:String x:Key="About_Description">Windows 原生网络、防火墙与 WSL 管理工具</x:String>
     <x:String x:Key="About_CopyrightPrefix">沨哥网络 -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
     <x:String x:Key="About_Version">版本 1.4.2</x:String>
     <x:String x:Key="About_Features">功能</x:String>
-    <x:String x:Key="About_FeatureText">添加、查询和删除 TCP/UDP 防火墙规则，支持入站、出站和双向配置。</x:String>
+    <x:String x:Key="About_FeatureText">在一个原生 WinUI 应用中管理网络配置、防火墙规则、SMB 共享和 WSL 发行版。</x:String>
     <x:String x:Key="About_Frameworks">技术框架</x:String>
     <x:String x:Key="About_FrameworkText">Microsoft WinUI 3 · Windows Community Toolkit · .NET 8</x:String>
     <x:String x:Key="About_Admin">管理员权限</x:String>
