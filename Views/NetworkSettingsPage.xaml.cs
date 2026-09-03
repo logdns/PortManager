@@ -149,8 +149,18 @@ public sealed partial class NetworkSettingsPage : Page
             return new NetworkConfigurationRequest { UseDhcp = true };
         if (double.IsNaN(PrefixLengthBox.Value) || double.IsInfinity(PrefixLengthBox.Value)) { error = App.Text("Network_InvalidPrefix"); return null; }
         if (double.IsNaN(RouteMetricBox.Value) || double.IsInfinity(RouteMetricBox.Value)) { error = App.Text("Network_InvalidMetric"); return null; }
-        var prefix = checked((int)PrefixLengthBox.Value);
-        var metric = checked((int)RouteMetricBox.Value);
+        if (PrefixLengthBox.Value < 1 || PrefixLengthBox.Value > 32 || PrefixLengthBox.Value % 1 != 0)
+        {
+            error = App.Text("Network_InvalidPrefix");
+            return null;
+        }
+        if (RouteMetricBox.Value < 1 || RouteMetricBox.Value > 9999 || RouteMetricBox.Value % 1 != 0)
+        {
+            error = App.Text("Network_InvalidMetric");
+            return null;
+        }
+        var prefix = (int)PrefixLengthBox.Value;
+        var metric = (int)RouteMetricBox.Value;
         var request = new NetworkConfigurationRequest
         {
             UseDhcp = false,
