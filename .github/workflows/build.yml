@@ -315,4 +315,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $assets = Get-ChildItem release-assets -Recurse -File | ForEach-Object FullName
-          gh release create $env:GITHUB_REF_NAME --verify-tag --generate-notes @assets
+          gh release create $env:GITHUB_REF_NAME `
+            --repo $env:GITHUB_REPOSITORY `
+            --target $env:GITHUB_SHA `
+            --verify-tag `
+            --generate-notes `
+            @assets
