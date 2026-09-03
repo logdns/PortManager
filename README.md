@@ -6,9 +6,11 @@ Win-XinAi-De-Tools 是一款原生 Windows 工具，用于网络配置、Windows
 
 ## Current release / 当前版本
 
-**v1.6.0**
+**v1.6.1**
 
-Download: [GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.0)  ·  下载：[GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.0)
+Download: [GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.1)  ·  下载：[GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/releases/tag/v1.6.1)
+
+Release history: [CHANGELOG.md](CHANGELOG.md) · 版本记录：[CHANGELOG.md](CHANGELOG.md)
 
 ## Features / 功能
 
@@ -35,9 +37,9 @@ Download: [GitHub Releases](https://github.com/logdns/Win-XinAi-De-Tools/release
 
 ### WSL integration / WSL 集成
 
-The WSL page is implemented as a native WinUI management surface in this repository. When WSL is missing, it shows an actionable setup panel with an elevated `wsl.exe --install` action, Ubuntu installation, and Microsoft's installation help link. When WSL is installed without a distribution, the page offers to install Ubuntu and then refresh the list.
+The WSL page is implemented as a native WinUI management surface in this repository. When WSL is missing, it shows an actionable setup panel with an elevated `wsl.exe --install` action, waits for the installer, reports its exit result, and links to Microsoft's installation help. When WSL is installed without a distribution, the page offers to install Ubuntu without launching an interactive first-run shell. Distribution actions and advanced settings are separated into responsive, scrollable tabs. The settings tab also exposes native WSL version, update, and shutdown commands.
 
-WSL 页面是本仓库中的原生 WinUI 管理界面。未安装 WSL 时，界面会显示可操作的安装面板，提供提升权限的 `wsl.exe --install`、Ubuntu 安装和微软安装帮助链接；已安装 WSL 但没有发行版时，可直接安装 Ubuntu 并刷新列表。
+WSL 页面是本仓库中的原生 WinUI 管理界面。未安装 WSL 时，界面会显示可操作的安装面板，提供提升权限的 `wsl.exe --install`，等待安装结束、报告退出结果，并链接微软安装帮助；已安装 WSL 但没有发行版时，可安装 Ubuntu 而不立即启动交互式首次配置。发行版操作与高级设置现已拆分到响应式、可滚动的标签页中；设置页还提供原生 WSL 版本、更新和全部关闭命令。
 
 The workflow follows common WSL dashboard patterns, but this project is an independent implementation and does not copy or bundle third-party dashboard source code or assets.
 
@@ -45,15 +47,15 @@ The workflow follows common WSL dashboard patterns, but this project is an indep
 
 ## Installation / 安装
 
-Windows 10 version 1809 (build 17763) or later is required. Administrator privileges are needed for firewall, network, SMB, and WSL installation changes. Choose the package matching your architecture.
+Windows 10 version 1809 (build 17763) or later is required. The one-command `wsl --install` workflow requires Windows 10 version 2004 (build 19041) or later; older supported Windows builds must use Microsoft's manual WSL installation guide. Administrator privileges are needed for firewall, network, SMB, and WSL installation changes. Choose the package matching your architecture.
 
-需要 Windows 10 版本 1809（Build 17763）或更高版本。修改防火墙、网络、SMB 以及安装 WSL 需要管理员权限，请选择匹配系统架构的版本。
+应用需要 Windows 10 版本 1809（Build 17763）或更高版本；一键执行 `wsl --install` 需要 Windows 10 版本 2004（Build 19041）或更高版本，更早但受支持的系统需按照微软手动安装指南配置 WSL。修改防火墙、网络、SMB 以及安装 WSL 需要管理员权限，请选择匹配系统架构的版本。
 
 | Architecture / 架构 | Portable ZIP / 免安装 ZIP | Installer / 安装包 |
 |---|---|---|
-| x86 | [Win-XinAi-De-Tools-win-x86.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.0/Win-XinAi-De-Tools-win-x86.zip) | [Win-XinAi-De-Tools-Setup-x86.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.0/Win-XinAi-De-Tools-Setup-x86.exe) |
-| x64 | [Win-XinAi-De-Tools-win-x64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.0/Win-XinAi-De-Tools-win-x64.zip) | [Win-XinAi-De-Tools-Setup-x64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.0/Win-XinAi-De-Tools-Setup-x64.exe) |
-| ARM64 | [Win-XinAi-De-Tools-win-arm64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.0/Win-XinAi-De-Tools-win-arm64.zip) | [Win-XinAi-De-Tools-Setup-arm64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.0/Win-XinAi-De-Tools-Setup-arm64.exe) |
+| x86 | [Win-XinAi-De-Tools-win-x86.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-win-x86.zip) | [Win-XinAi-De-Tools-Setup-x86.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-Setup-x86.exe) |
+| x64 | [Win-XinAi-De-Tools-win-x64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-win-x64.zip) | [Win-XinAi-De-Tools-Setup-x64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-Setup-x64.exe) |
+| ARM64 | [Win-XinAi-De-Tools-win-arm64.zip](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-win-arm64.zip) | [Win-XinAi-De-Tools-Setup-arm64.exe](https://github.com/logdns/Win-XinAi-De-Tools/releases/download/v1.6.1/Win-XinAi-De-Tools-Setup-arm64.exe) |
 
 The portable build is self-contained and does not require a separate .NET or Windows App SDK installation. Extract the ZIP and run `Win-XinAi-De-Tools.exe` as administrator. The installer creates Start menu and optional desktop shortcuts.
 
@@ -83,9 +85,9 @@ Replace `win-x64`/`x64` with `win-x86`/`x86` or `win-arm64`/`ARM64` for other ta
 
 ## GitHub Actions / 自动构建
 
-`.github/workflows/build.yml` runs unit tests, Windows firewall integration tests, x86/x64/ARM64 builds, x64 GUI and tray smoke tests, portable ZIP packaging, Inno Setup installers, and release publication for `v*` tags.
+`.github/workflows/build.yml` runs .NET and native-helper tests, Windows firewall integration tests, x86/x64/ARM64 builds, x64 GUI and tray smoke tests, portable ZIP packaging, Inno Setup installers, and release publication for version-matched `v*` tags. Third-party actions are pinned to immutable commits and only the release job receives repository write permission.
 
-`.github/workflows/build.yml` 会运行单元测试、Windows 防火墙集成测试、x86/x64/ARM64 构建、x64 GUI 和托盘冒烟测试、免安装 ZIP 打包、Inno Setup 安装包构建，并在推送 `v*` 标签时发布 Release。
+`.github/workflows/build.yml` 会运行 .NET 与原生辅助组件测试、Windows 防火墙集成测试、x86/x64/ARM64 构建、x64 GUI 和托盘冒烟测试、免安装 ZIP 打包、Inno Setup 安装包构建，并只为版本一致的 `v*` 标签发布 Release。第三方 Action 已固定到不可变提交，仅发布任务拥有仓库写权限。
 
 ## Repository layout / 项目结构
 

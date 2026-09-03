@@ -15,8 +15,9 @@ Thank you for helping improve Win-XinAi-De-Tools.
 2. Keep all user-facing strings in both `Localization/Strings.zh-CN.xaml` and `Localization/Strings.en-US.xaml`.
 3. Add or update tests for service and model behavior.
 4. Run `dotnet test Win-XinAi-De-Tools.Tests\Win-XinAi-De-Tools.Tests.csproj --configuration Release` on Windows.
-5. Run `git diff --check` and confirm that generated `bin/`, `obj/`, and `artifacts/` files are not included.
-6. Describe architecture-specific or administrator-permission requirements in the pull request.
+5. If a native WSL helper changed, run `cargo test --locked --manifest-path native/wsl-helper-rust/Cargo.toml` and `go test ./...` from `native/wsl-helper-go`.
+6. Run `git diff --check` and confirm that generated `bin/`, `obj/`, `target/`, and `artifacts/` files are not included.
+7. Describe architecture-specific or administrator-permission requirements in the pull request.
 
 ## Reporting Bugs
 

@@ -1,4 +1,5 @@
 using System.Linq;
+using PortManager.Models;
 using PortManager.Services;
 using Xunit;
 
@@ -45,5 +46,33 @@ public sealed class WslServiceTests
         var distro = Assert.Single(rows);
         Assert.Equal("Ubuntu", distro.Name);
         Assert.True(distro.IsDefault);
+    }
+
+    [Fact]
+    public void EnsureSuccessfulInstallerExitCode_AcceptsSuccess()
+    {
+        WslService.EnsureSuccessfulInstallerExitCode(0);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(-1)]
+    public void EnsureSuccessfulInstallerExitCode_ReportsFailure(int exitCode)
+    {
+        var error = Assert.Throws<WslOperationException>(() => WslService.EnsureSuccessfulInstallerExitCode(exitCode));
+
+        Assert.Contains(exitCode.ToString(), error.Message);
+        Assert.Contains("0x", error.Message);
+    }
+
+    [Theory]
+    [InlineData("Ubuntu", "Ubuntu")]
+    [InlineData("", "\"\"")]
+    [InlineData("Ubuntu Dev", "\"Ubuntu Dev\"")]
+    [InlineData("a\"b", "\"a\\\"b\"")]
+    [InlineData("C:\\WSL Data\\", "\"C:\\WSL Data\\\\\"")]
+    public void QuoteWindowsArgument_ProtectsScheduledTaskValues(string value, string expected)
+    {
+        Assert.Equal(expected, WslService.QuoteWindowsArgument(value));
     }
 }

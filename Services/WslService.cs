@@ -55,16 +55,26 @@ public static class WslService
     public static Task InstallAsync()
     {
         EnsureWindows();
-        StartElevated("--install");
-        return Task.CompletedTask;
+        return RunElevatedCheckedAsync("--install");
     }
 
     public static Task InstallDistributionAsync(string distribution = "Ubuntu")
     {
         EnsureWindows();
-        StartElevated("--install", "--distribution", distribution);
-        return Task.CompletedTask;
+        return RunElevatedCheckedAsync("--install", "--distribution", distribution, "--no-launch");
     }
+
+    public static async Task<string> GetVersionInfoAsync()
+    {
+        EnsureWindows();
+        var result = await RunAsync("--version");
+        if (result.ExitCode != 0)
+            throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? "Could not read the WSL version." : result.Error.Trim());
+        return result.Output.Replace("\0", string.Empty, StringComparison.Ordinal).Trim();
+    }
+
+    public static Task UpdateAsync() => RunCheckedAsync("--update");
+    public static Task ShutdownAllAsync() => RunCheckedAsync("--shutdown");
 
     public static void OpenInstallHelp()
     {
@@ -107,68 +117,75 @@ public static class WslService
     public static void OpenExplorer(string name)
     {
         EnsureWindows();
-        Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = $"\\\\wsl$\\{name}", UseShellExecute = true });
+        var info = new ProcessStartInfo { FileName = "explorer.exe", UseShellExecute = true };
+        info.ArgumentList.Add($"\\\\wsl$\\{name}");
+        Process.Start(info);
     }
 
     public static void OpenVsCode(string name)
     {
         EnsureWindows();
-        Process.Start(new ProcessStartInfo { FileName = "code", Arguments = $"--remote wsl+{name}", UseShellExecute = true });
+        var info = new ProcessStartInfo { FileName = "code", UseShellExecute = true };
+        info.ArgumentList.Add("--remote");
+        info.ArgumentList.Add($"wsl+{name}");
+        Process.Start(info);
     }
 
     public static Task SetAutostartAsync(string name, bool enabled)
     {
         EnsureWindows();
         var taskName = $"Win-XinAi-De-Tools\\WSL\\{name}";
-        return RunWindowsCommandAsync("schtasks.exe", enabled
-            ? $"/Create /TN \"{taskName}\" /SC ONLOGON /TR \"wsl.exe --distribution {name} --exec true\" /F"
-            : $"/Delete /TN \"{taskName}\" /F");
+        return enabled
+            ? RunWindowsCommandAsync("schtasks.exe", "/Create", "/TN", taskName, "/SC", "ONLOGON", "/TR", BuildScheduledWslCommand(name, "true"), "/F")
+            : RunWindowsCommandAsync("schtasks.exe", "/Delete", "/TN", taskName, "/F");
     }
 
     public static Task ScheduleCommandAsync(string taskName, string name, string command, string schedule, string startTime)
     {
         EnsureWindows();
         var fullName = $"Win-XinAi-De-Tools\\WSL\\{taskName}";
-        var trigger = schedule.Equals("once", StringComparison.OrdinalIgnoreCase) ? $"/SC ONCE /ST {startTime}" : $"/SC {schedule.ToUpperInvariant()} /ST {startTime}";
-        var taskCommand = $"wsl.exe --distribution {Quote(name)} --exec sh -lc {Quote(command)}";
-        return RunWindowsCommandAsync("schtasks.exe", $"/Create /TN \"{fullName}\" {trigger} /TR \"{taskCommand}\" /F");
+        var normalizedSchedule = schedule.Equals("once", StringComparison.OrdinalIgnoreCase) ? "ONCE" : schedule.ToUpperInvariant();
+        return RunWindowsCommandAsync("schtasks.exe", "/Create", "/TN", fullName, "/SC", normalizedSchedule, "/ST", startTime, "/TR", BuildScheduledWslCommand(name, command), "/F");
     }
 
     public static Task RemoveScheduledCommandAsync(string taskName)
     {
         EnsureWindows();
-        return RunWindowsCommandAsync("schtasks.exe", $"/Delete /TN \"Win-XinAi-De-Tools\\WSL\\{taskName}\" /F");
+        return RunWindowsCommandAsync("schtasks.exe", "/Delete", "/TN", $"Win-XinAi-De-Tools\\WSL\\{taskName}", "/F");
     }
 
     public static Task AddPortProxyAsync(int listenPort, string address, int port)
     {
         EnsureWindows();
-        return RunWindowsCommandAsync("netsh.exe", $"interface portproxy add v4tov4 listenport={listenPort} listenaddress=0.0.0.0 connectport={port} connectaddress={address}");
+        return RunWindowsCommandAsync("netsh.exe", "interface", "portproxy", "add", "v4tov4", $"listenport={listenPort}", "listenaddress=0.0.0.0", $"connectport={port}", $"connectaddress={address}");
     }
 
     public static Task RemovePortProxyAsync(int listenPort)
     {
         EnsureWindows();
-        return RunWindowsCommandAsync("netsh.exe", $"interface portproxy delete v4tov4 listenport={listenPort} listenaddress=0.0.0.0");
+        return RunWindowsCommandAsync("netsh.exe", "interface", "portproxy", "delete", "v4tov4", $"listenport={listenPort}", "listenaddress=0.0.0.0");
     }
 
     public static Task SetHttpProxyAsync(string? proxy)
     {
         EnsureWindows();
-        return RunWindowsCommandAsync("netsh.exe", string.IsNullOrWhiteSpace(proxy) ? "winhttp reset proxy" : $"winhttp set proxy {proxy}");
+        return string.IsNullOrWhiteSpace(proxy)
+            ? RunWindowsCommandAsync("netsh.exe", "winhttp", "reset", "proxy")
+            : RunWindowsCommandAsync("netsh.exe", "winhttp", "set", "proxy", proxy);
     }
 
     public static Task MountVhdAsync(string diskPath, int? partition = null)
     {
         EnsureWindows();
-        var arguments = $"--mount {Quote(diskPath)}" + (partition.HasValue ? $" --partition {partition.Value}" : string.Empty);
-        return RunWindowsCommandAsync("wsl.exe", arguments);
+        return partition.HasValue
+            ? RunCheckedAsync("--mount", diskPath, "--partition", partition.Value.ToString())
+            : RunCheckedAsync("--mount", diskPath);
     }
 
     public static Task UnmountVhdAsync(string diskPath)
     {
         EnsureWindows();
-        return RunWindowsCommandAsync("wsl.exe", $"--unmount {Quote(diskPath)}");
+        return RunCheckedAsync("--unmount", diskPath);
     }
 
     public static async Task<IReadOnlyList<string>> ListUsbDevicesAsync()
@@ -179,9 +196,9 @@ public static class WslService
         return result.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
-    public static Task BindUsbDeviceAsync(string busId) => RunWindowsCommandAsync("usbipd.exe", $"bind --busid {Quote(busId)}");
-    public static Task AttachUsbDeviceAsync(string busId, string distribution) => RunWindowsCommandAsync("usbipd.exe", $"attach --wsl --busid {Quote(busId)}");
-    public static Task DetachUsbDeviceAsync(string busId) => RunWindowsCommandAsync("usbipd.exe", $"detach --busid {Quote(busId)}");
+    public static Task BindUsbDeviceAsync(string busId) => RunWindowsCommandAsync("usbipd.exe", "bind", "--busid", busId);
+    public static Task AttachUsbDeviceAsync(string busId, string distribution) => RunWindowsCommandAsync("usbipd.exe", "attach", "--wsl", "--busid", busId);
+    public static Task DetachUsbDeviceAsync(string busId) => RunWindowsCommandAsync("usbipd.exe", "detach", "--busid", busId);
 
     public static void OpenTerminal(string name)
     {
@@ -222,16 +239,17 @@ public static class WslService
         if (result.ExitCode != 0) throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? "WSL command failed." : result.Error.Trim());
     }
 
-    private static async Task RunWindowsCommandAsync(string fileName, string arguments)
+    private static async Task RunWindowsCommandAsync(string fileName, params string[] arguments)
     {
         var result = await RunWindowsCommandCaptureAsync(fileName, arguments);
         if (result.ExitCode != 0)
             throw new WslOperationException(string.IsNullOrWhiteSpace(result.Error) ? $"Command failed: {fileName}" : result.Error.Trim());
     }
 
-    private static async Task<(int ExitCode, string Output, string Error)> RunWindowsCommandCaptureAsync(string fileName, string arguments)
+    private static async Task<(int ExitCode, string Output, string Error)> RunWindowsCommandCaptureAsync(string fileName, params string[] arguments)
     {
-        var info = new ProcessStartInfo { FileName = fileName, Arguments = arguments, UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
+        var info = new ProcessStartInfo { FileName = fileName, UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
+        foreach (var argument in arguments) info.ArgumentList.Add(argument);
         Process process;
         try { process = Process.Start(info) ?? throw new WslOperationException($"Could not start {fileName}."); }
         catch (Win32Exception exception) when (exception.NativeErrorCode is 2 or 3)
@@ -245,7 +263,36 @@ public static class WslService
         }
     }
 
-    private static string Quote(string value) => $"\"{value.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal)}\"";
+    internal static string QuoteWindowsArgument(string value)
+    {
+        if (value.Length > 0 && !value.Any(character => char.IsWhiteSpace(character) || character == '"'))
+            return value;
+
+        var result = new StringBuilder("\"");
+        var backslashes = 0;
+        foreach (var character in value)
+        {
+            if (character == '\\')
+            {
+                backslashes++;
+                continue;
+            }
+
+            if (character == '"')
+                result.Append('\\', backslashes * 2 + 1);
+            else
+                result.Append('\\', backslashes);
+
+            result.Append(character);
+            backslashes = 0;
+        }
+
+        result.Append('\\', backslashes * 2);
+        return result.Append('"').ToString();
+    }
+
+    private static string BuildScheduledWslCommand(string distribution, string command)
+        => $"wsl.exe --distribution {QuoteWindowsArgument(distribution)} --exec sh -lc {QuoteWindowsArgument(command)}";
 
     private static async Task<(int ExitCode, string Output, string Error)> RunAsync(params string[] arguments)
     {
@@ -270,7 +317,16 @@ public static class WslService
         }
     }
 
-    private static void StartElevated(params string[] arguments)
+    internal static void EnsureSuccessfulInstallerExitCode(int exitCode)
+    {
+        if (exitCode == 0)
+            return;
+
+        var hexadecimalCode = unchecked((uint)exitCode).ToString("X8");
+        throw new WslOperationException($"The WSL installer failed with exit code {exitCode} (0x{hexadecimalCode}).");
+    }
+
+    private static async Task RunElevatedCheckedAsync(params string[] arguments)
     {
         var info = new ProcessStartInfo
         {
@@ -283,7 +339,9 @@ public static class WslService
             info.ArgumentList.Add(argument);
         try
         {
-            Process.Start(info);
+            using var process = Process.Start(info) ?? throw new WslOperationException("Could not start the WSL installer.");
+            await process.WaitForExitAsync();
+            EnsureSuccessfulInstallerExitCode(process.ExitCode);
         }
         catch (Win32Exception exception) when (exception.NativeErrorCode == 1223)
         {

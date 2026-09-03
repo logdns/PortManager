@@ -13,7 +13,16 @@ public sealed partial class WslDashboardPage : Page
 
     public WslDashboardPage() => InitializeComponent();
 
-    private async void Page_Loaded(object sender, RoutedEventArgs e) { if (_loaded) return; _loaded = true; await RefreshAsync(); }
+    private async void Page_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (_loaded) return;
+        _loaded = true;
+        ShutdownOnExitCheckBox.IsChecked = WslService.ShutdownOnExit;
+        UpdateResponsiveLayout(ActualWidth);
+        await RefreshAsync();
+    }
+
+    private void Page_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateResponsiveLayout(e.NewSize.Width);
     private async void RefreshButton_Click(object sender, RoutedEventArgs e) => await RefreshAsync();
 
     private async Task RefreshAsync()
@@ -29,13 +38,14 @@ public sealed partial class WslDashboardPage : Page
             var selected = rows.FirstOrDefault(row => row.Name == selectedName) ?? rows.FirstOrDefault();
             DistributionList.SelectedItem = selected;
             EmptyText.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-            ErrorBar.IsOpen = false;
             UpdateSetupPanel(status);
+            await LoadVersionAsync(status.IsInstalled);
         }
         catch (Exception ex)
         {
             _wslInstalled = false;
             SetupPanel.Visibility = Visibility.Collapsed;
+            VersionText.Text = App.Text("Wsl_VersionUnavailable");
             ShowError(ex.Message);
             AuditLogService.Record("ListWslDistributions", ex.Message, false);
         }
@@ -49,10 +59,12 @@ public sealed partial class WslDashboardPage : Page
         SetupPanel.Visibility = needsInstall || needsDistribution ? Visibility.Visible : Visibility.Collapsed;
         InstallButton.Visibility = needsInstall ? Visibility.Visible : Visibility.Collapsed;
         InstallDistributionButton.Visibility = needsDistribution ? Visibility.Visible : Visibility.Collapsed;
-        HelpButton.Visibility = needsInstall ? Visibility.Visible : Visibility.Collapsed;
+        HelpButton.Visibility = needsInstall || needsDistribution ? Visibility.Visible : Visibility.Collapsed;
         SetupTitle.Text = App.Text(needsInstall ? "Wsl_NotInstalledTitle" : "Wsl_NoDistributionTitle");
         SetupMessage.Text = App.Text(needsInstall ? "Wsl_NotInstalledMessage" : "Wsl_NoDistributionMessage");
         StatusText.Text = App.Text(needsInstall ? "Wsl_StatusNotInstalled" : needsDistribution ? "Wsl_StatusNoDistribution" : "Wsl_StatusReady");
+        UpdateButton.IsEnabled = status.IsInstalled && !_busy;
+        ShutdownButton.IsEnabled = status.IsInstalled && !_busy;
     }
 
     private void DistributionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -60,30 +72,14 @@ public sealed partial class WslDashboardPage : Page
         var distro = DistributionList.SelectedItem as WslDistributionModel;
         SelectedText.Text = distro is null ? App.Text("Wsl_Select") : string.Format(App.Text("Wsl_SelectedFormat"), distro.Name, distro.State, distro.Version);
         var enabled = distro is not null && _wslInstalled && !_busy;
-        StartButton.IsEnabled = enabled; StopButton.IsEnabled = enabled; TerminateButton.IsEnabled = enabled; DefaultButton.IsEnabled = enabled; UnregisterButton.IsEnabled = enabled; TerminalButton.IsEnabled = enabled; ExplorerButton.IsEnabled = enabled; VsCodeButton.IsEnabled = enabled; DiskUsageButton.IsEnabled = enabled;
+        StartButton.IsEnabled = enabled; StopButton.IsEnabled = enabled; DefaultButton.IsEnabled = enabled; UnregisterButton.IsEnabled = enabled; TerminalButton.IsEnabled = enabled; ExplorerButton.IsEnabled = enabled; VsCodeButton.IsEnabled = enabled; DiskUsageButton.IsEnabled = enabled; AutostartCheckBox.IsEnabled = enabled;
     }
 
     private async void InstallButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            await WslService.InstallAsync();
-            StatusText.Text = App.Text("Wsl_InstallStarted");
-            AuditLogService.Record("InstallWsl", "wsl.exe --install");
-        }
-        catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record("InstallWsl", ex.Message, false); }
-    }
+        => await RunInstallAsync("InstallWsl", WslService.InstallAsync, "wsl.exe --install");
 
     private async void InstallDistributionButton_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            await WslService.InstallDistributionAsync();
-            StatusText.Text = App.Text("Wsl_InstallStarted");
-            AuditLogService.Record("InstallWslDistribution", "Ubuntu");
-        }
-        catch (Exception ex) { ShowError(ex.Message); AuditLogService.Record("InstallWslDistribution", ex.Message, false); }
-    }
+        => await RunInstallAsync("InstallWslDistribution", WslService.InstallDistributionAsync, "Ubuntu");
 
     private void HelpButton_Click(object sender, RoutedEventArgs e)
     {
@@ -97,9 +93,22 @@ public sealed partial class WslDashboardPage : Page
 
     private async void StartButton_Click(object sender, RoutedEventArgs e) => await RunActionAsync("WslStart", WslService.StartAsync, App.Text("Wsl_Started"));
     private async void StopButton_Click(object sender, RoutedEventArgs e) => await RunActionAsync("WslStop", WslService.StopAsync, App.Text("Wsl_Stopped"));
-    private async void TerminateButton_Click(object sender, RoutedEventArgs e) => await RunActionAsync("WslTerminate", WslService.TerminateAsync, App.Text("Wsl_Terminated"));
     private async void DefaultButton_Click(object sender, RoutedEventArgs e) => await RunActionAsync("WslSetDefault", WslService.SetDefaultAsync, App.Text("Wsl_DefaultSet"));
-    private async void UnregisterButton_Click(object sender, RoutedEventArgs e) => await RunActionAsync("WslUnregister", WslService.UnregisterAsync, App.Text("Wsl_Unregistered"));
+    private async void UnregisterButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TrySelected(out var name)) return;
+        var dialog = new ContentDialog
+        {
+            XamlRoot = XamlRoot,
+            Title = App.Text("Wsl_UnregisterConfirmTitle"),
+            Content = string.Format(App.Text("Wsl_UnregisterConfirmMessage"), name),
+            PrimaryButtonText = App.Text("Wsl_Unregister"),
+            CloseButtonText = App.Text("Common_Cancel"),
+            DefaultButton = ContentDialogButton.Close
+        };
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            await RunActionAsync("WslUnregister", WslService.UnregisterAsync, App.Text("Wsl_Unregistered"));
+    }
     private void TerminalButton_Click(object sender, RoutedEventArgs e)
     {
         if (DistributionList.SelectedItem is not WslDistributionModel distro) return;
@@ -156,6 +165,18 @@ public sealed partial class WslDashboardPage : Page
 
     private void ShutdownOnExitCheckBox_Click(object sender, RoutedEventArgs e) => WslService.ShutdownOnExit = ShutdownOnExitCheckBox.IsChecked == true;
 
+    private async void UpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        await RunShellActionAsync("UpdateWsl", WslService.UpdateAsync);
+        await LoadVersionAsync(_wslInstalled);
+    }
+
+    private async void ShutdownButton_Click(object sender, RoutedEventArgs e)
+    {
+        await RunShellActionAsync("ShutdownWsl", WslService.ShutdownAllAsync);
+        await RefreshAsync();
+    }
+
     private async void ScheduleButton_Click(object sender, RoutedEventArgs e)
     {
         if (!TrySelected(out var name) || string.IsNullOrWhiteSpace(TaskNameBox.Text) || string.IsNullOrWhiteSpace(TaskCommandBox.Text) || string.IsNullOrWhiteSpace(TaskStartTimeBox.Text)) return;
@@ -206,6 +227,37 @@ public sealed partial class WslDashboardPage : Page
         finally { SetBusy(false); }
     }
 
+    private async Task RunInstallAsync(string action, Func<Task> operation, string auditDetails)
+    {
+        SetBusy(true);
+        ShowNotice(InfoBarSeverity.Informational, App.Text("Wsl_InstallingTitle"), App.Text("Wsl_InstallStarted"));
+        try
+        {
+            await operation();
+            AuditLogService.Record(action, auditDetails);
+            await RefreshAsync();
+            ShowNotice(InfoBarSeverity.Success, App.Text("Wsl_InstallCompleteTitle"), App.Text("Wsl_InstallComplete"));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex.Message);
+            AuditLogService.Record(action, ex.Message, false);
+        }
+        finally { SetBusy(false); }
+    }
+
+    private async Task LoadVersionAsync(bool installed)
+    {
+        if (!installed)
+        {
+            VersionText.Text = App.Text("Wsl_VersionUnavailable");
+            return;
+        }
+
+        try { VersionText.Text = await WslService.GetVersionInfoAsync(); }
+        catch { VersionText.Text = App.Text("Wsl_VersionUnavailable"); }
+    }
+
     private async Task RunActionAsync(string action, Func<string, Task> operation, string success)
     {
         if (DistributionList.SelectedItem is not WslDistributionModel distro) return;
@@ -215,6 +267,56 @@ public sealed partial class WslDashboardPage : Page
         finally { SetBusy(false); }
     }
 
-    private void SetBusy(bool busy) { _busy = busy; LoadingRing.IsActive = busy; RefreshButton.IsEnabled = !busy; DistributionList.IsEnabled = !busy; DistributionList_SelectionChanged(DistributionList, null!); }
-    private void ShowError(string message) { ErrorBar.Title = App.Text("Wsl_Error"); ErrorBar.Message = message; ErrorBar.IsOpen = true; }
+    private void SetBusy(bool busy)
+    {
+        _busy = busy;
+        LoadingRing.IsActive = busy;
+        RefreshButton.IsEnabled = !busy;
+        DistributionList.IsEnabled = !busy;
+        InstallButton.IsEnabled = !busy;
+        InstallDistributionButton.IsEnabled = !busy;
+        UpdateButton.IsEnabled = _wslInstalled && !busy;
+        ShutdownButton.IsEnabled = _wslInstalled && !busy;
+        DistributionList_SelectionChanged(DistributionList, null!);
+    }
+
+    private void UpdateResponsiveLayout(double width)
+    {
+        var compact = width < 760;
+        RootGrid.Padding = compact ? new Thickness(18, 20, 18, 24) : new Thickness(28, 24, 28, 28);
+        DistributionColumn.Width = compact ? new GridLength(1, GridUnitType.Star) : new GridLength(280);
+        DetailsColumn.Width = compact ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+        DistributionRow.Height = compact ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
+        DetailsRow.Height = compact ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+        Grid.SetColumn(DistributionCard, 0);
+        Grid.SetColumnSpan(DistributionCard, compact ? 2 : 1);
+        Grid.SetRow(DetailsCard, compact ? 1 : 0);
+        Grid.SetColumn(DetailsCard, compact ? 0 : 1);
+        Grid.SetColumnSpan(DetailsCard, compact ? 2 : 1);
+        DistributionList.MaxHeight = compact ? 150 : double.PositiveInfinity;
+
+        SetupActionColumn.Width = compact ? new GridLength(0) : GridLength.Auto;
+        SetupActionRow.Height = compact ? GridLength.Auto : new GridLength(0);
+        Grid.SetRow(SetupButtons, compact ? 1 : 0);
+        Grid.SetColumn(SetupButtons, compact ? 0 : 1);
+
+        ActionColumnThree.Width = compact ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+        ActionColumnFour.Width = compact ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+        var actionButtons = new[] { StartButton, StopButton, DefaultButton, TerminalButton, ExplorerButton, VsCodeButton, DiskUsageButton, UnregisterButton };
+        for (var index = 0; index < actionButtons.Length; index++)
+        {
+            Grid.SetRow(actionButtons[index], compact ? index / 2 : index / 4);
+            Grid.SetColumn(actionButtons[index], compact ? index % 2 : index % 4);
+        }
+    }
+
+    private void ShowNotice(InfoBarSeverity severity, string title, string message)
+    {
+        OperationBar.Severity = severity;
+        OperationBar.Title = title;
+        OperationBar.Message = message;
+        OperationBar.IsOpen = true;
+    }
+
+    private void ShowError(string message) => ShowNotice(InfoBarSeverity.Error, App.Text("Wsl_Error"), message);
 }

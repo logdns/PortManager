@@ -187,11 +187,37 @@
     <x:String x:Key="Wsl_Install">Install WSL</x:String>
     <x:String x:Key="Wsl_InstallDistribution">Install Ubuntu</x:String>
     <x:String x:Key="Wsl_OpenInstallHelp">Installation help</x:String>
-    <x:String x:Key="Wsl_InstallStarted">The WSL installer was started. Finish the steps in the elevated window, then refresh this page.</x:String>
+    <x:String x:Key="Wsl_InstallStarted">Waiting for the WSL installer to finish. Approve the administrator prompt and keep the installer window open.</x:String>
     <x:String x:Key="Wsl_StatusReady">WSL is ready.</x:String>
     <x:String x:Key="Wsl_StatusNotInstalled">WSL is not installed.</x:String>
     <x:String x:Key="Wsl_StatusNoDistribution">WSL is installed; no distribution is registered.</x:String>
     <x:String x:Key="Wsl_InstanceControl">Instance control</x:String><x:String x:Key="Wsl_Terminate">Terminate</x:String><x:String x:Key="Wsl_Unregister">Unregister</x:String><x:String x:Key="Wsl_OpenExplorer">Open Explorer</x:String><x:String x:Key="Wsl_OpenVsCode">Open VS Code</x:String><x:String x:Key="Wsl_DiskUsage">Disk usage</x:String><x:String x:Key="Wsl_Autostart">Start this distribution at logon</x:String><x:String x:Key="Wsl_AutostartHelp">Creates a Windows Task Scheduler logon task.</x:String><x:String x:Key="Wsl_ShutdownOnExit">Terminate distributions when the app exits</x:String><x:String x:Key="Wsl_ShutdownOnExitHelp">The setting is reserved for the global exit policy.</x:String><x:String x:Key="Wsl_Backup">Backup, restore, and move</x:String><x:String x:Key="Wsl_BackupHelp">Export or import TAR archives and move a distribution to another drive.</x:String><x:String x:Key="Wsl_Export">Export TAR</x:String><x:String x:Key="Wsl_Import">Import TAR</x:String><x:String x:Key="Wsl_Move">Move</x:String><x:String x:Key="Wsl_DiskMount">VHDX disk mount</x:String><x:String x:Key="Wsl_DiskMountHelp">Mount or unmount a VHDX file using the native WSL command.</x:String><x:String x:Key="Wsl_Mount">Mount</x:String><x:String x:Key="Wsl_Unmount">Unmount</x:String><x:String x:Key="Wsl_TaskScheduler">Task scheduler</x:String><x:String x:Key="Wsl_TaskHelp">Schedule a shell command in the selected distribution with Windows Task Scheduler.</x:String><x:String x:Key="Wsl_Schedule">Schedule</x:String><x:String x:Key="Wsl_RemoveSchedule">Remove task</x:String><x:String x:Key="Wsl_Network">Networking</x:String><x:String x:Key="Wsl_NetworkHelp">Configure WinHTTP proxy and IPv4 port forwarding.</x:String><x:String x:Key="Wsl_SetProxy">Set proxy</x:String><x:String x:Key="Wsl_AddPortForward">Add forwarding</x:String><x:String x:Key="Wsl_RemovePortForward">Remove forwarding</x:String><x:String x:Key="Wsl_Usb">USB devices</x:String><x:String x:Key="Wsl_UsbHelp">Requires usbipd-win. Bind, attach, and detach USB devices for WSL.</x:String><x:String x:Key="Wsl_UsbRefresh">Refresh devices</x:String><x:String x:Key="Wsl_UsbBind">Bind</x:String><x:String x:Key="Wsl_UsbAttach">Attach</x:String><x:String x:Key="Wsl_UsbDetach">Detach</x:String><x:String x:Key="Wsl_ActionComplete">Action completed.</x:String><x:String x:Key="Wsl_Terminated">Distribution terminated.</x:String><x:String x:Key="Wsl_Unregistered">Distribution unregistered.</x:String>
+
+    <x:String x:Key="Wsl_TabOverview">Overview</x:String>
+    <x:String x:Key="Wsl_TabSettings">Settings</x:String>
+    <x:String x:Key="Wsl_TabStorage">Storage</x:String>
+    <x:String x:Key="Wsl_TabNetwork">Network &amp; USB</x:String>
+    <x:String x:Key="Wsl_Settings">WSL settings and maintenance</x:String>
+    <x:String x:Key="Wsl_InstallingTitle">Installing WSL</x:String>
+    <x:String x:Key="Wsl_InstallCompleteTitle">Installation command completed</x:String>
+    <x:String x:Key="Wsl_InstallComplete">The installer reported success. If WSL still appears unavailable, restart Windows and refresh this page.</x:String>
+    <x:String x:Key="Wsl_VersionUnavailable">Version information is unavailable. This WSL version may not support the version command.</x:String>
+    <x:String x:Key="Wsl_Update">Update WSL</x:String>
+    <x:String x:Key="Wsl_ShutdownAll">Shut down all distributions</x:String>
+    <x:String x:Key="Wsl_UnregisterConfirmTitle">Unregister this distribution?</x:String>
+    <x:String x:Key="Wsl_UnregisterConfirmMessage">Unregistering “{0}” permanently deletes all of its data, settings, and software. This cannot be undone.</x:String>
+    <x:String x:Key="Wsl_TaskName">Task name</x:String>
+    <x:String x:Key="Wsl_TaskNamePlaceholder">For example: Daily WSL backup</x:String>
+    <x:String x:Key="Wsl_TaskCommand">Shell command</x:String>
+    <x:String x:Key="Wsl_TaskTime">Start time</x:String>
+    <x:String x:Key="Wsl_TaskFrequency">Frequency</x:String>
+    <x:String x:Key="Wsl_ArchivePath">TAR archive path</x:String>
+    <x:String x:Key="Wsl_InstallPath">Install or move directory</x:String>
+    <x:String x:Key="Wsl_DiskPath">VHDX file path</x:String>
+    <x:String x:Key="Wsl_Proxy">WinHTTP proxy</x:String>
+    <x:String x:Key="Wsl_ListenPort">Listen port</x:String>
+    <x:String x:Key="Wsl_ConnectAddress">Destination address</x:String>
+    <x:String x:Key="Wsl_ConnectPort">Destination port</x:String>
 
     <x:String x:Key="More_Title">More features</x:String>
     <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>
@@ -248,7 +274,7 @@
     <x:String x:Key="About_Description">Native Windows network, firewall, and WSL management utility</x:String>
     <x:String x:Key="About_CopyrightPrefix">Fengge Network -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">Version 1.6.0</x:String>
+    <x:String x:Key="About_Version">Version 1.6.1</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Manage Windows network settings, firewall rules, SMB sharing, and WSL distributions from one native WinUI application.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>

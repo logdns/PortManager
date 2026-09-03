@@ -187,11 +187,37 @@
     <x:String x:Key="Wsl_Install">安装 WSL</x:String>
     <x:String x:Key="Wsl_InstallDistribution">安装 Ubuntu</x:String>
     <x:String x:Key="Wsl_OpenInstallHelp">安装帮助</x:String>
-    <x:String x:Key="Wsl_InstallStarted">已启动 WSL 安装程序。请在提升权限窗口中完成步骤，然后刷新本页面。</x:String>
+    <x:String x:Key="Wsl_InstallStarted">正在等待 WSL 安装程序完成。请确认管理员权限请求，并保留安装窗口。</x:String>
     <x:String x:Key="Wsl_StatusReady">WSL 已就绪。</x:String>
     <x:String x:Key="Wsl_StatusNotInstalled">尚未安装 WSL。</x:String>
     <x:String x:Key="Wsl_StatusNoDistribution">WSL 已安装，但尚未注册发行版。</x:String>
     <x:String x:Key="Wsl_InstanceControl">实例控制</x:String><x:String x:Key="Wsl_Terminate">终止</x:String><x:String x:Key="Wsl_Unregister">注销</x:String><x:String x:Key="Wsl_OpenExplorer">打开资源管理器</x:String><x:String x:Key="Wsl_OpenVsCode">打开 VS Code</x:String><x:String x:Key="Wsl_DiskUsage">磁盘使用</x:String><x:String x:Key="Wsl_Autostart">登录时启动此发行版</x:String><x:String x:Key="Wsl_AutostartHelp">创建 Windows 任务计划程序登录任务。</x:String><x:String x:Key="Wsl_ShutdownOnExit">退出应用时终止发行版</x:String><x:String x:Key="Wsl_ShutdownOnExitHelp">此设置预留给全局退出策略。</x:String><x:String x:Key="Wsl_Backup">备份、恢复和迁移</x:String><x:String x:Key="Wsl_BackupHelp">导出或导入 TAR 存档，并将发行版迁移到其他磁盘。</x:String><x:String x:Key="Wsl_Export">导出 TAR</x:String><x:String x:Key="Wsl_Import">导入 TAR</x:String><x:String x:Key="Wsl_Move">迁移</x:String><x:String x:Key="Wsl_DiskMount">VHDX 磁盘挂载</x:String><x:String x:Key="Wsl_DiskMountHelp">使用原生 WSL 命令挂载或卸载 VHDX 文件。</x:String><x:String x:Key="Wsl_Mount">挂载</x:String><x:String x:Key="Wsl_Unmount">卸载</x:String><x:String x:Key="Wsl_TaskScheduler">任务计划</x:String><x:String x:Key="Wsl_TaskHelp">使用 Windows 任务计划程序在所选发行版中定时执行 Shell 命令。</x:String><x:String x:Key="Wsl_Schedule">计划任务</x:String><x:String x:Key="Wsl_RemoveSchedule">删除任务</x:String><x:String x:Key="Wsl_Network">网络管理</x:String><x:String x:Key="Wsl_NetworkHelp">配置 WinHTTP 代理和 IPv4 端口转发。</x:String><x:String x:Key="Wsl_SetProxy">设置代理</x:String><x:String x:Key="Wsl_AddPortForward">添加转发</x:String><x:String x:Key="Wsl_RemovePortForward">删除转发</x:String><x:String x:Key="Wsl_Usb">USB 设备</x:String><x:String x:Key="Wsl_UsbHelp">需要安装 usbipd-win，可绑定、附加和分离 WSL USB 设备。</x:String><x:String x:Key="Wsl_UsbRefresh">刷新设备</x:String><x:String x:Key="Wsl_UsbBind">绑定</x:String><x:String x:Key="Wsl_UsbAttach">附加</x:String><x:String x:Key="Wsl_UsbDetach">分离</x:String><x:String x:Key="Wsl_ActionComplete">操作已完成。</x:String><x:String x:Key="Wsl_Terminated">发行版已终止。</x:String><x:String x:Key="Wsl_Unregistered">发行版已注销。</x:String>
+
+    <x:String x:Key="Wsl_TabOverview">常用</x:String>
+    <x:String x:Key="Wsl_TabSettings">设置</x:String>
+    <x:String x:Key="Wsl_TabStorage">存储</x:String>
+    <x:String x:Key="Wsl_TabNetwork">网络与 USB</x:String>
+    <x:String x:Key="Wsl_Settings">WSL 设置与维护</x:String>
+    <x:String x:Key="Wsl_InstallingTitle">正在安装 WSL</x:String>
+    <x:String x:Key="Wsl_InstallCompleteTitle">安装命令已完成</x:String>
+    <x:String x:Key="Wsl_InstallComplete">已收到安装程序的成功结果。若页面仍显示未安装，请重启 Windows 后再刷新。</x:String>
+    <x:String x:Key="Wsl_VersionUnavailable">当前 WSL 版本不支持版本查询，或尚未安装商店版 WSL。</x:String>
+    <x:String x:Key="Wsl_Update">更新 WSL</x:String>
+    <x:String x:Key="Wsl_ShutdownAll">关闭全部发行版</x:String>
+    <x:String x:Key="Wsl_UnregisterConfirmTitle">注销此发行版？</x:String>
+    <x:String x:Key="Wsl_UnregisterConfirmMessage">注销“{0}”将永久删除其全部数据、设置和软件。此操作无法撤销。</x:String>
+    <x:String x:Key="Wsl_TaskName">任务名称</x:String>
+    <x:String x:Key="Wsl_TaskNamePlaceholder">例如：WSL 每日备份</x:String>
+    <x:String x:Key="Wsl_TaskCommand">Shell 命令</x:String>
+    <x:String x:Key="Wsl_TaskTime">开始时间</x:String>
+    <x:String x:Key="Wsl_TaskFrequency">执行频率</x:String>
+    <x:String x:Key="Wsl_ArchivePath">TAR 存档路径</x:String>
+    <x:String x:Key="Wsl_InstallPath">安装或迁移目录</x:String>
+    <x:String x:Key="Wsl_DiskPath">VHDX 文件路径</x:String>
+    <x:String x:Key="Wsl_Proxy">WinHTTP 代理</x:String>
+    <x:String x:Key="Wsl_ListenPort">监听端口</x:String>
+    <x:String x:Key="Wsl_ConnectAddress">目标地址</x:String>
+    <x:String x:Key="Wsl_ConnectPort">目标端口</x:String>
 
     <x:String x:Key="More_Title">更多功能</x:String>
     <x:String x:Key="More_Subtitle">后续模块采用独立页面接入，不影响现有端口管理功能</x:String>
@@ -248,7 +274,7 @@
     <x:String x:Key="About_Description">Windows 原生网络、防火墙与 WSL 管理工具</x:String>
     <x:String x:Key="About_CopyrightPrefix">沨哥网络 -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">版本 1.6.0</x:String>
+    <x:String x:Key="About_Version">版本 1.6.1</x:String>
     <x:String x:Key="About_Features">功能</x:String>
     <x:String x:Key="About_FeatureText">在一个原生 WinUI 应用中管理网络配置、防火墙规则、SMB 共享和 WSL 发行版。</x:String>
     <x:String x:Key="About_Frameworks">技术框架</x:String>
