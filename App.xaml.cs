@@ -85,7 +85,7 @@ public partial class App : Application
     }
 
     private static string LogPath
-        => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PortManager", "startup.log");
+        => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Win-XinAi-De-Tools", "startup.log");
 
     internal static void LogStartup(string message)
     {
@@ -116,7 +116,7 @@ public partial class App : Application
 
         try
         {
-            MessageBoxW(IntPtr.Zero, details, "win-xinai-de-tools", 0x10 | 0x1000);
+            MessageBoxW(IntPtr.Zero, details, "Win-XinAi-De-Tools", 0x10 | 0x1000);
         }
         catch
         {

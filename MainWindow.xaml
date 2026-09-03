@@ -59,6 +59,16 @@
                     <FontIcon Glyph="&#xE968;"/>
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem x:Name="SmbItem" Tag="SmbSettings">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE8A1;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem x:Name="WslItem" Tag="WslDashboard">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE756;"/>
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItemSeparator/>
             <NavigationViewItem x:Name="MoreItem" Tag="ComingSoon">
                 <NavigationViewItem.Icon>

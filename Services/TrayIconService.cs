@@ -125,7 +125,7 @@ internal static class TrayIconService
         Flags = NifMessage | NifIcon | NifTip,
         CallbackMessage = WmTrayIcon,
         Icon = _icon,
-        Tip = "win-xinai-de-tools",
+        Tip = "Win-XinAi-De-Tools",
         Info = string.Empty,
         InfoTitle = string.Empty
     };
@@ -170,7 +170,7 @@ internal static class TrayIconService
         if (menu == IntPtr.Zero) return;
         try
         {
-            AppendMenu(menu, MenuString, MenuOpen, LanguageState.IsEnglish ? "Open win-xinai-de-tools" : "打开 win-xinai-de-tools");
+            AppendMenu(menu, MenuString, MenuOpen, LanguageState.IsEnglish ? "Open Win-XinAi-De-Tools" : "打开 Win-XinAi-De-Tools");
             AppendMenu(menu, MenuString, MenuExit, LanguageState.IsEnglish ? "Exit" : "退出程序");
             SetForegroundWindow(window);
             GetCursorPos(out var point);

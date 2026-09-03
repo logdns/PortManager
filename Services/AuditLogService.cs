@@ -15,7 +15,7 @@ public static class AuditLogService
 
     public static string LogPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "PortManager", "audit.log");
+        "Win-XinAi-De-Tools", "audit.log");
 
     public static void Record(string action, string details, bool success = true)
     {

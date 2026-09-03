@@ -1,4 +1,4 @@
-name: Build win-xinai-de-tools
+name: Build Win-XinAi-De-Tools
 
 on:
   push:
@@ -18,12 +18,12 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Run unit tests
-        run: dotnet test PortManager.Tests/PortManager.Tests.csproj --configuration Release
+        run: dotnet test Win-XinAi-De-Tools.Tests/Win-XinAi-De-Tools.Tests.csproj --configuration Release
       - name: Run Windows Firewall integration test
         shell: pwsh
         env:
           PORTMANAGER_RUN_INTEGRATION: "1"
-        run: dotnet test PortManager.Tests/PortManager.Tests.csproj --configuration Release --no-build --filter "Category=WindowsIntegration"
+        run: dotnet test Win-XinAi-De-Tools.Tests/Win-XinAi-De-Tools.Tests.csproj --configuration Release --no-build --filter "Category=WindowsIntegration"
 
   build:
     needs: test
@@ -47,9 +47,9 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Restore
-        run: dotnet restore PortManager.csproj --runtime ${{ matrix.rid }} -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None
+        run: dotnet restore Win-XinAi-De-Tools.csproj --runtime ${{ matrix.rid }} -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None
       - name: Build
-        run: dotnet build PortManager.csproj --configuration Release --no-restore -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None
+        run: dotnet build Win-XinAi-De-Tools.csproj --configuration Release --no-restore -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None
       - name: Dump XAML compiler diagnostics
         if: failure()
         shell: pwsh
@@ -57,7 +57,7 @@ jobs:
           Get-ChildItem -Path obj -Recurse -Filter output.json -ErrorAction SilentlyContinue |
             ForEach-Object { Get-Content $_.FullName -Raw }
       - name: Publish portable app
-        run: dotnet publish PortManager.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
+        run: dotnet publish Win-XinAi-De-Tools.csproj --configuration Release --no-restore --runtime ${{ matrix.rid }} --self-contained true -p:Platform=${{ matrix.platform }} -p:WindowsPackageType=None -o artifacts/portable/${{ matrix.rid }}
       - name: Keep only Chinese and English resources
         shell: pwsh
         run: |
@@ -79,7 +79,7 @@ jobs:
           $publishDirectory = "artifacts/portable/${{ matrix.rid }}"
           $architecture = '${{ matrix.installer_arch }}'
           $instructions = @"
-          win-xinai-de-tools ${{ github.ref_name }}
+          Win-XinAi-De-Tools ${{ github.ref_name }}
 
           Architecture: $architecture
 
@@ -88,7 +88,7 @@ jobs:
             x86   - 32-bit Windows
             arm64 - Windows on ARM devices
 
-          Run win-xinai-de-tools.exe as administrator. The app requires administrator
+          Run Win-XinAi-De-Tools.exe as administrator. The app requires administrator
           permission to manage Windows Firewall and network settings.
 
           If the program does not open, verify that the package architecture
@@ -99,8 +99,8 @@ jobs:
         if: matrix.rid == 'win-x64'
         shell: pwsh
         run: |
-          $executable = Join-Path $pwd "artifacts/portable/win-x64/win-xinai-de-tools.exe"
-          $logPath = Join-Path $env:LOCALAPPDATA "PortManager/startup.log"
+          $executable = Join-Path $pwd "artifacts/portable/win-x64/Win-XinAi-De-Tools.exe"
+          $logPath = Join-Path $env:LOCALAPPDATA "Win-XinAi-De-Tools/startup.log"
           Remove-Item $logPath -Force -ErrorAction SilentlyContinue
 
           Add-Type @'
@@ -211,12 +211,12 @@ jobs:
           }
       - name: Zip portable app
         shell: pwsh
-        run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/win-xinai-de-tools-${{ matrix.rid }}.zip
+        run: Compress-Archive -Path artifacts/portable/${{ matrix.rid }}/* -DestinationPath artifacts/Win-XinAi-De-Tools-${{ matrix.rid }}.zip
       - name: Upload portable artifact
         uses: actions/upload-artifact@v5
         with:
-          name: win-xinai-de-tools-${{ matrix.rid }}
-          path: artifacts/win-xinai-de-tools-${{ matrix.rid }}.zip
+          name: Win-XinAi-De-Tools-${{ matrix.rid }}
+          path: artifacts/Win-XinAi-De-Tools-${{ matrix.rid }}.zip
 
   installer:
     runs-on: windows-latest
@@ -239,11 +239,11 @@ jobs:
       - name: Download portable build
         uses: actions/download-artifact@v5
         with:
-          name: win-xinai-de-tools-${{ matrix.rid }}
+          name: Win-XinAi-De-Tools-${{ matrix.rid }}
           path: artifacts/download
       - name: Extract portable build
         shell: pwsh
-        run: Expand-Archive artifacts/download/win-xinai-de-tools-${{ matrix.rid }}.zip artifacts/installer-source
+        run: Expand-Archive artifacts/download/Win-XinAi-De-Tools-${{ matrix.rid }}.zip artifacts/installer-source
       - name: Download Simplified Chinese installer language
         shell: pwsh
         run: |
@@ -253,14 +253,14 @@ jobs:
       - name: Build installer
         shell: pwsh
         run: |
-          [xml]$project = Get-Content PortManager.csproj
+          [xml]$project = Get-Content Win-XinAi-De-Tools.csproj
           $version = @($project.Project.PropertyGroup.Version)[0]
           if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid project version: $version" }
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DSourceDir=$pwd\artifacts\installer-source" "/DBuildArch=${{ matrix.installer_arch }}" "/DAppVersion=$version" installer\PortManager.iss
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DSourceDir=$pwd\artifacts\installer-source" "/DBuildArch=${{ matrix.installer_arch }}" "/DAppVersion=$version" installer/Win-XinAi-De-Tools.iss
       - name: Upload installer artifact
         uses: actions/upload-artifact@v5
         with:
-          name: win-xinai-de-tools-Setup-${{ matrix.rid }}
+          name: Win-XinAi-De-Tools-Setup-${{ matrix.rid }}
           path: artifacts/installer/*.exe
 
   release:

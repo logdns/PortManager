@@ -3,13 +3,15 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <x:String x:Key="App_Title">win-xinai-de-tools</x:String>
+    <x:String x:Key="App_Title">Win-XinAi-De-Tools</x:String>
     <x:String x:Key="Nav_Dashboard">Dashboard</x:String>
     <x:String x:Key="Nav_AddPort">Add port</x:String>
     <x:String x:Key="Nav_Rules">Firewall rules</x:String>
     <x:String x:Key="Nav_Delete">Delete rules</x:String>
     <x:String x:Key="Nav_Query">Port query</x:String>
     <x:String x:Key="Nav_Network">Network settings</x:String>
+    <x:String x:Key="Nav_Smb">SMB sharing</x:String>
+    <x:String x:Key="Nav_Wsl">WSL manager</x:String>
     <x:String x:Key="Nav_More">More features</x:String>
     <x:String x:Key="Nav_About">About</x:String>
     <x:String x:Key="Language_Header">Interface language</x:String>
@@ -24,7 +26,7 @@
     <x:String x:Key="Common_Retry">Retry</x:String>
     <x:String x:Key="Common_FirewallError">Windows Firewall is unavailable</x:String>
     <x:String x:Key="Common_FirewallErrorDetail">Confirm that the app is running as administrator and the Windows Defender Firewall service is active.</x:String>
-    <x:String x:Key="Window_CloseTitle">Close win-xinai-de-tools</x:String>
+    <x:String x:Key="Window_CloseTitle">Close Win-XinAi-De-Tools</x:String>
     <x:String x:Key="Window_CloseContent">Choose whether to minimize to the taskbar or exit the application.</x:String>
     <x:String x:Key="Window_Exit">Exit</x:String>
     <x:String x:Key="Window_Minimize">Minimize</x:String>
@@ -125,6 +127,61 @@
     <x:String x:Key="Network_InvalidMetric">Route metric must be a number from 1 to 9999.</x:String>
     <x:String x:Key="Network_Error">Network configuration failed</x:String>
 
+    <x:String x:Key="Common_On">On</x:String>
+    <x:String x:Key="Common_Off">Off</x:String>
+    <x:String x:Key="Smb_Title">SMB settings</x:String>
+    <x:String x:Key="Smb_Subtitle">Manage SMB Direct, SMB 1.0/CIFS, and the share folder</x:String>
+    <x:String x:Key="Smb_HelpTitle">Administrator privileges required</x:String>
+    <x:String x:Key="Smb_HelpMessage">These switches control Windows optional features. The default action does not restart Windows. Enabling force restart reboots the computer immediately; save your work first.</x:String>
+    <x:String x:Key="Smb_Features">SMB features</x:String>
+    <x:String x:Key="Smb_Direct">SMB Direct</x:String>
+    <x:String x:Key="Smb_One">SMB 1.0/CIFS file sharing support</x:String>
+    <x:String x:Key="Smb_DirectHelp">SMB Direct uses RDMA for low-latency, high-throughput SMB transfers when supported by the hardware and driver.</x:String>
+    <x:String x:Key="Smb_OneHelp">SMB 1.0/CIFS is a legacy protocol with security risks. Enable it only for older-device compatibility.</x:String>
+    <x:String x:Key="Smb_ForceRestart">Force a system restart after applying</x:String>
+    <x:String x:Key="Smb_RestartHelp">Windows optional feature changes may require a restart. When checked, a forced restart is issued immediately.</x:String>
+    <x:String x:Key="Smb_Apply">Apply SMB settings</x:String>
+    <x:String x:Key="Smb_Refresh">Refresh status</x:String>
+    <x:String x:Key="Smb_StatusFormat">SMB Direct: {0}; SMB 1.0/CIFS: {1}</x:String>
+    <x:String x:Key="Smb_Applied">SMB settings applied</x:String>
+    <x:String x:Key="Smb_ConfirmTitle">Apply SMB settings?</x:String>
+    <x:String x:Key="Smb_ConfirmMessage">Windows optional features will be changed and network connections may briefly be interrupted. Continue?</x:String>
+    <x:String x:Key="Smb_ConfirmRestartTitle">Apply changes and restart?</x:String>
+    <x:String x:Key="Smb_ConfirmRestartMessage">The computer will force-restart immediately after applying. Unsaved data may be lost. Continue?</x:String>
+    <x:String x:Key="Smb_ShareTitle">Shared folder</x:String>
+    <x:String x:Key="Smb_ShareDescription">Create or update a Windows SMB share named share, granting Everyone change access by default.</x:String>
+    <x:String x:Key="Smb_SharePath">Shared folder path</x:String>
+    <x:String x:Key="Smb_SharePathHelp">Enter an existing local folder. The network address is \\computer-name\share.</x:String>
+    <x:String x:Key="Smb_SetShare">Set share</x:String>
+    <x:String x:Key="Smb_RemoveShare">Remove share</x:String>
+    <x:String x:Key="Smb_ShareActiveFormat">Share active: {0} -> {1}</x:String>
+    <x:String x:Key="Smb_ShareSetFormat">Share configured: {0}</x:String>
+    <x:String x:Key="Smb_ShareMissing">The share has not been created.</x:String>
+    <x:String x:Key="Smb_ShareRemoved">The share was removed.</x:String>
+    <x:String x:Key="Smb_RemoveConfirmTitle">Remove share?</x:String>
+    <x:String x:Key="Smb_RemoveConfirmMessage">This stops SMB access to the folder but does not delete its files. Continue?</x:String>
+    <x:String x:Key="Smb_Error">SMB operation failed</x:String>
+
+    <x:String x:Key="Wsl_Title">WSL manager</x:String>
+    <x:String x:Key="Wsl_Subtitle">Manage Linux distributions with native Windows WSL commands</x:String>
+    <x:String x:Key="Wsl_HelpTitle">WSL Dashboard integration</x:String>
+    <x:String x:Key="Wsl_HelpMessage">This page provides a lightweight native manager without copying third-party code. owu/wsl-dashboard is GPL-3.0; use the link below to obtain the full project separately.</x:String>
+    <x:String x:Key="Wsl_Distributions">Linux distributions</x:String>
+    <x:String x:Key="Wsl_Refresh">Refresh distributions</x:String>
+    <x:String x:Key="Wsl_Empty">No WSL distributions were detected.</x:String>
+    <x:String x:Key="Wsl_Actions">Distribution actions</x:String>
+    <x:String x:Key="Wsl_Select">Select a distribution.</x:String>
+    <x:String x:Key="Wsl_SelectedFormat">{0} · State: {1} · WSL {2}</x:String>
+    <x:String x:Key="Wsl_Start">Start</x:String>
+    <x:String x:Key="Wsl_Stop">Stop</x:String>
+    <x:String x:Key="Wsl_SetDefault">Set default</x:String>
+    <x:String x:Key="Wsl_OpenTerminal">Open terminal</x:String>
+    <x:String x:Key="Wsl_Started">Distribution started.</x:String>
+    <x:String x:Key="Wsl_Stopped">Distribution stopped.</x:String>
+    <x:String x:Key="Wsl_DefaultSet">Default distribution updated.</x:String>
+    <x:String x:Key="Wsl_ExternalLink">Open the owu/wsl-dashboard project</x:String>
+    <x:String x:Key="Wsl_Error">WSL operation failed</x:String>
+
     <x:String x:Key="More_Title">More features</x:String>
     <x:String x:Key="More_Subtitle">Future modules use isolated pages without affecting port management</x:String>
     <x:String x:Key="More_Connection">Connection monitor</x:String>
@@ -167,7 +224,7 @@
     <x:String x:Key="Transfer_Error">Rule transfer failed</x:String>
 
     <x:String x:Key="Audit_Title">Audit log</x:String>
-    <x:String x:Key="Audit_Subtitle">Review operations performed by win-xinai-de-tools</x:String>
+    <x:String x:Key="Audit_Subtitle">Review operations performed by Win-XinAi-De-Tools</x:String>
     <x:String x:Key="Audit_Refresh">Refresh</x:String>
     <x:String x:Key="Audit_Clear">Clear log</x:String>
     <x:String x:Key="Audit_ClearConfirmTitle">Clear audit log?</x:String>
@@ -180,7 +237,7 @@
     <x:String x:Key="About_Description">Native Windows network and firewall utility</x:String>
     <x:String x:Key="About_CopyrightPrefix">Fengge Network -</x:String>
     <x:String x:Key="About_Website">xinai.de</x:String>
-    <x:String x:Key="About_Version">Version 1.3.1</x:String>
+    <x:String x:Key="About_Version">Version 1.4.0</x:String>
     <x:String x:Key="About_Features">Features</x:String>
     <x:String x:Key="About_FeatureText">Add, query, and delete TCP/UDP firewall rules with inbound, outbound, and bidirectional options.</x:String>
     <x:String x:Key="About_Frameworks">Frameworks</x:String>

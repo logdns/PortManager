@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <AssemblyName>Win-XinAi-De-Tools.Tests</AssemblyName>
+    <RootNamespace>WinXinAiDeTools.Tests</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
@@ -20,5 +22,8 @@
     <Compile Include="..\Services\RuleTransferService.cs" Link="Services\RuleTransferService.cs" />
     <Compile Include="..\Models\RuleTransferDocument.cs" Link="Models\RuleTransferDocument.cs" />
     <Compile Include="..\Models\NetworkModels.cs" Link="Models\NetworkModels.cs" />
+    <Compile Include="..\Models\SmbModels.cs" Link="Models\SmbModels.cs" />
+    <Compile Include="..\Models\WslModels.cs" Link="Models\WslModels.cs" />
+    <Compile Include="..\Services\WslService.cs" Link="Services\WslService.cs" />
   </ItemGroup>
 </Project>

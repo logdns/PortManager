@@ -44,7 +44,7 @@ public sealed partial class MainWindow : Window
         _appWindow.Closing += AppWindow_Closing;
         _appWindow.Resize(new SizeInt32(1100, 720));
 
-        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "PortManager.ico");
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "Win-XinAi-De-Tools.ico");
         if (File.Exists(iconPath))
         {
             _appWindow.SetIcon(iconPath);
@@ -151,7 +151,7 @@ public sealed partial class MainWindow : Window
 
     private void NavView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
     {
-        if (_currentTag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings")
+        if (_currentTag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings" or "SmbSettings" or "WslDashboard")
             NavigateTo("ComingSoon");
         else if (_currentTag != "Dashboard")
             NavigateTo("Dashboard");
@@ -183,6 +183,8 @@ public sealed partial class MainWindow : Window
         DeleteItem.Content = App.Text("Nav_Delete");
         QueryItem.Content = App.Text("Nav_Query");
         NetworkItem.Content = App.Text("Nav_Network");
+        SmbItem.Content = App.Text("Nav_Smb");
+        WslItem.Content = App.Text("Nav_Wsl");
         MoreItem.Content = App.Text("Nav_More");
         AboutItem.Content = App.Text("Nav_About");
         LanguageHeader.Text = App.Text("Language_Header");
@@ -200,6 +202,8 @@ public sealed partial class MainWindow : Window
             "DeleteRule" => typeof(DeleteRulePage),
             "PortStatus" => typeof(PortStatusPage),
             "NetworkSettings" => typeof(NetworkSettingsPage),
+            "SmbSettings" => typeof(SmbSettingsPage),
+            "WslDashboard" => typeof(WslDashboardPage),
             "ComingSoon" => typeof(ComingSoonPage),
             "ConnectionMonitor" => typeof(ConnectionMonitorPage),
             "RuleTransfer" => typeof(RuleTransferPage),
@@ -212,10 +216,10 @@ public sealed partial class MainWindow : Window
             return;
 
         _currentTag = tag;
-        NavView.IsBackButtonVisible = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings"
+        NavView.IsBackButtonVisible = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings" or "SmbSettings" or "WslDashboard"
             ? NavigationViewBackButtonVisible.Visible
             : NavigationViewBackButtonVisible.Collapsed;
-        NavView.IsBackEnabled = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings";
+        NavView.IsBackEnabled = tag is "ConnectionMonitor" or "RuleTransfer" or "AuditLog" or "NetworkSettings" or "SmbSettings" or "WslDashboard";
         if ((force || ContentFrame.CurrentSourcePageType != pageType) && ContentFrame.Navigate(pageType))
             App.LogStartup($"Navigation completed: {pageType.Name}.");
     }
