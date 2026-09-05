@@ -21,6 +21,14 @@ Win-XinAi-De-Tools 是一款原生 Windows 工具，用于管理网络配置、W
 - 终止或注销发行版、查看磁盘使用、在资源管理器或 VS Code 中打开、导入或导出 TAR、挂载 VHDX、迁移发行版、安排命令、配置 HTTP 代理或 IPv4 端口转发，以及管理 usbipd-win 设备。
 - 支持 `/silent` 参数、登录自启、启动时最小化到通知区域，以及退出应用时可选关闭 WSL。
 
+## 界面预览
+
+以下预览图依据当前 WinUI 布局渲染，展示主要使用流程：
+
+![概览页预览](docs/screenshots/dashboard.png)
+
+![WSL 管理页预览](docs/screenshots/wsl-manager.png)
+
 ## WSL 集成
 
 WSL 页面是本仓库实现的原生 WinUI 管理界面。未安装 WSL 时，界面会提供提升权限的 `wsl.exe --install` 操作，等待安装结束、报告退出结果并链接到微软安装指南。发行版面板始终提供 WSL 在线目录和 TAR 导入入口。

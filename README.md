@@ -21,6 +21,14 @@ See [CHANGELOG.md](CHANGELOG.md) for the release history.
 - Terminate or unregister distributions, inspect disk usage, open Explorer or VS Code, import or export TAR archives, mount VHDX files, migrate distributions, schedule commands, configure an HTTP proxy or IPv4 port forwarding, and manage usbipd-win devices.
 - Use `/silent`, start automatically at logon, start minimized to the notification area, and optionally shut down WSL when the application exits.
 
+## Interface previews
+
+The following previews are rendered from the current WinUI layout and show the primary workflows:
+
+![Dashboard preview](docs/screenshots/dashboard.png)
+
+![WSL manager preview](docs/screenshots/wsl-manager.png)
+
 ## WSL integration
 
 The WSL page is a native WinUI management interface implemented in this repository. If WSL is unavailable, it provides an elevated `wsl.exe --install` action, waits for the installer, reports the exit result, and links to Microsoft's installation guide. The distribution panel always provides access to WSL's online catalog and TAR import.
